@@ -101,7 +101,7 @@ const Community = ({ userProgress }) => {
       case 'anxious': return 'text-orange-600 bg-orange-100';
       case 'sad': return 'text-blue-600 bg-blue-100';
       case 'stressed': return 'text-red-600 bg-red-100';
-      default: return 'text-calm-600 bg-calm-100';
+      default: return 'text-blue-900 bg-blue-100';
     }
   };
 
@@ -117,7 +117,7 @@ const Community = ({ userProgress }) => {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-calm-800 mb-4">
+        <h1 className="text-4xl font-bold text-blue-900 mb-4">
           MindMend Community
         </h1>
         <p className="text-blue-900">
@@ -126,7 +126,7 @@ const Community = ({ userProgress }) => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex space-x-1 mb-6 bg-calm-100 p-1 rounded-lg">
+      <div className="flex space-x-1 mb-6 bg-blue-100 p-1 rounded-lg">
         {[
           { id: 'feed', label: 'Community Feed', icon: '📱' },
           { id: 'groups', label: 'Support Groups', icon: '👥' },
@@ -138,7 +138,7 @@ const Community = ({ userProgress }) => {
             className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-md transition-all ${
               activeTab === tab.id
                 ? 'bg-white text-primary-600 shadow-sm'
-                : 'text-calm-600 hover:text-calm-800'
+                : 'text-blue-900 hover:text-blue-800'
             }`}
           >
             <span>{tab.icon}</span>
@@ -152,22 +152,22 @@ const Community = ({ userProgress }) => {
         <div className="space-y-6">
           {/* Create Post */}
           <div className="card">
-            <h3 className="text-lg font-semibold text-calm-800 mb-4">Share with the community</h3>
+            <h3 className="text-lg font-semibold text-blue-900 mb-4">Share with the community</h3>
             <div className="space-y-4">
               <textarea
                 value={newPost}
                 onChange={(e) => setNewPost(e.target.value)}
                 placeholder="Share your wellness journey, insights, or encouragement..."
-                className="w-full p-4 border border-calm-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                className="w-full p-4 border border-blue-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
                 rows="3"
               />
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <label className="flex items-center space-x-2">
                     <input type="checkbox" className="rounded" />
-                    <span className="text-sm text-calm-600">Post anonymously</span>
+                    <span className="text-sm text-blue-900">Post anonymously</span>
                   </label>
-                  <select className="text-sm border border-calm-200 rounded px-2 py-1">
+                  <select className="text-sm border border-blue-200 rounded px-2 py-1">
                     <option>Current mood: Happy</option>
                     <option>Current mood: Anxious</option>
                     <option>Current mood: Sad</option>
@@ -197,26 +197,26 @@ const Community = ({ userProgress }) => {
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <h4 className="font-semibold text-calm-800">{post.user.name}</h4>
+                      <h4 className="font-semibold text-blue-900">{post.user.name}</h4>
                       <span className="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">
                         Level {post.user.level}
                       </span>
                       <span className={`px-2 py-1 text-xs rounded-full ${getMoodColor(post.mood)}`}>
                         {post.mood}
                       </span>
-                      <span className="text-sm text-calm-500">{post.timestamp}</span>
+                      <span className="text-sm text-blue-500">{post.timestamp}</span>
                     </div>
-                    <p className="text-calm-700 mb-4">{post.content}</p>
+                    <p className="text-blue-700 mb-4">{post.content}</p>
                     <div className="flex items-center space-x-6">
-                      <button className="flex items-center space-x-2 text-calm-600 hover:text-primary-600">
+                      <button className="flex items-center space-x-2 text-blue-900 hover:text-primary-600">
                         <span>❤️</span>
                         <span className="text-sm">{post.likes}</span>
                       </button>
-                      <button className="flex items-center space-x-2 text-calm-600 hover:text-primary-600">
+                      <button className="flex items-center space-x-2 text-blue-900 hover:text-primary-600">
                         <span>💬</span>
                         <span className="text-sm">{post.comments}</span>
                       </button>
-                      <button className="flex items-center space-x-2 text-calm-600 hover:text-primary-600">
+                      <button className="flex items-center space-x-2 text-blue-900 hover:text-primary-600">
                         <span>🔗</span>
                         <span className="text-sm">Share</span>
                       </button>
@@ -238,13 +238,13 @@ const Community = ({ userProgress }) => {
                 <div className="flex items-start space-x-4">
                   <div className="text-3xl">{group.icon}</div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-calm-800 mb-2">{group.name}</h3>
-                    <p className="text-sm text-calm-600 mb-3">{group.description}</p>
+                    <h3 className="text-lg font-semibold text-blue-900 mb-2">{group.name}</h3>
+                    <p className="text-sm text-blue-900 mb-3">{group.description}</p>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-calm-500">{group.members.toLocaleString()} members</span>
+                      <span className="text-sm text-blue-500">{group.members.toLocaleString()} members</span>
                       <button className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         group.isJoined
-                          ? 'bg-calm-100 text-calm-700 hover:bg-calm-200'
+                          ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
                           : 'bg-primary-500 text-white hover:bg-primary-600'
                       }`}>
                         {group.isJoined ? 'Joined' : 'Join Group'}
@@ -265,9 +265,9 @@ const Community = ({ userProgress }) => {
             <div key={challenge.id} className="card">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-calm-800 mb-2">{challenge.name}</h3>
-                  <p className="text-calm-600 mb-2">{challenge.description}</p>
-                  <div className="flex items-center space-x-4 text-sm text-calm-500">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-2">{challenge.name}</h3>
+                  <p className="text-blue-900 mb-2">{challenge.description}</p>
+                  <div className="flex items-center space-x-4 text-sm text-blue-500">
                     <span>👥 {challenge.participants.toLocaleString()} participants</span>
                     <span>⏰ {challenge.endDate}</span>
                   </div>
@@ -280,7 +280,7 @@ const Community = ({ userProgress }) => {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-blue-900">Your Progress</span>
-                  <span className="text-calm-800 font-medium">
+                  <span className="text-blue-800 font-medium">
                     {challenge.progress}/{challenge.total} days
                   </span>
                 </div>

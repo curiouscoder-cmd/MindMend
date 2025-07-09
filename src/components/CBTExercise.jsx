@@ -138,10 +138,10 @@ const CBTExercise = ({ mood, onComplete, onBack }) => {
       <div className="max-w-2xl mx-auto text-center">
         <div className="card">
           <div className="text-6xl mb-6">🎉</div>
-          <h2 className="text-3xl font-bold text-calm-800 mb-4">
+          <h2 className="text-3xl font-bold text-blue-900 mb-4">
             Exercise Complete!
           </h2>
-          <p className="text-calm-600 mb-6">
+          <p className="text-blue-900 mb-6">
             Great job completing your {currentExercise.title} exercise. 
             You've earned 10 calm points!
           </p>
@@ -164,16 +164,16 @@ const CBTExercise = ({ mood, onComplete, onBack }) => {
       <div className="text-center mb-8">
         <div className="flex items-center justify-center space-x-3 mb-4">
           <span className="text-4xl">{mood?.emoji}</span>
-          <h1 className="text-3xl font-bold text-calm-800">
+          <h1 className="text-3xl font-bold text-blue-900">
             {currentExercise.title}
           </h1>
         </div>
-        <p className="text-calm-600">{currentExercise.description}</p>
+        <p className="text-blue-900">{currentExercise.description}</p>
       </div>
 
       {/* Progress Bar */}
       <div className="mb-8">
-        <div className="flex justify-between text-sm text-calm-600 mb-2">
+        <div className="flex justify-between text-sm text-blue-900 mb-2">
           <span>Step {currentStep + 1} of {currentExercise.steps.length}</span>
           <span>{Math.round(((currentStep + 1) / currentExercise.steps.length) * 100)}% Complete</span>
         </div>
@@ -187,10 +187,10 @@ const CBTExercise = ({ mood, onComplete, onBack }) => {
 
       {/* Exercise Content */}
       <div className="card">
-        <h2 className="text-2xl font-semibold text-calm-800 mb-4">
+        <h2 className="text-2xl font-semibold text-blue-900 mb-4">
           {currentStepData.title}
         </h2>
-        <p className="text-calm-600 mb-6">
+        <p className="text-blue-900 mb-6">
           {currentStepData.content}
         </p>
 
@@ -327,7 +327,7 @@ const GroundingExercise = ({ instruction, onComplete }) => {
       <div className="bg-calm-50 p-6 rounded-lg mb-6">
         <p className="text-calm-800 mb-4">{instruction}</p>
         <div className="text-6xl mb-4 animate-pulse-gentle">🌱</div>
-        <p className="text-calm-600 text-sm mb-4">
+        <p className="text-blue-900 text-sm mb-4">
           Take your time with this exercise. Focus on each sense mindfully.
         </p>
       </div>

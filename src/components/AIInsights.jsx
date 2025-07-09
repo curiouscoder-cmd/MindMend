@@ -196,7 +196,7 @@ const AIInsights = ({ userProgress, moodHistory }) => {
       <div className="card">
         <div className="flex items-center space-x-2 mb-4">
           <span className="text-2xl">🤖</span>
-          <h3 className="text-xl font-semibold text-calm-800">AI Insights</h3>
+          <h3 className="text-xl font-semibold text-blue-900">AI Insights</h3>
           <span className="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">
             Beta
           </span>
@@ -231,7 +231,7 @@ const AIInsights = ({ userProgress, moodHistory }) => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-calm-600">
+          <div className="text-center py-8 text-blue-900">
             <span className="text-4xl mb-2 block">📊</span>
             <p>Complete more exercises to unlock AI insights!</p>
           </div>
@@ -241,7 +241,7 @@ const AIInsights = ({ userProgress, moodHistory }) => {
       {/* Mood Trends */}
       {moodTrends.direction && (
         <div className="card">
-          <h3 className="text-xl font-semibold text-calm-800 mb-4">Mood Trends</h3>
+          <h3 className="text-xl font-semibold text-blue-900 mb-4">Mood Trends</h3>
           <div className="flex items-center space-x-4 mb-4">
             <div className={`p-3 rounded-full ${
               moodTrends.direction === 'improving' ? 'bg-green-100' :
@@ -253,17 +253,17 @@ const AIInsights = ({ userProgress, moodHistory }) => {
               </span>
             </div>
             <div>
-              <h4 className="font-semibold text-calm-800 capitalize">
+              <h4 className="font-semibold text-blue-900 capitalize">
                 {moodTrends.direction} Trend
               </h4>
-              <p className="text-sm text-calm-600">{moodTrends.recommendation}</p>
+              <p className="text-sm text-blue-900">{moodTrends.recommendation}</p>
             </div>
           </div>
           
-          <div className="bg-calm-50 p-3 rounded-lg">
-            <div className="text-sm text-calm-600 mb-1">Current Mood Score</div>
+          <div className="bg-blue-50 p-3 rounded-lg">
+            <div className="text-sm text-blue-900 mb-1">Current Mood Score</div>
             <div className="flex items-center space-x-2">
-              <div className="flex-1 bg-calm-200 rounded-full h-2">
+              <div className="flex-1 bg-blue-200 rounded-full h-2">
                 <div 
                   className="h-full bg-primary-500 rounded-full"
                   style={{ width: `${(moodTrends.recentScore / 4) * 100}%` }}
@@ -279,7 +279,7 @@ const AIInsights = ({ userProgress, moodHistory }) => {
 
       {/* Personalized Tips */}
       <div className="card">
-        <h3 className="text-xl font-semibold text-calm-800 mb-4">Personalized Tips</h3>
+        <h3 className="text-xl font-semibold text-blue-900 mb-4">Personalized Tips</h3>
         <div className="space-y-3">
           {personalizedTips.map((tip, index) => (
             <div key={index} className="p-4 bg-primary-50 rounded-lg">
@@ -302,7 +302,7 @@ const AIInsights = ({ userProgress, moodHistory }) => {
 
       {/* Quick Actions */}
       <div className="card">
-        <h3 className="text-xl font-semibold text-calm-800 mb-4">Recommended Actions</h3>
+        <h3 className="text-xl font-semibold text-blue-900 mb-4">Recommended Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <button className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg text-left hover:shadow-md transition-all">
             <div className="flex items-center space-x-3">

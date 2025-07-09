@@ -92,7 +92,7 @@ const CrisisMode = ({ onClose, onExerciseComplete }) => {
       case 2: return { text: 'Hold', color: 'text-purple-600', scale: 'scale-110' };
       case 3: return { text: 'Breathe Out', color: 'text-green-600', scale: 'scale-90' };
       case 0: return { text: 'Hold', color: 'text-orange-600', scale: 'scale-90' };
-      default: return { text: 'Ready?', color: 'text-calm-600', scale: 'scale-100' };
+      default: return { text: 'Ready?', color: 'text-blue-900', scale: 'scale-100' };
     }
   };
 
@@ -100,8 +100,8 @@ const CrisisMode = ({ onClose, onExerciseComplete }) => {
     const exercise = crisisExercises[0];
     return (
       <div className="text-center">
-        <h3 className="text-2xl font-bold text-calm-800 mb-4">{exercise.title}</h3>
-        <p className="text-calm-600 mb-6">{exercise.description}</p>
+        <h3 className="text-2xl font-bold text-blue-800 mb-4">{exercise.title}</h3>
+        <p className="text-blue-900 mb-6">{exercise.description}</p>
         
         <div className="space-y-4">
           {exercise.steps.map((step, index) => (
@@ -112,7 +112,7 @@ const CrisisMode = ({ onClose, onExerciseComplete }) => {
                   ? 'border-primary-400 bg-primary-50 shadow-lg'
                   : index < groundingStep
                   ? 'border-green-400 bg-green-50'
-                  : 'border-calm-200 bg-calm-50'
+                  : 'border-blue-200 bg-blue-50'
               }`}
             >
               <div className="flex items-center space-x-3">
@@ -121,12 +121,12 @@ const CrisisMode = ({ onClose, onExerciseComplete }) => {
                     ? 'bg-green-400 text-white'
                     : index === groundingStep
                     ? 'bg-primary-400 text-white animate-pulse'
-                    : 'bg-calm-300 text-calm-600'
+                    : 'bg-blue-300 text-blue-600'
                 }`}>
                   {index < groundingStep ? '✓' : index + 1}
                 </div>
                 <span className={`font-medium ${
-                  index === groundingStep ? 'text-primary-800' : 'text-calm-700'
+                  index === groundingStep ? 'text-primary-800' : 'text-blue-700'
                 }`}>
                   {step}
                 </span>
@@ -165,8 +165,8 @@ const CrisisMode = ({ onClose, onExerciseComplete }) => {
     const phase = getBreathingPhase();
     return (
       <div className="text-center">
-        <h3 className="text-2xl font-bold text-calm-800 mb-4">Emergency Breathing</h3>
-        <p className="text-calm-600 mb-8">Focus on your breath to calm your nervous system</p>
+        <h3 className="text-2xl font-bold text-blue-800 mb-4">Emergency Breathing</h3>
+        <p className="text-blue-900 mb-8">Focus on your breath to calm your nervous system</p>
         
         <div className="mb-8">
           <div className={`w-32 h-32 mx-auto rounded-full bg-gradient-to-r from-blue-400 to-purple-400 flex items-center justify-center transform transition-all duration-1000 ${phase.scale} ${isBreathing ? 'animate-pulse' : ''}`}>
@@ -177,10 +177,10 @@ const CrisisMode = ({ onClose, onExerciseComplete }) => {
         </div>
 
         <div className="mb-6">
-          <p className="text-lg text-calm-700 mb-2">
+          <p className="text-lg text-blue-700 mb-2">
             {isBreathing ? `Cycle ${Math.floor(breathingCount / 4) + 1} of 4` : 'Click to start breathing exercise'}
           </p>
-          <div className="text-sm text-calm-500">
+          <div className="text-sm text-blue-500">
             Breathe in for 4 → Hold for 4 → Breathe out for 4 → Hold for 4
           </div>
         </div>
@@ -212,8 +212,8 @@ const CrisisMode = ({ onClose, onExerciseComplete }) => {
     const exercise = crisisExercises[2];
     return (
       <div className="text-center">
-        <h3 className="text-2xl font-bold text-calm-800 mb-4">{exercise.title}</h3>
-        <p className="text-calm-600 mb-6">{exercise.description}</p>
+        <h3 className="text-2xl font-bold text-blue-800 mb-4">{exercise.title}</h3>
+        <p className="text-blue-900 mb-6">{exercise.description}</p>
         
         <div className="space-y-4 mb-8">
           {exercise.statements.map((statement, index) => (
@@ -248,7 +248,7 @@ const CrisisMode = ({ onClose, onExerciseComplete }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="p-6 border-b border-calm-200 bg-gradient-to-r from-red-50 to-orange-50">
+        <div className="p-6 border-b border-blue-200 bg-gradient-to-r from-red-50 to-orange-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
@@ -261,7 +261,7 @@ const CrisisMode = ({ onClose, onExerciseComplete }) => {
             </div>
             <button
               onClick={onClose}
-              className="text-calm-500 hover:text-calm-700 text-2xl"
+              className="text-blue-500 hover:text-blue-700 text-2xl"
             >
               ×
             </button>
@@ -276,18 +276,18 @@ const CrisisMode = ({ onClose, onExerciseComplete }) => {
         </div>
 
         {/* Emergency Contacts */}
-        <div className="p-6 border-t border-calm-200 bg-calm-50">
-          <h4 className="font-semibold text-calm-800 mb-4">Need immediate help?</h4>
+        <div className="p-6 border-t border-blue-200 bg-blue-50">
+          <h4 className="font-semibold text-blue-800 mb-4">Need immediate help?</h4>
           <div className="space-y-3">
             {emergencyContacts.map((contact, index) => (
               <div key={index} className="flex items-center justify-between p-3 bg-white rounded-lg border">
                 <div>
-                  <h5 className="font-medium text-calm-800">{contact.name}</h5>
-                  <p className="text-sm text-calm-600">{contact.description}</p>
+                  <h5 className="font-medium text-blue-800">{contact.name}</h5>
+                  <p className="text-sm text-blue-600">{contact.description}</p>
                 </div>
                 <div className="text-right">
                   <div className="font-bold text-primary-600">{contact.number}</div>
-                  <div className="text-xs text-calm-500">{contact.type}</div>
+                  <div className="text-xs text-blue-500">{contact.type}</div>
                 </div>
               </div>
             ))}

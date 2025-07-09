@@ -66,7 +66,7 @@ const ProgressTracking = ({ progress, onBack }) => {
         <h1 className="text-4xl font-bold text-calm-800 mb-4">
           Your Progress Journey
         </h1>
-        <p className="text-calm-600">
+        <p className="text-blue-900">
           Track your mental wellness journey and celebrate your achievements
         </p>
       </div>
@@ -78,7 +78,7 @@ const ProgressTracking = ({ progress, onBack }) => {
           <div className="text-2xl font-bold text-primary-600 mb-1">
             {completedExercises}
           </div>
-          <div className="text-calm-600 text-sm">Exercises Completed</div>
+          <div className="text-blue-900 text-sm">Exercises Completed</div>
         </div>
         
         <div className="card text-center">
@@ -86,7 +86,7 @@ const ProgressTracking = ({ progress, onBack }) => {
           <div className="text-2xl font-bold text-primary-600 mb-1">
             {calmPoints}
           </div>
-          <div className="text-calm-600 text-sm">Calm Points</div>
+          <div className="text-blue-900 text-sm">Calm Points</div>
         </div>
         
         <div className="card text-center">
@@ -94,7 +94,7 @@ const ProgressTracking = ({ progress, onBack }) => {
           <div className="text-2xl font-bold text-primary-600 mb-1">
             {streak}
           </div>
-          <div className="text-calm-600 text-sm">Day Streak</div>
+          <div className="text-blue-900 text-sm">Day Streak</div>
         </div>
         
         <div className="card text-center">
@@ -102,7 +102,7 @@ const ProgressTracking = ({ progress, onBack }) => {
           <div className="text-2xl font-bold text-primary-600 mb-1">
             {Math.round(progressPercentage)}%
           </div>
-          <div className="text-calm-600 text-sm">Overall Progress</div>
+          <div className="text-blue-900 text-sm">Overall Progress</div>
         </div>
       </div>
 
@@ -114,7 +114,7 @@ const ProgressTracking = ({ progress, onBack }) => {
           </h2>
           
           <div className="mb-6">
-            <div className="flex justify-between text-sm text-calm-600 mb-2">
+            <div className="flex justify-between text-sm text-blue-900 mb-2">
               <span>Exercises Completed</span>
               <span>{completedExercises} / {totalExercises}</span>
             </div>
@@ -132,7 +132,7 @@ const ProgressTracking = ({ progress, onBack }) => {
                 <div className="text-2xl">🎯</div>
                 <div>
                   <div className="font-medium text-calm-800">Next Goal</div>
-                  <div className="text-sm text-calm-600">
+                  <div className="text-sm text-blue-900">
                     Complete {Math.min(totalExercises, completedExercises + 1)} exercises
                   </div>
                 </div>
@@ -156,7 +156,7 @@ const ProgressTracking = ({ progress, onBack }) => {
           <div className="grid grid-cols-7 gap-2 mb-4">
             {weeklyData.map((day, index) => (
               <div key={index} className="text-center">
-                <div className="text-xs text-calm-600 mb-2">{day.day}</div>
+                <div className="text-xs text-blue-900 mb-2">{day.day}</div>
                 <div 
                   className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-medium ${
                     day.exercises > 0 
@@ -173,7 +173,7 @@ const ProgressTracking = ({ progress, onBack }) => {
             ))}
           </div>
           
-          <div className="text-center text-sm text-calm-600">
+          <div className="text-center text-sm text-blue-900">
             Keep up the great work! Consistency is key to mental wellness.
           </div>
         </div>
@@ -201,17 +201,17 @@ const ProgressTracking = ({ progress, onBack }) => {
                 {achievement.icon}
               </div>
               <h3 className={`font-semibold mb-1 ${
-                achievement.unlocked ? 'text-primary-800' : 'text-calm-600'
+                achievement.unlocked ? 'text-primary-800' : 'text-blue-900'
               }`}>
                 {achievement.title}
               </h3>
               <p className={`text-sm ${
-                achievement.unlocked ? 'text-primary-700' : 'text-calm-500'
+                achievement.unlocked ? 'text-primary-700' : 'text-blue-500'
               }`}>
                 {achievement.description}
               </p>
               {!achievement.unlocked && (
-                <div className="mt-2 text-xs text-calm-500">
+                <div className="mt-2 text-xs text-blue-500">
                   {completedExercises}/{achievement.requirement} exercises
                 </div>
               )}
@@ -234,7 +234,7 @@ const ProgressTracking = ({ progress, onBack }) => {
               : "You're doing amazing!"
             }
           </h3>
-          <p className="text-calm-600 mb-6">
+          <p className="text-blue-900 mb-6">
             {completedExercises === 0 
               ? "Take the first step towards better mental wellness today."
               : "Every exercise brings you closer to better mental wellness. Keep going!"

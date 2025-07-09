@@ -68,7 +68,7 @@ const Onboarding = ({ onMoodSelect }) => {
                   <h3 className="font-semibold text-calm-800 text-lg">
                     {mood.label}
                   </h3>
-                  <p className="text-calm-600 text-sm">
+                  <p className="text-blue-900 text-sm">
                     {mood.description}
                   </p>
                 </div>
@@ -98,7 +98,7 @@ const Onboarding = ({ onMoodSelect }) => {
         <div className="flex flex-col items-center justify-center text-center bg-white rounded-full shadow-sm border border-calm-100 w-56 h-56 mx-auto">
           <div className="text-3xl mb-3">🧠</div>
           <h3 className="font-semibold text-calm-800 mb-2">CBT Exercises</h3>
-          <p className="text-calm-600 text-sm">
+          <p className="text-blue-900 text-sm">
             Evidence-based cognitive behavioral therapy techniques
           </p>
         </div>
@@ -106,7 +106,7 @@ const Onboarding = ({ onMoodSelect }) => {
         <div className="flex flex-col items-center justify-center text-center bg-white rounded-full shadow-sm border border-calm-100 w-56 h-56 mx-auto">
           <div className="text-3xl mb-3">📈</div>
           <h3 className="font-semibold text-calm-800 mb-2">Progress Tracking</h3>
-          <p className="text-calm-600 text-sm">
+          <p className="text-blue-900 text-sm">
             Monitor your mental wellness journey over time
           </p>
         </div>
@@ -114,9 +114,47 @@ const Onboarding = ({ onMoodSelect }) => {
         <div className="flex flex-col items-center justify-center text-center bg-white rounded-full shadow-sm border border-calm-100 w-56 h-56 mx-auto">
           <div className="text-3xl mb-3">✨</div>
           <h3 className="font-semibold text-calm-800 mb-2">Calm Points</h3>
-          <p className="text-calm-600 text-sm">
+          <p className="text-blue-900 text-sm">
             Earn rewards for completing exercises and building habits
           </p>
+        </div>
+      </div>
+
+      {/* Calming Music and Video Feature */}
+      <div className="flex flex-col md:flex-row items-center justify-center mt-12 gap-8">
+        {/* Music Card */}
+        <div className="flex flex-col items-center justify-center text-center bg-gradient-to-br from-blue-100 to-calm-100 rounded-full shadow-lg border border-blue-200 w-56 h-56 mb-4 md:mb-0">
+          <div className="text-5xl mb-3">🎵</div>
+          <h3 className="font-semibold text-blue-900 mb-2">Listen to Calming Music</h3>
+          <audio id="calm-audio" src="/music.mp3" preload="auto"></audio>
+          <button
+            onClick={() => {
+              const audio = document.getElementById('calm-audio');
+              if (audio.paused) {
+                audio.play();
+              } else {
+                audio.pause();
+              }
+            }}
+            className="mt-2 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full font-semibold shadow transition-all duration-200"
+          >
+            Play / Pause
+          </button>
+          <p className="text-blue-900 text-xs mt-2">Gentle background music to help you relax</p>
+        </div>
+      </div>
+      {/* Large Video Card */}
+      <div className="flex flex-col items-center justify-center w-full mt-8">
+        <div className="flex flex-col items-center justify-center text-center bg-gradient-to-br from-green-100 to-calm-100 rounded-3xl shadow-lg border border-green-200 w-full max-w-3xl mx-auto p-6">
+          <div className="text-5xl mb-3">🌱</div>
+          <h3 className="font-semibold text-blue-900 mb-2">Watch Calming Video</h3>
+          <video
+            src="/plant.mp4"
+            controls
+            className="w-full max-w-2xl h-72 rounded-2xl object-cover bg-white shadow mx-auto"
+            style={{ minHeight: '18rem' }}
+          />
+          <p className="text-blue-900 text-xs mt-2">A peaceful plant video to soothe your mind</p>
         </div>
       </div>
     </div>
