@@ -1,7 +1,7 @@
 # MindMend - AI-Powered Mental Wellness Platform
 
 A beautiful, minimalistic mental wellness platform built with React and Tailwind CSS, featuring personalized CBT exercises and progress tracking.
-
+check here : minddmend.netlify.app/
 ## Features
 
 ### 🏠 Personalized Onboarding
