@@ -36,11 +36,19 @@ A beautiful, minimalistic mental wellness platform built with React and Tailwind
 - Clean, minimalistic aesthetic
 - Healthcare-appropriate theme
 
+### 🎵 Listen to Calming Music
+- Enjoy a calming, royalty-free music track directly from the homepage
+- Users can upload their own music file as `public/music.mp3` to personalize the experience
+
+### 🌱 Watch Calming Video
+- Watch a peaceful, relaxing video on the homepage to help soothe your mind
+- Users can upload their own video file as `public/plant.mp4` for a custom experience
+
 ## Technology Stack
 
 - **Frontend**: React 19.1.0
+- **Build Tool**: Vite 6.3.5 (Vite + React for fast development and modern build tooling)
 - **Styling**: Tailwind CSS 3.4.0
-- **Build Tool**: Create React App
 - **Icons**: Emoji-based for universal compatibility
 - **Fonts**: Inter font family for clean readability
 
@@ -128,6 +136,10 @@ CBT exercises can be modified in the `CBTExercise.js` component by updating the 
 
 ### Achievements
 Achievement criteria can be adjusted in the `ProgressTracking.js` component.
+
+### Calming Music & Video
+- To use your own music, upload an MP3 file as `public/music.mp3`
+- To use your own video, upload an MP4 file as `public/plant.mp4`
 
 ## Browser Support
 
