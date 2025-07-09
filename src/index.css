@@ -4,9 +4,10 @@
 
 @layer base {
   body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    min-height: 100vh;
+    background-color: #fff7ed;
+    background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+    background-repeat: repeat;
+    font-family: 'Inter', sans-serif;
   }
 }
 
@@ -49,5 +50,16 @@
   
   .progress-fill {
     @apply h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-500 ease-out;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Caveat', cursive;
+    letter-spacing: 0.5px;
+  }
+  .card-human {
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 1.5rem;
+    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04), 0 1.5px 4px 0 rgba(0,0,0,0.03);
+    border: 2.5px dashed #ffd6e0;
+    padding: 1.5rem;
   }
 }
