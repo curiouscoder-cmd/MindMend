@@ -144,7 +144,7 @@ const MoodAnalytics = ({ moodHistory, userProgress }) => {
         <h1 className="text-4xl font-bold text-calm-800 mb-4">
           Mood Analytics
         </h1>
-        <p className="text-calm-600">
+        <p className="text-blue-900">
           Understand your emotional patterns and track your wellness journey
         </p>
       </div>

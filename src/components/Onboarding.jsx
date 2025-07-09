@@ -39,10 +39,10 @@ const Onboarding = ({ onMoodSelect }) => {
         <h1 className="text-4xl md:text-5xl font-bold text-calm-800 mb-4">
           Welcome to <span className="text-primary-600">MindMend</span>
         </h1>
-        <p className="text-xl text-calm-600 mb-2">
+        <p className="text-xl text-blue-900 mb-2">
           Your AI-powered mental wellness companion
         </p>
-        <p className="text-calm-500 max-w-2xl mx-auto">
+        <p className="text-blue-900 max-w-2xl mx-auto">
           Let's start by understanding how you're feeling today. 
           Select your current emotional state to receive personalized CBT exercises.
         </p>
@@ -95,7 +95,7 @@ const Onboarding = ({ onMoodSelect }) => {
 
       {/* Features Preview */}
       <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="text-center p-6 bg-white rounded-lg shadow-sm border border-calm-100">
+        <div className="flex flex-col items-center justify-center text-center bg-white rounded-full shadow-sm border border-calm-100 w-56 h-56 mx-auto">
           <div className="text-3xl mb-3">🧠</div>
           <h3 className="font-semibold text-calm-800 mb-2">CBT Exercises</h3>
           <p className="text-calm-600 text-sm">
@@ -103,7 +103,7 @@ const Onboarding = ({ onMoodSelect }) => {
           </p>
         </div>
         
-        <div className="text-center p-6 bg-white rounded-lg shadow-sm border border-calm-100">
+        <div className="flex flex-col items-center justify-center text-center bg-white rounded-full shadow-sm border border-calm-100 w-56 h-56 mx-auto">
           <div className="text-3xl mb-3">📈</div>
           <h3 className="font-semibold text-calm-800 mb-2">Progress Tracking</h3>
           <p className="text-calm-600 text-sm">
@@ -111,7 +111,7 @@ const Onboarding = ({ onMoodSelect }) => {
           </p>
         </div>
         
-        <div className="text-center p-6 bg-white rounded-lg shadow-sm border border-calm-100">
+        <div className="flex flex-col items-center justify-center text-center bg-white rounded-full shadow-sm border border-calm-100 w-56 h-56 mx-auto">
           <div className="text-3xl mb-3">✨</div>
           <h3 className="font-semibold text-calm-800 mb-2">Calm Points</h3>
           <p className="text-calm-600 text-sm">

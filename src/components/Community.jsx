@@ -120,7 +120,7 @@ const Community = ({ userProgress }) => {
         <h1 className="text-4xl font-bold text-calm-800 mb-4">
           MindMend Community
         </h1>
-        <p className="text-calm-600">
+        <p className="text-blue-900">
           Connect, share, and grow together on your wellness journey
         </p>
       </div>
@@ -279,7 +279,7 @@ const Community = ({ userProgress }) => {
               
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-calm-600">Your Progress</span>
+                  <span className="text-blue-900">Your Progress</span>
                   <span className="text-calm-800 font-medium">
                     {challenge.progress}/{challenge.total} days
                   </span>

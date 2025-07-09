@@ -140,7 +140,7 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-calm-800">Meet Mira</h1>
-            <p className="text-calm-600">Your AI Wellness Coach</p>
+            <p className="text-blue-900">Your AI Wellness Coach</p>
           </div>
         </div>
         <div className="flex items-center justify-center space-x-2 text-sm text-calm-500">
@@ -241,13 +241,13 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
         <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg">
           <div className="text-2xl mb-2">💭</div>
           <h3 className="font-semibold text-blue-800 mb-1">Empathetic Listening</h3>
-          <p className="text-sm text-blue-600">I'm here to listen without judgment and provide support</p>
+          <p className="text-sm text-blue-900">I'm here to listen without judgment and provide support</p>
         </div>
         
         <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg">
           <div className="text-2xl mb-2">🎯</div>
-          <h3 className="font-semibold text-green-800 mb-1">Personalized Guidance</h3>
-          <p className="text-sm text-green-600">Tailored advice based on your unique situation</p>
+          <h3 className="font-semibold text-blue-800 mb-1">Personalized Guidance</h3>
+          <p className="text-sm text-blue-900">Tailored advice based on your unique situation</p>
         </div>
         
         <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg">

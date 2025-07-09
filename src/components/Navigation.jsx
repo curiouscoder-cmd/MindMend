@@ -30,8 +30,8 @@ const Navigation = ({ currentView, onNavigate, calmPoints, onCrisisMode }) => {
                 onClick={() => onNavigate(item.id)}
                 className={`flex items-center space-x-1 lg:space-x-2 px-2 lg:px-3 py-2 rounded-lg transition-all duration-200 text-sm lg:text-base ${
                   currentView === item.id
-                    ? 'bg-primary-50 text-primary-600 font-medium'
-                    : 'text-calm-600 hover:text-primary-600 hover:bg-calm-50'
+                    ? 'bg-primary-50 text-black font-medium'
+                    : 'text-black hover:text-primary-600 hover:bg-calm-50'
                 }`}
               >
                 <span className="text-base lg:text-lg">{item.icon}</span>
