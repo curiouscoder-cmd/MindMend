@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+  }
+  
+  .btn-secondary {
+    @apply bg-white hover:bg-calm-50 text-calm-700 font-medium py-3 px-6 rounded-lg border border-calm-200 transition-all duration-200 shadow-sm hover:shadow-md;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-lg p-6 border border-calm-100;
+  }
+  
+  .mood-button {
+    @apply w-full p-4 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-md transform hover:-translate-y-1;
+  }
+  
+  .mood-button.happy {
+    @apply border-yellow-200 bg-yellow-50 hover:border-yellow-300 hover:bg-yellow-100;
+  }
+  
+  .mood-button.anxious {
+    @apply border-orange-200 bg-orange-50 hover:border-orange-300 hover:bg-orange-100;
+  }
+  
+  .mood-button.sad {
+    @apply border-blue-200 bg-blue-50 hover:border-blue-300 hover:bg-blue-100;
+  }
+  
+  .mood-button.stressed {
+    @apply border-red-200 bg-red-50 hover:border-red-300 hover:bg-red-100;
+  }
+  
+  .progress-bar {
+    @apply w-full bg-calm-200 rounded-full h-3 overflow-hidden;
+  }
+  
+  .progress-fill {
+    @apply h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-500 ease-out;
+  }
+}
