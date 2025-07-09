@@ -143,7 +143,7 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
             <p className="text-blue-900">Your AI Wellness Coach</p>
           </div>
         </div>
-        <div className="flex items-center justify-center space-x-2 text-sm text-calm-500">
+        <div className="flex items-center justify-center space-x-2 text-sm text-blue-900">
           <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
           <span>Online and ready to help</span>
         </div>
