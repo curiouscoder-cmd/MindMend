@@ -1,9 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+
+// Confetti component for celebration
+const Confetti = () => (
+  <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center animate-fade-in">
+    <div className="absolute inset-0 overflow-hidden">
+      {[...Array(60)].map((_, i) => (
+        <div
+          key={i}
+          className="absolute w-2 h-2 rounded-full"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            background: `hsl(${Math.random() * 360}, 80%, 70%)`,
+            opacity: 0.8,
+            transform: `scale(${0.8 + Math.random() * 0.8}) rotate(${Math.random() * 360}deg)`,
+            animation: `confetti-fall 1.5s ease-out ${Math.random()}s 1`,
+          }}
+        />
+      ))}
+    </div>
+    <style>{`
+      @keyframes confetti-fall {
+        0% { transform: translateY(-100px) scale(1) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(400px) scale(1.2) rotate(360deg); opacity: 0; }
+      }
+    `}</style>
+  </div>
+);
 
 const Gamification = ({ userProgress, onLevelUp }) => {
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [currentLevel, setCurrentLevel] = useState(1);
   const [xpToNextLevel, setXpToNextLevel] = useState(100);
+  const [unlockedBadgeId, setUnlockedBadgeId] = useState(null);
+  const prevBadgesRef = useRef([]);
 
   // Calculate level based on calm points
   useEffect(() => {
@@ -16,6 +46,21 @@ const Gamification = ({ userProgress, onLevelUp }) => {
     }
     setXpToNextLevel(100 - (userProgress.calmPoints % 100));
   }, [userProgress.calmPoints, currentLevel, onLevelUp]);
+
+  // Detect badge unlock
+  useEffect(() => {
+    if (!prevBadgesRef.current.length) {
+      prevBadgesRef.current = badges.map(b => b.unlocked);
+      return;
+    }
+    badges.forEach((badge, idx) => {
+      if (badge.unlocked && !prevBadgesRef.current[idx]) {
+        setUnlockedBadgeId(badge.id);
+        setTimeout(() => setUnlockedBadgeId(null), 2000);
+      }
+    });
+    prevBadgesRef.current = badges.map(b => b.unlocked);
+  });
 
   const badges = [
     {
@@ -99,70 +144,61 @@ const Gamification = ({ userProgress, onLevelUp }) => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Confetti on Level Up or Badge Unlock */}
+      {(showLevelUp || unlockedBadgeId) && <Confetti />}
       {/* Level Up Animation */}
       {showLevelUp && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
-          <div className="bg-white rounded-xl p-8 text-center animate-slide-up">
-            <div className="text-6xl mb-4">🎉</div>
-            <h2 className="text-3xl font-bold text-primary-600 mb-2">Level Up!</h2>
+          <div className="bg-white rounded-xl p-8 text-center animate-slide-up shadow-2xl border-4 border-primary-200">
+            <div className="text-6xl mb-4 animate-bounce">🎉</div>
+            <h2 className="text-3xl font-bold text-primary-600 mb-2 animate-pop">Level Up!</h2>
             <p className="text-calm-600 mb-4">You've reached Level {currentLevel}!</p>
-            <div className="text-4xl font-bold text-primary-500">Level {currentLevel}</div>
+            <div className="text-4xl font-bold text-primary-500 animate-glow">Level {currentLevel}</div>
           </div>
         </div>
       )}
-
       {/* Level Progress */}
-      <div className="card">
+      <div className="card bg-gradient-to-br from-primary-50 to-calm-50 shadow-xl border-0">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-xl font-semibold text-calm-800">Level {currentLevel}</h3>
             <p className="text-calm-600 text-sm">{xpToNextLevel} points to next level</p>
           </div>
-          <div className="text-4xl">
+          <div className="text-4xl animate-pop">
             {currentLevel >= 10 ? '🏆' : currentLevel >= 5 ? '🧘‍♀️' : currentLevel >= 3 ? '🌟' : '🌱'}
           </div>
         </div>
-        
-        <div className="progress-bar mb-2">
-          <div 
-            className="progress-fill"
+        <div className="relative h-4 rounded-full bg-calm-100 overflow-hidden mb-2">
+          <div
+            className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full shadow-inner transition-all duration-700 animate-progress-bar"
             style={{ width: `${((userProgress.calmPoints % 100) / 100) * 100}%` }}
           ></div>
         </div>
-        
         <div className="flex justify-between text-sm text-calm-600">
           <span>{userProgress.calmPoints % 100} XP</span>
           <span>100 XP</span>
         </div>
       </div>
-
       {/* Badges */}
-      <div className="card">
+      <div className="card bg-gradient-to-br from-primary-50 to-calm-50 shadow-xl border-0">
         <h3 className="text-xl font-semibold text-calm-800 mb-4">Achievements</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {badges.map((badge) => (
-            <div 
+            <div
               key={badge.id}
-              className={`p-4 rounded-lg border-2 text-center transition-all duration-200 ${
-                badge.unlocked
-                  ? 'border-primary-200 bg-primary-50 shadow-md'
-                  : 'border-calm-200 bg-calm-50 opacity-60'
-              }`}
+              className={`relative group p-4 rounded-xl border-2 text-center transition-all duration-300 cursor-pointer hover:scale-105 hover:shadow-2xl
+                ${badge.unlocked ? 'border-primary-300 bg-gradient-to-br from-primary-100 to-primary-50 shadow-md animate-badge-pop' : 'border-calm-200 bg-calm-50 opacity-60'}
+                ${unlockedBadgeId === badge.id ? 'animate-badge-glow' : ''}
+              `}
             >
-              <div className={`text-3xl mb-2 ${badge.unlocked ? '' : 'grayscale'}`}>
-                {badge.icon}
+              <div className={`text-4xl mb-2 transition-all duration-300 ${badge.unlocked ? 'animate-badge-pop' : 'grayscale opacity-60'}`}>{badge.icon}</div>
+              <h4 className={`font-semibold text-base mb-1 ${badge.unlocked ? 'text-primary-800' : 'text-calm-600'}`}>{badge.name}</h4>
+              <p className={`text-xs ${badge.unlocked ? 'text-primary-700' : 'text-calm-500'}`}>{badge.description}</p>
+              {/* Tooltip */}
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-max max-w-xs px-3 py-2 rounded-lg bg-black bg-opacity-80 text-white text-xs opacity-0 group-hover:opacity-100 pointer-events-none transition-all z-10">
+                {badge.unlocked ? 'Unlocked!' : `Unlock by: ${badge.description}`}
               </div>
-              <h4 className={`font-semibold text-sm mb-1 ${
-                badge.unlocked ? 'text-primary-800' : 'text-calm-600'
-              }`}>
-                {badge.name}
-              </h4>
-              <p className={`text-xs ${
-                badge.unlocked ? 'text-primary-700' : 'text-calm-500'
-              }`}>
-                {badge.description}
-              </p>
               {!badge.unlocked && (
                 <div className="mt-2 text-xs text-calm-500">
                   Progress: {Math.min(userProgress.completedExercises, badge.requirement)}/{badge.requirement}
@@ -172,13 +208,12 @@ const Gamification = ({ userProgress, onLevelUp }) => {
           ))}
         </div>
       </div>
-
       {/* Active Challenges */}
-      <div className="card">
+      <div className="card bg-gradient-to-br from-calm-50 to-primary-50 shadow-xl border-0">
         <h3 className="text-xl font-semibold text-calm-800 mb-4">Active Challenges</h3>
         <div className="space-y-4">
           {challenges.map((challenge) => (
-            <div key={challenge.id} className="p-4 bg-calm-50 rounded-lg">
+            <div key={challenge.id} className="p-4 bg-calm-50 rounded-xl shadow-md hover:shadow-xl transition-all duration-300">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl">{challenge.icon}</span>
@@ -194,10 +229,9 @@ const Gamification = ({ userProgress, onLevelUp }) => {
                   <div className="text-xs text-calm-500">{challenge.reward}</div>
                 </div>
               </div>
-              
-              <div className="progress-bar">
-                <div 
-                  className="progress-fill"
+              <div className="relative h-3 rounded-full bg-calm-200 overflow-hidden">
+                <div
+                  className="absolute left-0 top-0 h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-700 animate-progress-bar"
                   style={{ width: `${(challenge.progress / challenge.target) * 100}%` }}
                 ></div>
               </div>
@@ -205,9 +239,8 @@ const Gamification = ({ userProgress, onLevelUp }) => {
           ))}
         </div>
       </div>
-
       {/* Leaderboard Preview */}
-      <div className="card">
+      <div className="card bg-gradient-to-br from-primary-50 to-calm-50 shadow-xl border-0">
         <h3 className="text-xl font-semibold text-calm-800 mb-4">Community Leaderboard</h3>
         <div className="space-y-3">
           {[
@@ -217,23 +250,21 @@ const Gamification = ({ userProgress, onLevelUp }) => {
             { rank: 4, name: 'You', level: currentLevel, points: userProgress.calmPoints, avatar: '🌟' },
             { rank: 5, name: 'PeacefulPanda', level: 6, points: 650, avatar: '🐼' }
           ].map((user) => (
-            <div 
+            <div
               key={user.rank}
-              className={`flex items-center justify-between p-3 rounded-lg ${
-                user.name === 'You' ? 'bg-primary-50 border border-primary-200' : 'bg-calm-50'
-              }`}
+              className={`flex items-center justify-between p-3 rounded-xl transition-all duration-300
+                ${user.name === 'You' ? 'bg-primary-100 border-2 border-primary-300 shadow-lg scale-105' : 'bg-calm-50'}
+                hover:scale-105 hover:shadow-xl`}
             >
               <div className="flex items-center space-x-3">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                  user.rank <= 3 ? 'bg-yellow-100 text-yellow-800' : 'bg-calm-200 text-calm-700'
-                }`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
+                  ${user.rank <= 3 ? 'bg-yellow-100 text-yellow-800' : 'bg-calm-200 text-calm-700'}`}
+                >
                   {user.rank <= 3 ? ['🥇', '🥈', '🥉'][user.rank - 1] : user.rank}
                 </div>
                 <span className="text-2xl">{user.avatar}</span>
                 <div>
-                  <div className={`font-medium ${user.name === 'You' ? 'text-primary-800' : 'text-calm-800'}`}>
-                    {user.name}
-                  </div>
+                  <div className={`font-medium ${user.name === 'You' ? 'text-primary-800' : 'text-calm-800'}`}>{user.name}</div>
                   <div className="text-sm text-calm-600">Level {user.level}</div>
                 </div>
               </div>
@@ -245,6 +276,18 @@ const Gamification = ({ userProgress, onLevelUp }) => {
           ))}
         </div>
       </div>
+      {/* Animations */}
+      <style>{`
+        .animate-badge-pop { animation: badge-pop 0.5s cubic-bezier(.68,-0.55,.27,1.55); }
+        @keyframes badge-pop { 0% { transform: scale(0.7); } 80% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        .animate-badge-glow { box-shadow: 0 0 16px 4px #60a5fa, 0 0 32px 8px #a5b4fc; animation: badge-glow 1.2s ease-in-out; }
+        @keyframes badge-glow { 0% { box-shadow: 0 0 0 0 #60a5fa; } 50% { box-shadow: 0 0 32px 8px #a5b4fc; } 100% { box-shadow: 0 0 0 0 #60a5fa; } }
+        .animate-pop { animation: pop 0.5s cubic-bezier(.68,-0.55,.27,1.55); }
+        @keyframes pop { 0% { transform: scale(0.7); } 80% { transform: scale(1.15); } 100% { transform: scale(1); } }
+        .animate-glow { animation: glow 1.5s infinite alternate; }
+        @keyframes glow { 0% { text-shadow: 0 0 8px #60a5fa; } 100% { text-shadow: 0 0 24px #a5b4fc; } }
+        .animate-progress-bar { transition: width 0.7s cubic-bezier(.68,-0.55,.27,1.55); }
+      `}</style>
     </div>
   );
 };
