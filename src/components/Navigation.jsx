@@ -1,12 +1,13 @@
 import React from 'react';
 
-const Navigation = ({ currentView, onNavigate, calmPoints }) => {
+const Navigation = ({ currentView, onNavigate, calmPoints, onCrisisMode }) => {
   const navItems = [
     { id: 'onboarding', label: 'Home', icon: '🏠' },
-    { id: 'progress', label: 'Progress', icon: '📊' },
+    { id: 'coach', label: 'AI Coach', icon: '🤖' },
+    { id: 'analytics', label: 'Analytics', icon: '📊' },
     { id: 'gamification', label: 'Achievements', icon: '🏆' },
-    { id: 'insights', label: 'AI Insights', icon: '🤖' },
-    { id: 'community', label: 'Community', icon: '👥' }
+    { id: 'community', label: 'Community', icon: '👥' },
+    { id: 'insights', label: 'Insights', icon: '💡' }
   ];
 
   return (
