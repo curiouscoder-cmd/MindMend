@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { GeminiService } from '../services/geminiService';
+import VoiceEnabledMessage from './VoiceEnabledMessage';
+import { mockData } from '../data/mockData';
+import elevenLabsService from '../services/elevenLabsService';
 
 const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   const [messages, setMessages] = useState([]);
@@ -6,6 +10,9 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   const [isTyping, setIsTyping] = useState(false);
   const [coachPersonality, setCoachPersonality] = useState('supportive');
   const messagesEndRef = useRef(null);
+  const scrollContainerRef = useRef(null);
+  const textareaRef = useRef(null);
+  const [showScrollToBottom, setShowScrollToBottom] = useState(false);
 
   // Initialize with welcome message
   useEffect(() => {
@@ -24,6 +31,23 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Track scroll to toggle scroll-to-bottom button
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
+      setShowScrollToBottom(!nearBottom);
+    };
+    el.addEventListener('scroll', onScroll);
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setShowScrollToBottom(false);
+  };
+
   const generateWelcomeMessage = () => {
     const timeOfDay = new Date().getHours();
     const greeting = timeOfDay < 12 ? 'Good morning' : timeOfDay < 18 ? 'Good afternoon' : 'Good evening';
@@ -37,61 +61,83 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
     return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
   };
 
-  const generateAIResponse = (userMessage) => {
-    const responses = {
-      anxious: [
-        "I hear that you're feeling anxious. That's completely valid - anxiety is your mind's way of trying to protect you. Let's try a quick grounding exercise together. Can you name 3 things you can see right now?",
-        "Anxiety can feel overwhelming, but you're not alone in this. Your breathing is a powerful tool - would you like to try a calming breathing exercise with me?",
-        "I understand anxiety can be really challenging. Remember, this feeling is temporary. You've gotten through difficult moments before, and you can get through this one too. What usually helps you feel more grounded?"
-      ],
-      sad: [
-        "I'm sorry you're feeling sad right now. Your feelings are valid, and it's okay to sit with them. Sometimes sadness is our heart's way of processing. Would you like to talk about what's contributing to these feelings?",
-        "Sadness can feel heavy, but please know that you matter and this feeling will pass. You're taking a positive step by being here. What's one small thing that usually brings you a tiny bit of comfort?",
-        "I see you're going through a tough time. It takes courage to reach out when you're feeling low. You don't have to carry this alone. Would a gentle self-compassion exercise help right now?"
-      ],
-      stressed: [
-        "Stress can make everything feel urgent and overwhelming. Let's take a step back together. What's the most pressing thing on your mind right now? Sometimes breaking it down helps.",
-        "I can sense you're feeling stressed. Your nervous system is in high alert mode, which is exhausting. Would you like to try a quick stress-relief technique to help your body calm down?",
-        "Stress is your body's response to feeling overwhelmed. You're handling a lot right now, and that's tough. What if we focused on just the next small step instead of everything at once?"
-      ],
-      happy: [
-        "I love hearing that you're feeling good! Happiness is wonderful to experience and even better when we can savor it. What's contributing to your positive mood today?",
-        "That's fantastic! When we're feeling good, it's a great time to build on that positive energy. Would you like to do a gratitude practice to amplify these good feelings?",
-        "Your positive energy is wonderful! These are the moments worth celebrating. What's one thing you're particularly grateful for right now?"
-      ],
-      general: [
-        "Thank you for sharing that with me. I'm here to listen and support you. What feels most important for you to focus on right now?",
-        "I appreciate you opening up. Everyone's wellness journey is unique, and yours matters. How can I best support you today?",
-        "It sounds like you have a lot on your mind. I'm here to help you work through whatever you're experiencing. What would feel most helpful right now?"
-      ]
-    };
+  const generateAIResponse = async (userMessage) => {
+    try {
+      const response = await GeminiService.generateChatResponse(
+        userMessage, 
+        moodHistory, 
+        userProgress
+      );
+      return response;
+    } catch (error) {
+      console.error('AI Response Error:', error);
+      // Fallback with intent handling and varied templates
+      const text = userMessage.toLowerCase();
 
-    // Simple keyword detection for mood
-    const lowerMessage = userMessage.toLowerCase();
-    let detectedMood = 'general';
-    
-    if (lowerMessage.includes('anxious') || lowerMessage.includes('worried') || lowerMessage.includes('nervous')) {
-      detectedMood = 'anxious';
-    } else if (lowerMessage.includes('sad') || lowerMessage.includes('down') || lowerMessage.includes('depressed')) {
-      detectedMood = 'sad';
-    } else if (lowerMessage.includes('stressed') || lowerMessage.includes('overwhelmed') || lowerMessage.includes('pressure')) {
-      detectedMood = 'stressed';
-    } else if (lowerMessage.includes('happy') || lowerMessage.includes('good') || lowerMessage.includes('great')) {
-      detectedMood = 'happy';
+      // Simple intent detection
+      const intent = (() => {
+        if (/breath|breathing|ground|calm me|panic|anxious/.test(text)) return 'breathing';
+        if (/motivat|encourag|inspire|push/.test(text)) return 'motivation';
+        if (/tough|hard day|bad day|overwhelm|stressed/.test(text)) return 'tough_day';
+        if (/gratitude|grateful|thanks/.test(text)) return 'gratitude';
+        if (/sleep|insomnia|rest/.test(text)) return 'sleep';
+        if (/happy|good|great|better/.test(text)) return 'celebrate';
+        return 'general';
+      })();
+
+      const templates = {
+        breathing: [
+          "Let's try a 4-7-8 breathing together: Inhale through your nose for 4, hold for 7, exhale slowly through your mouth for 8. We can do 3 rounds. Ready for round 1?",
+          "We can do a quick 5-4-3-2-1 grounding. Tell me: 5 things you see, 4 you can touch, 3 you hear, 2 you smell, 1 you taste. Start with what you see around you.",
+          "Try box breathing with me: Inhale 4 • Hold 4 • Exhale 4 • Hold 4. I'll keep time if you'd like."
+        ],
+        motivation: [
+          "You're showing up for yourself—that's powerful. Let's set a tiny goal for the next 10 minutes. What feels doable right now?",
+          "Progress > perfection. Think of one small action you can take today. I can help you pick if you'd like.",
+          "Your consistency matters more than intensity. What would a 1% improvement look like right now?"
+        ],
+        tough_day: [
+          "That sounds heavy. I'm here with you. Want to vent for 2 minutes or try a quick reset exercise?",
+          "When days feel tough, breaking it into ‘next 1 step’ helps. What's one gentle next step we can take together?",
+          "You're allowed to take a pause. Would you like a 3-minute reset or a supportive reflection prompt?"
+        ],
+        gratitude: [
+          "Beautiful. Want to try a 3-line gratitude note? 1) What happened 2) Why it mattered 3) How it made you feel.",
+          "Gratitude can shift our lens. What's one small thing today that felt kind, safe, or comforting?",
+          "Let’s anchor this: Name one person, one place, and one ability you’re grateful for right now."
+        ],
+        sleep: [
+          "For better sleep: dim lights, slow exhale breathing, and write down tomorrow’s top 1 task. Want a short wind-down routine?",
+          "Try this: 4 slow breaths, loosen jaw and shoulders, then imagine placing your worries in a box you'll open tomorrow.",
+          "We can try progressive relaxation: tense each muscle group for 5s, then release. Shall I guide you?"
+        ],
+        celebrate: [
+          "Love that! What contributed to this feeling? Let’s note it so we can repeat it more often.",
+          "That’s wonderful—let’s savor it for 10 seconds. Breathe in and name what feels good about this moment.",
+          "Amazing. Want to set a tiny ritual to celebrate wins like this?"
+        ],
+        general: [
+          "Thank you for sharing that. What feels most supportive right now—listening, a tool, or a tiny next step?",
+          "I'm here with you. Would you like to unpack this, try a quick practice, or set a gentle intention?",
+          "I hear you. On a scale 1-10, how intense does this feel? We can choose a practice based on that."
+        ]
+      };
+
+      const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
+      return pick(templates[intent] ?? templates.general);
     }
-
-    const moodResponses = responses[detectedMood];
-    return moodResponses[Math.floor(Math.random() * moodResponses.length)];
   };
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  const handleSendMessage = async (overrideText) => {
+    const text = (overrideText ?? inputMessage).trim();
+    if (!text) return;
 
     // Add user message
     const userMsg = {
       id: Date.now(),
       type: 'user',
-      content: inputMessage,
+      content: text,
       timestamp: new Date()
     };
 
@@ -99,9 +145,9 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate AI thinking time
-    setTimeout(() => {
-      const aiResponse = generateAIResponse(inputMessage);
+    // Generate AI response
+    try {
+      const aiResponse = await generateAIResponse(text);
       const aiMsg = {
         id: Date.now() + 1,
         type: 'coach',
@@ -112,7 +158,10 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
 
       setMessages(prev => [...prev, aiMsg]);
       setIsTyping(false);
-    }, 1500 + Math.random() * 1000); // 1.5-2.5 seconds
+    } catch (error) {
+      console.error('Error generating AI response:', error);
+      setIsTyping(false);
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -122,12 +171,24 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
     }
   };
 
+  // Auto-resize the textarea height
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 160) + 'px'; // cap at ~6 rows
+  }, [inputMessage]);
+
+  // Use mock data for quick responses
   const quickResponses = [
     "I'm feeling anxious",
-    "I'm having a tough day",
+    "I'm having a tough day", 
     "I'm feeling good today",
     "I need some motivation",
-    "Help me relax"
+    "Help me relax",
+    "I'm stressed about exams",
+    "Can you guide me through breathing?",
+    "I want to practice gratitude"
   ];
 
   return (
@@ -150,41 +211,57 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
       </div>
 
       {/* Chat Container */}
-      <div className="card max-h-96 overflow-hidden flex flex-col">
+      <div className="card flex flex-col h-[60vh] min-h-[28rem]">
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-80">
+        <div
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar"
+        >
           {messages.map((message) => (
             <div
               key={message.id}
               className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div
-                className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl ${
-                  message.type === 'user'
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-gradient-to-r from-purple-50 to-pink-50 text-calm-800 border border-purple-100'
-                }`}
-              >
-                {message.type === 'coach' && (
-                  <div className="flex items-center space-x-2 mb-2">
-                    <span className="text-lg">🤖</span>
-                    <span className="text-xs font-medium text-purple-600">Mira</span>
+              {message.type === 'user' ? (
+                <div className="max-w-[80%] lg:max-w-[70%] flex items-start space-x-2">
+                  <div className="flex-1 px-4 py-3 rounded-2xl bg-primary-500 text-white shadow-sm">
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                    <div className="text-[10px] mt-1 text-primary-100 text-right">
+                      {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
                   </div>
-                )}
-                <p className="text-sm leading-relaxed">{message.content}</p>
-                <div className={`text-xs mt-2 ${
-                  message.type === 'user' ? 'text-primary-100' : 'text-calm-500'
-                }`}>
-                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <div className="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center shadow">
+                    <span className="text-sm">🧑</span>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="max-w-[80%] lg:max-w-[70%] flex items-start space-x-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center shadow">
+                    <span className="text-base">🤖</span>
+                  </div>
+                  <div className="flex-1 bg-white rounded-2xl border border-purple-100 p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-medium text-purple-600">Mira</span>
+                      <div className="text-[10px] text-calm-500">
+                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    </div>
+                    <VoiceEnabledMessage 
+                      message={message}
+                      persona="mira"
+                      emotion={message.mood || 'supportive'}
+                      showControls={true}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           ))}
           
           {/* Typing Indicator */}
           {isTyping && (
             <div className="flex justify-start">
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-4 py-3 rounded-2xl border border-purple-100">
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-4 py-3 rounded-2xl border border-purple-100 shadow-sm">
                 <div className="flex items-center space-x-2">
                   <span className="text-lg">🤖</span>
                   <div className="flex space-x-1">
@@ -197,6 +274,16 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
             </div>
           )}
           <div ref={messagesEndRef} />
+          {showScrollToBottom && (
+            <div className="flex justify-center">
+              <button
+                onClick={scrollToBottom}
+                className="mt-2 px-3 py-1 text-xs bg-white border border-calm-200 rounded-full shadow hover:bg-calm-50"
+              >
+                Jump to latest ↓
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Quick Responses */}
@@ -205,8 +292,8 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
             {quickResponses.map((response, index) => (
               <button
                 key={index}
-                onClick={() => setInputMessage(response)}
-                className="px-3 py-1 bg-calm-100 hover:bg-calm-200 text-calm-700 text-xs rounded-full transition-all"
+                onClick={() => handleSendMessage(response)}
+                className="px-3 py-1 bg-calm-100 hover:bg-calm-200 text-calm-700 text-xs rounded-full transition-all shadow-sm"
               >
                 {response}
               </button>
@@ -215,20 +302,21 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t border-calm-100">
+        <div className="p-4 border-t border-calm-100 sticky bottom-0 bg-white">
           <div className="flex space-x-3">
             <textarea
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Share what's on your mind..."
-              className="flex-1 p-3 border border-calm-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-              rows="2"
+              className="flex-1 p-3 border border-calm-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none shadow-sm"
+              rows="1"
+              ref={textareaRef}
             />
             <button
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || isTyping}
-              className="btn-primary px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary px-6 disabled:opacity-50 disabled:cursor-not-allowed shadow"
             >
               Send
             </button>
@@ -252,7 +340,7 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
         
         <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg">
           <div className="text-2xl mb-2">🌱</div>
-          <h3 className="font-semibent text-purple-800 mb-1">Growth Support</h3>
+          <h3 className="font-semibold text-purple-800 mb-1">Growth Support</h3>
           <p className="text-sm text-purple-600">Helping you build resilience and coping skills</p>
         </div>
       </div>
