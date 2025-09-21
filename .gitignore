@@ -36,3 +36,6 @@ jspm_packages/
 
 # Build output
 dist/
+
+# Local Netlify folder
+.netlify

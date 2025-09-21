@@ -52,7 +52,10 @@ export const handler = async (event, context) => {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
+    console.log('GEMINI_API_KEY available:', !!apiKey);
+    console.log('API Key preview:', apiKey ? `${apiKey.slice(0, 5)}...${apiKey.slice(-5)}` : 'MISSING');
     if (!apiKey) {
+      console.error('Missing GEMINI_API_KEY environment variable');
       throw new Error('Missing GEMINI_API_KEY');
     }
 
@@ -61,7 +64,7 @@ export const handler = async (event, context) => {
       {
         role: 'user',
         parts: [
-          { text: `${MENTAL_HEALTH_CONTEXT}\n\nUser's recent mood history: ${moodHistory.slice(-5).join(', ') || 'No recent data'}\nUser's progress: ${userProgress.completedExercises || 0} exercises completed, ${userProgress.streak || 0} day streak\n\nUser message: "${message}"\n\nTask: Provide a supportive, culturally-sensitive, CBT-grounded response in 2-3 short sentences. Offer a practical next step when appropriate.` }
+          { text: `You are Mira, an empathetic AI wellness coach specializing in CBT techniques for young adults in India. User says: "${message}". Their mood history: ${moodHistory.slice(-5).join(', ') || 'none'}. Progress: ${userProgress.completedExercises || 0} exercises done, ${userProgress.streak || 0} day streak. Respond with empathy and practical CBT guidance in 2-3 sentences.` }
         ]
       }
     ];
@@ -75,18 +78,22 @@ export const handler = async (event, context) => {
         maxOutputTokens: 220
       }
     };
-
-    // Use a stable model id
-    const model = 'gemini-2.5-flash';
+    const model = 'gemini-1.5-flash';
     const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`;
+    console.log('Making Gemini API call to:', model);
+    console.log('Request body:', JSON.stringify(body, null, 2));
+    
     const resp = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)
     });
+    
+    console.log('Gemini API response status:', resp.status);
 
     if (!resp.ok) {
       const errText = await resp.text().catch(() => '');
+      console.error(`Gemini API error: ${resp.status} - ${errText}`);
       throw new Error(`Gemini HTTP ${resp.status}: ${errText}`);
     }
 
@@ -109,6 +116,8 @@ export const handler = async (event, context) => {
 
   } catch (error) {
     console.error('Chat API Error:', error);
+    console.error('Error details:', error.message);
+    console.error('Stack trace:', error.stack);
     
     // Fallback response
     const fallbackResponses = {

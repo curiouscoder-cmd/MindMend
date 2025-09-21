@@ -13,6 +13,7 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   const scrollContainerRef = useRef(null);
   const textareaRef = useRef(null);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
+  const [autoPlayVoice, setAutoPlayVoice] = useState(true);
 
   // Initialize with welcome message
   useEffect(() => {
@@ -63,11 +64,13 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
 
   const generateAIResponse = async (userMessage) => {
     try {
+      console.log('Calling Gemini API with:', { userMessage, moodHistory, userProgress });
       const response = await GeminiService.generateChatResponse(
         userMessage, 
         moodHistory, 
         userProgress
       );
+      console.log('Gemini API response:', response);
       return response;
     } catch (error) {
       console.error('AI Response Error:', error);
@@ -204,9 +207,25 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
             <p className="text-blue-900">Your AI Wellness Coach</p>
           </div>
         </div>
-        <div className="flex items-center justify-center space-x-2 text-sm text-blue-900">
-          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-          <span>Online and ready to help</span>
+        <div className="flex items-center justify-center space-x-4 text-sm text-blue-900">
+          <div className="flex items-center space-x-2">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span>Online and ready to help</span>
+          </div>
+          
+          {/* Auto-play toggle */}
+          <button
+            onClick={() => setAutoPlayVoice(!autoPlayVoice)}
+            className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs transition-all ${
+              autoPlayVoice 
+                ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+            title={autoPlayVoice ? 'Auto-play enabled' : 'Auto-play disabled'}
+          >
+            <span>{autoPlayVoice ? '🔊' : '🔇'}</span>
+            <span>Auto-speak</span>
+          </button>
         </div>
       </div>
 
@@ -250,6 +269,7 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
                       message={message}
                       persona="mira"
                       emotion={message.mood || 'supportive'}
+                      autoPlay={autoPlayVoice}
                       showControls={true}
                     />
                   </div>
