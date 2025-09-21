@@ -17,7 +17,12 @@ const VoiceEnabledMessage = ({
 
   useEffect(() => {
     if (autoPlay && message.content) {
-      handlePlayMessage();
+      // Add a small delay to prevent immediate auto-play on page load
+      const timer = setTimeout(() => {
+        handlePlayMessage();
+      }, 500);
+      
+      return () => clearTimeout(timer);
     }
   }, [message.content, autoPlay]);
 
@@ -35,9 +40,10 @@ const VoiceEnabledMessage = ({
       
       if (!url) {
         // Generate speech if not cached
-        url = await elevenLabsService.generateCoachResponse(
+        url = await elevenLabsService.generateSpeech(
           message.content, 
-          emotion
+          persona,
+          { emotion }
         );
         setAudioUrl(url);
       }

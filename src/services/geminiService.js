@@ -1,5 +1,5 @@
 // Serverless API endpoints for Netlify functions
-const API_BASE_URL = import.meta.env.PROD ? '/.netlify/functions' : 'http://localhost:8888/.netlify/functions';
+const API_BASE_URL = '/.netlify/functions';
 
 // Mental health context for all interactions
 const MENTAL_HEALTH_CONTEXT = `
@@ -22,7 +22,7 @@ Current conversation context: Mental wellness support chat
 export class GeminiService {
   static async generateChatResponse(userMessage, moodHistory = [], userProgress = {}) {
     try {
-      const response = await fetch(`${API_BASE_URL}/chat`, {
+      const response = await fetch(`${API_BASE_URL}/chat-simple`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

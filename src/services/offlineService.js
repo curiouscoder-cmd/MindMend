@@ -56,8 +56,10 @@ class OfflineService {
           db.createObjectStore('userProgress', { keyPath: 'id' });
         }
         
-        // Populate with offline CBT exercises
-        this.populateOfflineExercises(db);
+        // Populate with offline CBT exercises after transaction completes
+        request.transaction.oncomplete = () => {
+          this.populateOfflineExercises(db);
+        };
       };
     });
   }

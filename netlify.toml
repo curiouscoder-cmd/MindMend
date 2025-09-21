@@ -13,6 +13,10 @@
 [build.environment]
   NODE_VERSION = "18"
 
+[dev]
+  command = "npm run dev"
+  targetPort = 3000
+
 # Environment variables for production
 # Add your Gemini API key in Netlify dashboard under Site settings > Environment variables
 # GEMINI_API_KEY = "your_actual_api_key_here"
