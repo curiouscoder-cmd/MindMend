@@ -1,8 +1,7 @@
 -- MindMend AI Database Schema for Supabase
 -- Run this in your Supabase SQL editor to create the required tables
 
--- Enable Row Level Security
-ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret';
+-- Note: Supabase handles JWT secrets automatically, no manual configuration needed
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
