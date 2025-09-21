@@ -9,7 +9,13 @@ import AICoach from './components/AICoach.jsx';
 import AIInsights from './components/AIInsights.jsx';
 import MoodAnalytics from './components/MoodAnalytics.jsx';
 import CrisisMode from './components/CrisisMode.jsx';
+import EmotionalTwin from './components/EmotionalTwin.jsx';
+import VoiceInput from './components/VoiceInput.jsx';
+import DoodleMoodInput from './components/DoodleMoodInput.jsx';
+import AIGroupTherapy from './components/AIGroupTherapy.jsx';
+import OfflineIndicator from './components/OfflineIndicator.jsx';
 import { useMoodTheme } from './hooks/useMoodTheme.js';
+import offlineService from './services/offlineService.js';
 
 function App() {
   const [currentView, setCurrentView] = useState('onboarding');
@@ -33,13 +39,21 @@ function App() {
     setCurrentView('exercise');
   };
 
-  const handleExerciseComplete = () => {
+  const handleExerciseComplete = async () => {
+    const newProgress = {
+      completedExercises: userProgress.completedExercises + 1,
+      calmPoints: userProgress.calmPoints + 10,
+      streak: userProgress.streak + 1
+    };
+    
     setUserProgress(prev => ({
       ...prev,
-      completedExercises: prev.completedExercises + 1,
-      calmPoints: prev.calmPoints + 10,
-      streak: prev.streak + 1
+      ...newProgress
     }));
+    
+    // Save progress offline
+    await offlineService.updateProgress(newProgress);
+    
     setCurrentView('progress');
   };
 
@@ -105,6 +119,47 @@ function App() {
             userProgress={userProgress}
           />
         );
+      case 'emotional-twin':
+        return (
+          <EmotionalTwin
+            moodHistory={moodHistory}
+            userProgress={userProgress}
+            personalityTraits={{}}
+          />
+        );
+      case 'voice-input':
+        return (
+          <VoiceInput
+            onEmotionDetected={(emotion) => {
+              console.log('Emotion detected:', emotion);
+              if (emotion.urgency === 'high') {
+                setShowCrisisMode(true);
+              }
+            }}
+            onTranscriptionComplete={(text) => {
+              console.log('Transcription:', text);
+            }}
+          />
+        );
+      case 'doodle-mood':
+        return (
+          <DoodleMoodInput
+            onMoodDetected={(analysis) => {
+              console.log('Mood analysis:', analysis);
+              setCurrentMood(analysis.primaryMood);
+            }}
+            onDoodleComplete={(data) => {
+              console.log('Doodle complete:', data);
+            }}
+          />
+        );
+      case 'group-therapy':
+        return (
+          <AIGroupTherapy
+            userProgress={userProgress}
+            currentMood={currentMood}
+          />
+        );
       default:
         return <Onboarding onMoodSelect={handleMoodSelection} />;
     }
@@ -126,6 +181,9 @@ function App() {
       >
         🆘
       </button>
+
+      {/* Offline Indicator */}
+      <OfflineIndicator />
 
       <main className="container mx-auto px-4 py-8">
         {renderCurrentView()}

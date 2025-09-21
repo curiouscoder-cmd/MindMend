@@ -4,10 +4,14 @@ const Navigation = ({ currentView, onNavigate, calmPoints, onCrisisMode }) => {
   const navItems = [
     { id: 'onboarding', label: 'Home', icon: '🏠' },
     { id: 'coach', label: 'AI Coach', icon: '🤖' },
-    { id: 'analytics', label: 'Analytics' },
+    { id: 'group-therapy', label: 'Group', icon: '👥' },
+    { id: 'voice-input', label: 'Voice', icon: '🎤' },
+    { id: 'doodle-mood', label: 'Express', icon: '🎨' },
+    { id: 'emotional-twin', label: 'Twin', icon: '🌱' },
+    { id: 'analytics', label: 'Analytics', icon: '📊' },
     { id: 'gamification', label: 'Achievements', icon: '🏆' },
     { id: 'community', label: 'Community', icon: '👥' },
-    { id: 'insights', label: 'Insights' }
+    { id: 'insights', label: 'Insights', icon: '💡' }
   ];
 
   return (
