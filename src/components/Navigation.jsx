@@ -15,40 +15,39 @@ const Navigation = ({ currentView, onNavigate, calmPoints, onCrisisMode }) => {
   ];
 
   return (
-    <nav className="bg-white shadow-sm border-b border-calm-100">
+    <nav className="bg-white/90 backdrop-blur border-b border-ocean/10 shadow-soft">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between min-h-16 py-2 gap-3 overflow-hidden">
           {/* Logo */}
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-primary-500 to-primary-600 rounded-lg flex items-center justify-center">
+          <div className="flex items-center space-x-3 shrink-0">
+            <div className="w-9 h-9 bg-gradient-to-r from-ocean to-highlight rounded-2xl flex items-center justify-center shadow-soft">
               <span className="text-white font-bold text-sm">M</span>
             </div>
-            <h1 className="text-xl font-bold text-calm-800">MindMend</h1>
+            <h1 className="text-xl font-bold text-navy">MindMend</h1>
           </div>
 
           {/* Navigation Items */}
-          <div className="flex items-center space-x-2 lg:space-x-4">
+          <div className="flex flex-wrap items-center gap-2 lg:gap-4 max-w-full min-w-0 flex-1 justify-center">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => onNavigate(item.id)}
-                className={`flex items-center space-x-1 lg:space-x-2 px-2 lg:px-3 py-2 rounded-lg transition-all duration-200 text-sm lg:text-base ${
+                className={`flex items-center space-x-1 lg:space-x-2 px-2 lg:px-3 py-2 rounded-2xl transition-all duration-200 text-sm lg:text-base ${
                   currentView === item.id
-                    ? 'bg-primary-50 text-black font-medium'
-                    : 'text-black hover:text-primary-600 hover:bg-calm-50'
+                    ? 'bg-sky text-navy font-semibold shadow-soft'
+                    : 'text-navy/80 hover:text-navy hover:bg-mint/60 hover:shadow-soft hover:-translate-y-0.5'
                 }`}
               >
-                <span className="text-base lg:text-lg">{item.icon}</span>
-                <span className="hidden md:inline text-xs lg:text-sm">{item.label}</span>
+                <span className="text-sm lg:text-sm">{item.label}</span>
               </button>
             ))}
-            
-            {/* Calm Points Display */}
-            <div className="flex items-center space-x-2 bg-primary-50 px-3 py-2 rounded-lg">
-              <span className="text-lg">✨</span>
-              <span className="text-primary-600 font-medium">{calmPoints}</span>
-              <span className="text-primary-500 text-sm hidden sm:inline">points</span>
-            </div>
+          
+          </div>
+
+          {/* Calm Points Display */}
+          <div className="flex items-center space-x-2 bg-mint px-3 py-2 rounded-2xl border border-ocean/10 shadow-soft shrink-0 ml-auto">
+            <span className="text-navy font-medium">{calmPoints}</span>
+            <span className="text-navy/70 text-sm hidden sm:inline">points</span>
           </div>
         </div>
       </div>

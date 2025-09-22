@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Navigation from './components/Navigation.jsx';
 import Onboarding from './components/Onboarding.jsx';
 import CBTExercise from './components/CBTExercise.jsx';
@@ -166,7 +167,7 @@ function App() {
   };
 
   return (
-    <div className={`min-h-screen ${backgroundGradient}`}>
+    <div className={`min-h-screen bg-mint/50`}>
       <Navigation
         currentView={currentView}
         onNavigate={handleNavigate}
@@ -176,7 +177,7 @@ function App() {
       {/* SOS Floating Button */}
       <button
         onClick={() => setShowCrisisMode(true)}
-        className="fixed bottom-6 right-6 w-16 h-16 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg flex items-center justify-center text-2xl z-40 transition-all duration-200 hover:scale-110"
+        className="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-br from-ocean to-highlight text-white rounded-full shadow-elevated flex items-center justify-center text-2xl z-40 transition-transform duration-200 hover:scale-110 animate-glow"
         title="Crisis Support - Immediate Help"
       >
         🆘
@@ -186,7 +187,17 @@ function App() {
       <OfflineIndicator />
 
       <main className="container mx-auto px-4 py-8">
-        {renderCurrentView()}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentView}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
+            {renderCurrentView()}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Crisis Mode Modal */}

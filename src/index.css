@@ -4,28 +4,32 @@
 
 @layer base {
   body {
-    background-color: #fff7ed;
+    background-color: rgba(190, 233, 232, 0.6); /* soft mint with transparency */
     background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
     background-repeat: repeat;
     font-family: 'Inter', sans-serif;
+    color: #1b4965; /* deep navy */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden; /* prevent horizontal page scroll */
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-500 hover:bg-primary-600 text-white font-medium py-3 px-6 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5;
+    @apply bg-gradient-to-r from-ocean to-highlight text-white font-medium py-3 px-6 rounded-2xl transition-all duration-200 shadow-soft hover:shadow-elevated transform hover:-translate-y-0.5 hover:scale-[1.02];
   }
   
   .btn-secondary {
-    @apply bg-white hover:bg-calm-50 text-calm-700 font-medium py-3 px-6 rounded-lg border border-calm-200 transition-all duration-200 shadow-sm hover:shadow-md;
+    @apply bg-white hover:bg-mint/60 text-navy font-medium py-3 px-6 rounded-2xl border border-ocean/20 transition-all duration-200 shadow-soft hover:shadow-elevated;
   }
   
   .card {
-    @apply bg-white rounded-xl shadow-lg p-6 border border-calm-100;
+    @apply bg-white rounded-2xl shadow-soft p-6 border border-ocean/10;
   }
   
   .mood-button {
-    @apply w-full p-4 rounded-xl border-2 transition-all duration-200 text-left hover:shadow-md transform hover:-translate-y-1;
+    @apply w-full p-4 rounded-2xl border-2 transition-all duration-200 text-left shadow-soft hover:shadow-elevated transform hover:-translate-y-1;
   }
   
   .mood-button.happy {
@@ -45,21 +49,51 @@
   }
   
   .progress-bar {
-    @apply w-full bg-calm-200 rounded-full h-3 overflow-hidden;
+    @apply w-full bg-mint rounded-full h-3 overflow-hidden shadow-inner;
   }
   
   .progress-fill {
-    @apply h-full bg-gradient-to-r from-primary-400 to-primary-600 rounded-full transition-all duration-500 ease-out;
+    @apply h-full bg-gradient-to-r from-ocean to-highlight rounded-full transition-all duration-500 ease-out;
   }
-  h1, h2, h3, h4 {
-    font-family: 'Caveat', cursive;
-    letter-spacing: 0.5px;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    color: #1b4965;
   }
   .card-human {
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(202, 233, 255, 0.85);
     border-radius: 1.5rem;
-    box-shadow: 0 2px 8px 0 rgba(0,0,0,0.04), 0 1.5px 4px 0 rgba(0,0,0,0.03);
-    border: 2.5px dashed #ffd6e0;
+    box-shadow: 0 2px 8px 0 rgba(27,73,101,0.06), 0 6px 20px rgba(27,73,101,0.08);
+    border: 2.5px dashed #bee9e8;
     padding: 1.5rem;
   }
+
+  /* Inputs & Forms */
+  .input, input[type="text"], input[type="email"], input[type="number"], input[type="password"], textarea, select {
+    @apply w-full bg-white/90 border border-ocean/20 rounded-2xl px-4 py-3 text-navy placeholder:text-navy/50 shadow-soft focus:outline-none focus:ring-2 focus:ring-ocean focus:border-transparent transition-all;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-mint text-navy border border-ocean/10;
+  }
+
+  /* Tables */
+  .table {
+    @apply w-full border-collapse overflow-hidden rounded-2xl shadow-soft;
+  }
+  .table thead th {
+    @apply bg-sky text-navy/90 font-semibold text-left px-4 py-3 border-b border-ocean/10;
+  }
+  .table tbody td {
+    @apply bg-white/90 text-navy px-4 py-3 border-b border-ocean/5;
+  }
+  .table tbody tr:hover td {
+    @apply bg-sky/60 transition-colors;
+  }
+
+  /* Hide scrollbar utility (use with overflow-x-auto containers) */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 }
