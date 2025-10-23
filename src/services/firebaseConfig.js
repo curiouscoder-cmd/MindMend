@@ -10,14 +10,20 @@ import { getAnalytics } from 'firebase/analytics';
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || 'demo-api-key',
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || 'demo-project.firebaseapp.com',
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || 'demo-project',
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || 'demo-project.appspot.com',
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || '123456789',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || '1:123456789:web:abc123',
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || 'G-ABC123',
 };
+
+console.log('🔧 Firebase Config:', {
+  projectId: firebaseConfig.projectId,
+  authDomain: firebaseConfig.authDomain,
+  isDev: import.meta.env.DEV
+});
 
 // Initialize Firebase
 let app;
@@ -36,34 +42,37 @@ try {
   db = getFirestore(app);
   storage = getStorage(app);
   
-  // Connect to emulators in development
-  if (import.meta.env.DEV) {
-    import('firebase/auth').then(({ connectAuthEmulator }) => {
-      try {
-        connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
-        console.log('🔧 Connected to Auth emulator');
-      } catch (e) {
-        // Already connected
-      }
-    });
-    
-    import('firebase/firestore').then(({ connectFirestoreEmulator }) => {
-      try {
-        connectFirestoreEmulator(db, '127.0.0.1', 8080);
-        console.log('🔧 Connected to Firestore emulator');
-      } catch (e) {
-        // Already connected
-      }
-    });
-    
-    import('firebase/storage').then(({ connectStorageEmulator }) => {
-      try {
-        connectStorageEmulator(storage, '127.0.0.1', 9199);
-        console.log('🔧 Connected to Storage emulator');
-      } catch (e) {
-        // Already connected
-      }
-    });
+  // Connect to emulators in development (optional - won't block if emulators not running)
+  if (import.meta.env.DEV && window.location.hostname === 'localhost') {
+    // Try to connect to emulators, but don't block if they're not running
+    setTimeout(() => {
+      import('firebase/auth').then(({ connectAuthEmulator }) => {
+        try {
+          connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
+          console.log('🔧 Connected to Auth emulator');
+        } catch (e) {
+          console.log('ℹ️ Auth emulator not available');
+        }
+      }).catch(() => {});
+      
+      import('firebase/firestore').then(({ connectFirestoreEmulator }) => {
+        try {
+          connectFirestoreEmulator(db, '127.0.0.1', 8080);
+          console.log('🔧 Connected to Firestore emulator');
+        } catch (e) {
+          console.log('ℹ️ Firestore emulator not available');
+        }
+      }).catch(() => {});
+      
+      import('firebase/storage').then(({ connectStorageEmulator }) => {
+        try {
+          connectStorageEmulator(storage, '127.0.0.1', 9199);
+          console.log('🔧 Connected to Storage emulator');
+        } catch (e) {
+          console.log('ℹ️ Storage emulator not available');
+        }
+      }).catch(() => {});
+    }, 100);
   }
   
   // Enable offline persistence for Firestore
