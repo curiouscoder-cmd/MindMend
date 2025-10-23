@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { GeminiService } from '../services/geminiService';
+import { callChatFunction } from '../services/cloudFunctions.js';
 import VoiceEnabledMessage from './VoiceEnabledMessage';
 import { mockData } from '../data/mockData';
 import elevenLabsService from '../services/elevenLabsService';
@@ -64,14 +64,14 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
 
   const generateAIResponse = async (userMessage) => {
     try {
-      console.log('Calling Gemini API with:', { userMessage, moodHistory, userProgress });
-      const response = await GeminiService.generateChatResponse(
+      console.log('Calling Gemini 2.5 via Firebase Function:', { userMessage, moodHistory, userProgress });
+      const result = await callChatFunction(
         userMessage, 
         moodHistory, 
         userProgress
       );
-      console.log('Gemini API response:', response);
-      return response;
+      console.log('Gemini 2.5 response:', result);
+      return result.response;
     } catch (error) {
       console.error('AI Response Error:', error);
       // Fallback with intent handling and varied templates
