@@ -1,6 +1,6 @@
 // Multilingual Chat with Gemma 3 + Gemini 2.5 Pipeline
 import { onRequest } from 'firebase-functions/v2/https';
-import { VertexAI } from '@google-cloud/aiplatform';
+import { VertexAI } from '@google-cloud/vertexai';
 import { 
   processMultilingualInput, 
   translateFromEnglish 

@@ -10,6 +10,7 @@ setGlobalOptions({
 });
 
 // Import function modules
+import { healthCheck } from './healthCheck.js';
 import { chat } from './chat.js';
 import { chatMultilingual } from './chatMultilingual.js';
 import { analyzeMood } from './analyzeMood.js';
@@ -35,6 +36,7 @@ import {
 
 // Export functions
 export { 
+  healthCheck,
   chat,
   chatMultilingual,
   analyzeMood, 

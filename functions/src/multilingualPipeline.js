@@ -1,6 +1,6 @@
 // Gemma 3 Multilingual Pipeline
 // Language Detection → Translation → Processing → Response Translation
-import { VertexAI } from '@google-cloud/aiplatform';
+import { VertexAI } from '@google-cloud/vertexai';
 
 const vertexAI = new VertexAI({
   project: process.env.GCP_PROJECT_ID || 'mindmend-ai',

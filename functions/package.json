@@ -14,7 +14,8 @@
   },
   "main": "src/index.js",
   "dependencies": {
-    "@google-cloud/aiplatform": "^5.10.0",
+    "@google-cloud/vertexai": "^1.9.1",
+    "@google-cloud/bigquery": "^7.3.0",
     "@google-cloud/vision": "^5.3.4",
     "@google-cloud/language": "^7.2.1",
     "@google-cloud/speech": "^7.2.1",

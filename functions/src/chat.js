@@ -1,6 +1,6 @@
 // Gemini 2.5 Chat Function
 import { onRequest } from 'firebase-functions/v2/https';
-import { VertexAI } from '@google-cloud/aiplatform';
+import { VertexAI } from '@google-cloud/vertexai';
 
 const vertexAI = new VertexAI({
   project: process.env.GCP_PROJECT_ID || 'mindmend-ai',

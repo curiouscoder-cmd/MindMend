@@ -1,9 +1,9 @@
 // Voice Chat - Speech-to-Text + Multilingual Chat + Text-to-Speech
 import { onRequest } from 'firebase-functions/v2/https';
 import speech from '@google-cloud/speech';
-import textToSpeech from '@google-cloud/text-to-speech';
+import { TextToSpeechClient } from '@google-cloud/text-to-speech';
 import { processMultilingualInput, translateFromEnglish } from './multilingualPipeline.js';
-import { VertexAI } from '@google-cloud/aiplatform';
+import { VertexAI } from '@google-cloud/vertexai';
 
 const vertexAI = new VertexAI({
   project: process.env.GCP_PROJECT_ID || 'mindmend-ai',
@@ -92,7 +92,7 @@ Your brief, empathetic response:`;
     
     // Step 5: Text-to-Speech
     console.log('Step 5: Text-to-Speech...');
-    const ttsClient = new textToSpeech.TextToSpeechClient();
+    const ttsClient = new TextToSpeechClient();
     
     const voiceConfig = {
       'en': { languageCode: 'en-IN', name: 'en-IN-Wavenet-D' },

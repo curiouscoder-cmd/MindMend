@@ -1,6 +1,6 @@
 // Cloud Text-to-Speech API - Multilingual Voice Output
 import { onRequest } from 'firebase-functions/v2/https';
-import textToSpeech from '@google-cloud/text-to-speech';
+import { TextToSpeechClient } from '@google-cloud/text-to-speech';
 
 // Voice configurations for different languages
 const VOICE_CONFIG = {
@@ -28,7 +28,7 @@ export const textToSpeech = onRequest({
       return res.status(400).json({ error: 'Text is required' });
     }
     
-    const client = new textToSpeech.TextToSpeechClient();
+    const client = new TextToSpeechClient();
     
     // Get voice config for language
     const voiceConfig = VOICE_CONFIG[languageCode] || VOICE_CONFIG['en'];
