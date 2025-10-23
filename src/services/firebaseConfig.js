@@ -6,7 +6,8 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getMessaging, isSupported } from 'firebase/messaging';
-import { getAnalytics } from 'firebase/analytics';
+// Don't import analytics - it gets blocked by ad blockers
+// import { getAnalytics } from 'firebase/analytics';
 
 // Firebase configuration from environment variables
 const firebaseConfig = {
@@ -94,15 +95,17 @@ try {
     }
   });
   
-  // Initialize Analytics (only in production)
-  if (import.meta.env.PROD && import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
-    analytics = getAnalytics(app);
-    console.log('✅ Firebase Analytics initialized');
-  }
+  // Analytics disabled - gets blocked by ad blockers
+  // if (import.meta.env.PROD && import.meta.env.VITE_ENABLE_ANALYTICS === 'true') {
+  //   analytics = getAnalytics(app);
+  //   console.log('✅ Firebase Analytics initialized');
+  // }
+  console.log('ℹ️ Analytics disabled (blocked by ad blockers)');
   
 } catch (error) {
   console.error('❌ Firebase initialization error:', error);
-  throw error;
+  console.warn('⚠️ App will continue without Firebase');
+  // Don't throw - allow app to continue without Firebase
 }
 
 // Export Firebase services

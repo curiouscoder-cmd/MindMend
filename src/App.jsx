@@ -282,8 +282,8 @@ function App() {
         🆘
       </button>
 
-      {/* Offline Indicator */}
-      <OfflineIndicator />
+      {/* Offline Indicator - Removed for cleaner navbar */}
+      {/* <OfflineIndicator /> */}
 
       <main className="container mx-auto px-4 py-8">
         <AnimatePresence mode="wait">
