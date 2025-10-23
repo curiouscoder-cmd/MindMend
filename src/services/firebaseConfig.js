@@ -36,6 +36,36 @@ try {
   db = getFirestore(app);
   storage = getStorage(app);
   
+  // Connect to emulators in development
+  if (import.meta.env.DEV) {
+    import('firebase/auth').then(({ connectAuthEmulator }) => {
+      try {
+        connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
+        console.log('🔧 Connected to Auth emulator');
+      } catch (e) {
+        // Already connected
+      }
+    });
+    
+    import('firebase/firestore').then(({ connectFirestoreEmulator }) => {
+      try {
+        connectFirestoreEmulator(db, '127.0.0.1', 8080);
+        console.log('🔧 Connected to Firestore emulator');
+      } catch (e) {
+        // Already connected
+      }
+    });
+    
+    import('firebase/storage').then(({ connectStorageEmulator }) => {
+      try {
+        connectStorageEmulator(storage, '127.0.0.1', 9199);
+        console.log('🔧 Connected to Storage emulator');
+      } catch (e) {
+        // Already connected
+      }
+    });
+  }
+  
   // Enable offline persistence for Firestore
   enableIndexedDbPersistence(db).catch((err) => {
     if (err.code === 'failed-precondition') {
