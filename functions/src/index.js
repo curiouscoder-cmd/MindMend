@@ -14,11 +14,17 @@ import { chat } from './chat.js';
 import { chatMultilingual } from './chatMultilingual.js';
 import { analyzeMood } from './analyzeMood.js';
 import { analyzeDoodle } from './analyzeDoodle.js';
+import { speechToText } from './speechToText.js';
+import { textToSpeech } from './textToSpeech.js';
+import { voiceChat } from './voiceChat.js';
 
 // Export functions
 export { 
   chat,
   chatMultilingual,
   analyzeMood, 
-  analyzeDoodle 
+  analyzeDoodle,
+  speechToText,
+  textToSpeech,
+  voiceChat
 };
