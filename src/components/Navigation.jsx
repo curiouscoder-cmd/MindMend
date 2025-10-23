@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { logout } from '../services/authService.js';
 
-const Navigation = ({ currentView, onNavigate, calmPoints, onCrisisMode }) => {
+const Navigation = ({ currentView, onNavigate, calmPoints, user }) => {
   const navItems = [
     { id: 'onboarding', label: 'Home', icon: '🏠' },
     { id: 'coach', label: 'AI Coach', icon: '🤖' },
@@ -44,10 +45,44 @@ const Navigation = ({ currentView, onNavigate, calmPoints, onCrisisMode }) => {
           
           </div>
 
-          {/* Calm Points Display */}
-          <div className="flex items-center space-x-2 bg-mint px-3 py-2 rounded-2xl border border-ocean/10 shadow-soft shrink-0 ml-auto">
-            <span className="text-navy font-medium">{calmPoints}</span>
-            <span className="text-navy/70 text-sm hidden sm:inline">points</span>
+          {/* User Profile & Calm Points */}
+          <div className="flex items-center space-x-3 shrink-0 ml-auto">
+            {/* Calm Points */}
+            <div className="flex items-center space-x-2 bg-mint px-3 py-2 rounded-2xl border border-ocean/10 shadow-soft">
+              <span className="text-navy font-medium">{calmPoints}</span>
+              <span className="text-navy/70 text-sm hidden sm:inline">points</span>
+            </div>
+            
+            {/* User Menu */}
+            {user && (
+              <div className="relative group">
+                <button className="flex items-center space-x-2 px-3 py-2 rounded-2xl hover:bg-mint/60 transition-all">
+                  {user.photoURL ? (
+                    <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full bg-ocean text-white flex items-center justify-center text-sm font-medium">
+                      {user.displayName?.[0] || '?'}
+                    </div>
+                  )}
+                  <span className="text-sm text-navy hidden md:inline max-w-[100px] truncate">
+                    {user.displayName || 'User'}
+                  </span>
+                </button>
+                
+                {/* Dropdown Menu */}
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-elevated border border-ocean/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                  <div className="p-2">
+                    <button
+                      onClick={logout}
+                      className="w-full text-left px-4 py-2 text-sm text-navy hover:bg-mint/60 rounded-lg transition-all flex items-center space-x-2"
+                    >
+                      <span>🚪</span>
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
