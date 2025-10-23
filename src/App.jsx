@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navigation from './components/Navigation.jsx';
 import Onboarding from './components/Onboarding.jsx';
@@ -15,10 +15,18 @@ import VoiceInput from './components/VoiceInput.jsx';
 import DoodleMoodInput from './components/DoodleMoodInput.jsx';
 import AIGroupTherapy from './components/AIGroupTherapy.jsx';
 import OfflineIndicator from './components/OfflineIndicator.jsx';
+import Login from './components/Login.jsx';
 import { useMoodTheme } from './hooks/useMoodTheme.js';
 import offlineService from './services/offlineService.js';
+import { onAuthChange } from './services/authService.js';
+import { createUserProfile, getUserProfile, updateUserProgress } from './services/firestoreService.js';
 
 function App() {
+  // Authentication state
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  
+  // App state
   const [currentView, setCurrentView] = useState('onboarding');
   const [selectedMood, setSelectedMood] = useState(null);
   const [userProgress, setUserProgress] = useState({
@@ -29,6 +37,44 @@ function App() {
   const [currentMood, setCurrentMood] = useState(null);
   const [moodHistory, setMoodHistory] = useState([]);
   const [showCrisisMode, setShowCrisisMode] = useState(false);
+
+  // Listen to authentication state changes
+  useEffect(() => {
+    const unsubscribe = onAuthChange(async (authUser) => {
+      setUser(authUser);
+      
+      if (authUser) {
+        console.log('👤 User authenticated:', authUser.displayName || authUser.uid);
+        
+        // Load or create user profile
+        try {
+          let profile = await getUserProfile(authUser.uid);
+          
+          if (!profile) {
+            // First time user - create profile
+            console.log('🆕 Creating new user profile...');
+            await createUserProfile(authUser.uid, {
+              displayName: authUser.displayName,
+              email: authUser.email,
+              photoURL: authUser.photoURL,
+            });
+            profile = await getUserProfile(authUser.uid);
+          }
+          
+          // Load user progress
+          if (profile?.progress) {
+            setUserProgress(profile.progress);
+          }
+        } catch (error) {
+          console.error('Error loading user profile:', error);
+        }
+      }
+      
+      setAuthLoading(false);
+    });
+    
+    return unsubscribe;
+  }, []);
 
   // Simple mood theme
   const { backgroundGradient } = useMoodTheme(currentMood);
@@ -52,8 +98,14 @@ function App() {
       ...newProgress
     }));
     
-    // Save progress offline
-    await offlineService.updateProgress(newProgress);
+    // Save to Firestore
+    if (user) {
+      try {
+        await updateUserProgress(user.uid, newProgress);
+      } catch (error) {
+        console.error('Error saving progress:', error);
+      }
+    }
     
     setCurrentView('progress');
   };
@@ -166,12 +218,31 @@ function App() {
     }
   };
 
+  // Show loading screen while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky to-mint">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ocean mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading MindMend...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login screen if not authenticated
+  if (!user) {
+    return <Login onLoginSuccess={setUser} />;
+  }
+
+  // Main app (user is authenticated)
   return (
     <div className={`min-h-screen bg-mint/50`}>
       <Navigation
         currentView={currentView}
         onNavigate={handleNavigate}
         calmPoints={userProgress.calmPoints}
+        user={user}
       />
 
       {/* SOS Floating Button */}
