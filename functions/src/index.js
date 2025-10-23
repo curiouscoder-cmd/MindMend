@@ -24,6 +24,14 @@ import {
   onStreakMilestone,
   onCrisisDetected 
 } from './notifications.js';
+import {
+  exportMoodEntry,
+  exportChatMessage,
+  exportExerciseCompletion,
+  getAnalyticsDashboard,
+  getUserInsights,
+  initializeBigQuery
+} from './analytics.js';
 
 // Export functions
 export { 
@@ -38,5 +46,11 @@ export {
   registerToken,
   sendDailyReminder,
   onStreakMilestone,
-  onCrisisDetected
+  onCrisisDetected,
+  exportMoodEntry,
+  exportChatMessage,
+  exportExerciseCompletion,
+  getAnalyticsDashboard,
+  getUserInsights,
+  initializeBigQuery
 };
