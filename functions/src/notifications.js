@@ -2,7 +2,8 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
-import { getFirestore } from 'firebase-admin/firestore';
+import { FieldValue } from 'firebase-admin/firestore';
+import { db } from './admin.js';
 
 /**
  * Send push notification to user
@@ -17,8 +18,6 @@ export const sendNotification = onRequest({
     if (!userId || !title || !body) {
       return res.status(400).json({ error: 'userId, title, and body are required' });
     }
-    
-    const db = getFirestore();
     
     // Get user's FCM tokens
     const userDoc = await db.collection('users').doc(userId).get();
@@ -92,12 +91,11 @@ export const registerToken = onRequest({
       return res.status(400).json({ error: 'userId and token are required' });
     }
     
-    const db = getFirestore();
     const userRef = db.collection('users').doc(userId);
     
     // Add token to user's tokens array (avoid duplicates)
     await userRef.update({
-      fcmTokens: getFirestore.FieldValue.arrayUnion(token),
+      fcmTokens: FieldValue.arrayUnion(token),
       lastTokenUpdate: new Date().toISOString(),
     });
     
@@ -122,8 +120,6 @@ export const sendDailyReminder = onRequest({
   timeoutSeconds: 300,
 }, async (req, res) => {
   try {
-    const db = getFirestore();
-    
     // Get all users with notifications enabled
     const usersSnapshot = await db.collection('users')
       .where('preferences.notificationsEnabled', '==', true)
@@ -236,7 +232,6 @@ export const onCrisisDetected = onDocumentCreated('crisisInterventions/{interven
     const intervention = event.data.data();
     const userId = intervention.userId;
     
-    const db = getFirestore();
     const userDoc = await db.collection('users').doc(userId).get();
     const fcmTokens = userDoc.data()?.fcmTokens || [];
     

@@ -2,7 +2,6 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { BigQuery } from '@google-cloud/bigquery';
-import { getFirestore } from 'firebase-admin/firestore';
 
 const bigquery = new BigQuery({
   projectId: process.env.GCP_PROJECT_ID || 'mindmend-ai',
