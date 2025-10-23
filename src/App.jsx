@@ -20,6 +20,7 @@ import { useMoodTheme } from './hooks/useMoodTheme.js';
 import offlineService from './services/offlineService.js';
 import { onAuthChange } from './services/authService.js';
 import { createUserProfile, getUserProfile, updateUserProgress } from './services/firestoreService.js';
+import { initializeFCM, onForegroundMessage } from './services/fcmService.js';
 
 function App() {
   // Authentication state
@@ -65,6 +66,15 @@ function App() {
           if (profile?.progress) {
             setUserProgress(profile.progress);
           }
+          
+          // Initialize FCM notifications
+          if (profile?.preferences?.notificationsEnabled !== false) {
+            initializeFCM(authUser.uid).then(success => {
+              if (success) {
+                console.log('✅ FCM initialized');
+              }
+            });
+          }
         } catch (error) {
           console.error('Error loading user profile:', error);
         }
@@ -75,6 +85,24 @@ function App() {
     
     return unsubscribe;
   }, []);
+  
+  // Listen for foreground notifications
+  useEffect(() => {
+    if (!user) return;
+    
+    const unsubscribe = onForegroundMessage((payload) => {
+      console.log('📬 Notification received:', payload);
+      
+      // Handle different notification types
+      const type = payload.data?.type;
+      
+      if (type === 'crisis_support') {
+        setShowCrisisMode(true);
+      }
+    });
+    
+    return unsubscribe;
+  }, [user]);
 
   // Simple mood theme
   const { backgroundGradient } = useMoodTheme(currentMood);

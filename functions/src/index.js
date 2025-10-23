@@ -17,6 +17,13 @@ import { analyzeDoodle } from './analyzeDoodle.js';
 import { speechToText } from './speechToText.js';
 import { textToSpeech } from './textToSpeech.js';
 import { voiceChat } from './voiceChat.js';
+import { 
+  sendNotification, 
+  registerToken, 
+  sendDailyReminder,
+  onStreakMilestone,
+  onCrisisDetected 
+} from './notifications.js';
 
 // Export functions
 export { 
@@ -26,5 +33,10 @@ export {
   analyzeDoodle,
   speechToText,
   textToSpeech,
-  voiceChat
+  voiceChat,
+  sendNotification,
+  registerToken,
+  sendDailyReminder,
+  onStreakMilestone,
+  onCrisisDetected
 };
