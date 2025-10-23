@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { callChatFunction } from '../services/cloudFunctions.js';
+import { callMultilingualChat } from '../services/cloudFunctions.js';
 import VoiceEnabledMessage from './VoiceEnabledMessage';
 import { mockData } from '../data/mockData';
 import elevenLabsService from '../services/elevenLabsService';
@@ -64,13 +64,15 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
 
   const generateAIResponse = async (userMessage) => {
     try {
-      console.log('Calling Gemini 2.5 via Firebase Function:', { userMessage, moodHistory, userProgress });
-      const result = await callChatFunction(
+      console.log('🌍 Calling Multilingual Pipeline (Gemma 3 + Gemini 2.5):', { userMessage, moodHistory, userProgress });
+      const result = await callMultilingualChat(
         userMessage, 
         moodHistory, 
         userProgress
       );
-      console.log('Gemini 2.5 response:', result);
+      console.log('✅ Multilingual response:', result);
+      console.log(`📊 Performance: ${result.performance?.total}ms (Preprocessing: ${result.performance?.preprocessing}ms, Gemini: ${result.performance?.gemini}ms, Translation: ${result.performance?.translation}ms)`);
+      console.log(`🌐 Language: ${result.detectedLanguage}, Urgency: ${result.preprocessing?.urgency}`);
       return result.response;
     } catch (error) {
       console.error('AI Response Error:', error);

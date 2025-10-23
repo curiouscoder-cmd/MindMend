@@ -11,8 +11,14 @@ setGlobalOptions({
 
 // Import function modules
 import { chat } from './chat.js';
+import { chatMultilingual } from './chatMultilingual.js';
 import { analyzeMood } from './analyzeMood.js';
 import { analyzeDoodle } from './analyzeDoodle.js';
 
 // Export functions
-export { chat, analyzeMood, analyzeDoodle };
+export { 
+  chat,
+  chatMultilingual,
+  analyzeMood, 
+  analyzeDoodle 
+};
