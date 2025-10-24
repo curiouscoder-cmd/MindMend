@@ -165,7 +165,7 @@ VITE_FIREBASE_VAPID_KEY=your_vapid_key
 
 # GCP
 GCP_PROJECT_ID=your_project_id
-GCP_LOCATION=us-central1
+GCP_LOCATION=asia-south1
 ```
 
 ### Step 3: Enable APIs
@@ -245,7 +245,7 @@ import { VertexAI } from '@google-cloud/vertexai';
 
 const vertexAI = new VertexAI({
   project: process.env.GCP_PROJECT_ID,
-  location: 'us-central1',
+  location: 'asia-south1',
 });
 
 export const chat = onRequest({ cors: true }, async (req, res) => {

@@ -91,7 +91,7 @@ VITE_FIREBASE_APP_ID=your_app_id
 
 # GCP Settings
 GCP_PROJECT_ID=mindmend-ai
-GCP_LOCATION=us-central1
+GCP_LOCATION=asia-south1
 EOF
 
 # Add to .gitignore
@@ -517,7 +517,7 @@ import { setGlobalOptions } from 'firebase-functions/v2';
 
 // Set global options
 setGlobalOptions({
-  region: 'us-central1',
+  region: 'asia-south1',
   maxInstances: 10,
 });
 
@@ -546,7 +546,7 @@ import { VertexAI } from '@google-cloud/aiplatform';
 
 const vertexAI = new VertexAI({
   project: process.env.GCP_PROJECT_ID,
-  location: 'us-central1',
+  location: 'asia-south1',
 });
 
 export const chat = onRequest({ 
@@ -619,7 +619,7 @@ import { VertexAI } from '@google-cloud/aiplatform';
 
 const vertexAI = new VertexAI({
   project: process.env.GCP_PROJECT_ID,
-  location: 'us-central1',
+  location: 'asia-south1',
 });
 
 const LANGUAGES = {

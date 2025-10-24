@@ -7,6 +7,25 @@ const vertexAI = new VertexAI({
   location: process.env.GCP_LOCATION || 'asia-south1', // Mumbai, India
 });
 
+console.log(`🌍 Vertex AI initialized: ${process.env.GCP_PROJECT_ID || 'mindmend-25dca'} @ ${process.env.GCP_LOCATION || 'asia-south1'}`);
+
+// Initialize Gemini 2.5 models for different tasks (Mumbai region optimized)
+const geminiFlash = vertexAI.getGenerativeModel({
+  model: 'gemini-2.5-flash',
+  generationConfig: {
+    maxOutputTokens: 150, // Reduced for faster responses
+    temperature: 0.1,
+  },
+});
+
+const geminiPro = vertexAI.getGenerativeModel({
+  model: 'gemini-2.5-flash', // Use Flash for faster translations too
+  generationConfig: {
+    maxOutputTokens: 300, // Reduced for faster responses
+    temperature: 0.2,
+  },
+});
+
 // Supported languages
 const LANGUAGES = {
   en: 'English',
@@ -32,7 +51,8 @@ export async function detectLanguage(text) {
 Language code:`;
     
     const result = await geminiFlash.generateContent(prompt);
-    const langCode = result.response.text.trim().toLowerCase();
+    const responseText = result.response?.text || result.response?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    const langCode = responseText.trim().toLowerCase();
     
     // Validate and return
     return LANGUAGES[langCode] ? langCode : 'en';
@@ -64,7 +84,7 @@ ${LANGUAGES[sourceLang]} text: "${text}"
 English translation:`;
     
     const result = await geminiPro.generateContent(prompt);
-    return result.response.text.trim();
+    return (result.response?.text || result.response?.candidates?.[0]?.content?.parts?.[0]?.text || text).trim();
   } catch (error) {
     console.error('Translation to English error:', error);
     return text; // Return original if translation fails
@@ -85,7 +105,7 @@ English text: "${text}"
 ${LANGUAGES[targetLang]} translation:`;
     
     const result = await geminiPro.generateContent(prompt);
-    return result.response.text.trim();
+    return (result.response?.text || result.response?.candidates?.[0]?.content?.parts?.[0]?.text || text).trim();
   } catch (error) {
     console.error('Translation from English error:', error);
     return text; // Return English if translation fails
@@ -111,7 +131,7 @@ Message: "${text}"
 Respond in JSON format only:`;
     
     const result = await model.generateContent(prompt);
-    const responseText = result.response.text.trim();
+    const responseText = (result.response?.text || result.response?.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
     
     // Extract JSON from response
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);

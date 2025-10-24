@@ -10,7 +10,7 @@ RED='\033[0;31m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-FUNCTIONS_URL="http://localhost:5001/mindmend-ai/us-central1"
+FUNCTIONS_URL="http://localhost:5001/mindmend-ai/asia-south1"
 
 echo "📝 Note: Make sure Firebase emulators are running!"
 echo "   Run: firebase emulators:start"

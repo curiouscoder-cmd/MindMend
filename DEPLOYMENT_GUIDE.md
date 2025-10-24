@@ -24,7 +24,7 @@
 ```bash
 # In Firebase Console:
 # 1. Authentication → Enable Google & Anonymous
-# 2. Firestore Database → Create (test mode, us-central1)
+# 2. Firestore Database → Create (test mode, asia-south1)
 # 3. Storage → Get started
 # 4. Cloud Messaging → Get VAPID key
 ```
@@ -100,10 +100,10 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
 VITE_FIREBASE_APP_ID=1:123456789:web:abc123
 VITE_FIREBASE_MEASUREMENT_ID=G-ABC123
 VITE_FIREBASE_VAPID_KEY=BNx...
-VITE_FUNCTIONS_URL=https://us-central1-mindmend-ai.cloudfunctions.net
+VITE_FUNCTIONS_URL=https://asia-south1-mindmend-ai.cloudfunctions.net
 
 GCP_PROJECT_ID=mindmend-ai
-GCP_LOCATION=us-central1
+GCP_LOCATION=asia-south1
 ```
 
 ### 3.3 Update Service Worker
@@ -148,7 +148,7 @@ firebase deploy --only functions:chatMultilingual,functions:voiceChat
 ### 4.3 Initialize BigQuery
 ```bash
 # Call the initialization endpoint once
-curl -X POST https://us-central1-mindmend-ai.cloudfunctions.net/initializeBigQuery
+curl -X POST https://asia-south1-mindmend-ai.cloudfunctions.net/initializeBigQuery
 ```
 
 ---
@@ -207,7 +207,7 @@ npm run dev
 # 1. Allow notifications when prompted
 # 2. Check browser console for FCM token
 # 3. Send test notification:
-curl -X POST https://us-central1-mindmend-ai.cloudfunctions.net/sendNotification \
+curl -X POST https://asia-south1-mindmend-ai.cloudfunctions.net/sendNotification \
   -H "Content-Type: application/json" \
   -d '{
     "userId": "YOUR_USER_ID",

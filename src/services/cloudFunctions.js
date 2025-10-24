@@ -1,5 +1,5 @@
 // Firebase Cloud Functions Client
-const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 'http://localhost:5001/mindmend-ai/us-central1';
+const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 'http://localhost:5001/mindmend-ai/asia-south1';
 
 /**
  * Call Gemini 2.5 chat function (English only)
