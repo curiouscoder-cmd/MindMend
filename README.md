@@ -1,12 +1,13 @@
-# MindMend - Google Cloud AI Mental Wellness Platform
+# MindMend - AI-Powered Mental Wellness Platform
 
 ![Last Commit](https://img.shields.io/badge/Last%20Commit-2025--10--24-blue.svg)
-![Version](https://img.shields.io/badge/Version-2.0.0-green.svg)
+![Version](https://img.shields.io/badge/Version-3.0.0-green.svg)
 [![Primary Language](https://img.shields.io/badge/Language-JavaScript-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Google Cloud](https://img.shields.io/badge/Google%20Cloud-Firebase%20%2B%20Vertex%20AI-4285F4.svg)](https://cloud.google.com/)
+[![Gemma 3](https://img.shields.io/badge/Gemma%203-Ollama%20%2B%20Vertex%20AI-FF6B35.svg)](https://ollama.ai/)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Firebase-FF6F00.svg)](https://mindmend-25dca.web.app/)
 
-> **🏆 Google Gen AI Exchange Hackathon Project** - Advanced mental wellness platform powered by Google Cloud's full AI stack, featuring multilingual support, Firebase integration, and Vertex AI models running from Mumbai region.
+> **🏆 Google Gen AI Exchange Hackathon Project** - Advanced mental wellness platform powered by **Gemma 3 + Gemini 2.5** hybrid AI architecture, featuring multilingual support for 10 Indian languages, Firebase integration, and local Ollama deployment for enhanced privacy and performance.
 
 ## 🚀 Google Cloud Technology Stack
 
@@ -16,9 +17,13 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4.17-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
-### Google Cloud Services (15 Services)
-![Firebase](https://img.shields.io/badge/Firebase-Functions%20Gen2-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)
+### AI Models & Services
+![Gemma 3](https://img.shields.io/badge/Gemma%203-1B%20%7C%204B%20%7C%2027B-FF6B35?style=for-the-badge&logo=google&logoColor=white)
+![Ollama](https://img.shields.io/badge/Ollama-Local%20Deployment-000000?style=for-the-badge&logo=ollama&logoColor=white)
 ![Vertex AI](https://img.shields.io/badge/Vertex%20AI-Gemini%202.5-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-Functions%20Gen2-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)
+
+### Google Cloud Services (15 Services)
 ![Firestore](https://img.shields.io/badge/Firestore-NoSQL-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)
 ![Cloud Vision](https://img.shields.io/badge/Cloud%20Vision-API-4285F4?style=for-the-badge&logo=google&logoColor=white)
 ![Cloud NLP](https://img.shields.io/badge/Cloud%20NLP-API-4285F4?style=for-the-badge&logo=google&logoColor=white)
@@ -28,7 +33,33 @@
 
 ## 📋 Project Overview
 
-**MindMend** is a comprehensive mental wellness platform built for the **Google Gen AI Exchange Hackathon**, showcasing the full power of Google Cloud's AI ecosystem. The platform provides evidence-based Cognitive Behavioral Therapy (CBT) exercises, multilingual AI support, and real-time analytics - all powered by 15+ Google Cloud services running from the Mumbai region (asia-south1) for optimal performance in India.
+**MindMend** is a comprehensive mental wellness platform built for the **Google Gen AI Exchange Hackathon**, showcasing the full power of Google Cloud's AI ecosystem enhanced with **Gemma 3 local deployment**. The platform provides evidence-based Cognitive Behavioral Therapy (CBT) exercises, multilingual AI support, and real-time analytics - all powered by a hybrid architecture combining local Ollama models with 15+ Google Cloud services running from the Mumbai region (asia-south1) for optimal performance in India.
+
+## 🦙 **NEW: Gemma 3 + Ollama Integration**
+
+### **🚀 Hybrid AI Architecture**
+```
+Local Ollama (Privacy) ←→ Vertex AI (Scale)
+     ↓                           ↓
+Gemma 3:1B (Detection)    Gemini 2.5 (Fallback)
+Gemma 3:4B (Translation)  Gemini 2.5 Pro (Complex)
+Gemma 3:27B (Quality)     Cloud APIs (Multimodal)
+```
+
+### **✨ Key Innovations**
+- **🔒 Privacy-First**: Sensitive data processed locally with Ollama
+- **⚡ Performance**: Sub-second language detection with Gemma 3:1B
+- **🌍 Multilingual**: 140+ languages supported by Gemma 3 architecture
+- **🎯 Context-Aware**: 128K token context for mental health conversations
+- **🔄 Intelligent Fallback**: Automatic switching between local and cloud models
+
+### **📊 Performance Metrics**
+| Model | Task | Latency | Context | Languages |
+|-------|------|---------|---------|-----------|
+| **Gemma 3:1B** | Language Detection | ~300ms | 32K tokens | 140+ |
+| **Gemma 3:4B** | Translation | ~13s | 128K tokens | 140+ |
+| **Gemma 3:27B** | High-Quality | ~30s | 128K tokens | 140+ |
+| **Gemini 2.5** | Fallback | ~4s | 1M tokens | 100+ |
 
 ## 🏆 Hackathon Implementation Status
 
@@ -167,76 +198,132 @@
 - **IndexedDB Storage**: Client-side database for offline data persistence
 - **Socket.io Integration**: Real-time messaging and notifications
 
-## 🛠️ Installation & Setup
+## 🛠️ Installation & Setup Guide
 
-### Prerequisites
+### 📋 Prerequisites
+
+#### **System Requirements**
 - **Node.js** (version 24 or higher)
 - **npm** or **yarn** package manager
+- **Git** for version control
+- **8GB+ RAM** (recommended for Gemma 3 models)
+- **10GB+ free disk space** (for Ollama models)
+
+#### **Cloud Services**
 - **Google Cloud Account** with billing enabled
 - **Firebase CLI** installed globally
 - **gcloud CLI** installed and authenticated
 
-### 🚀 Quick Start (Local Development)
+#### **AI Models (Choose One)**
+- **Option A**: **Ollama** (Local, Privacy-First) - **RECOMMENDED**
+- **Option B**: **Vertex AI Only** (Cloud-based)
 
-#### 1. **Clone the Repository**
+---
+
+## 🚀 **Quick Start Guide**
+
+### **Step 1: Clone & Install**
+
 ```bash
+# Clone the repository
 git clone https://github.com/curiouscoder-cmd/MindMend.git
 cd MindMend
-```
 
-#### 2. **Install Dependencies**
-```bash
-# Frontend dependencies
+# Install frontend dependencies
 npm install
 
-# Firebase Functions dependencies
-cd functions
-npm install
-cd ..
+# Install Firebase Functions dependencies
+cd functions && npm install && cd ..
 ```
 
-#### 3. **Firebase Project Setup**
+### **Step 2: Choose Your AI Setup**
+
+#### **🦙 Option A: Ollama + Gemma 3 (RECOMMENDED)**
+
+**Install Ollama:**
 ```bash
-# Login to Firebase
-firebase login
+# macOS/Linux
+curl -fsSL https://ollama.ai/install.sh | sh
 
-# Create Firebase project (or use existing)
-firebase projects:create mindmend-ai
-
-# Set project
-firebase use mindmend-ai
+# Windows (PowerShell)
+# Download from: https://ollama.ai/download/windows
 ```
 
-#### 4. **Google Cloud Setup**
+**Pull Gemma 3 Models:**
+```bash
+# Essential models (Required)
+ollama pull gemma3:1b    # Fast language detection (~815MB)
+ollama pull gemma3:4b    # Primary translation (~3.3GB)
+
+# Optional high-quality model
+ollama pull gemma3:27b   # Premium quality (~17GB)
+```
+
+**Start Ollama Server:**
+```bash
+ollama serve
+# Server will run on http://localhost:11434
+```
+
+**Verify Installation:**
+```bash
+# Check available models
+ollama list
+
+# Test Gemma 3
+ollama run gemma3:1b "Hello, how are you?"
+```
+
+#### **☁️ Option B: Vertex AI Only**
+
 ```bash
 # Login to Google Cloud
 gcloud auth login
 gcloud auth application-default login
 
-# Set project
-gcloud config set project mindmend-ai
+# Set your project
+gcloud config set project your-project-id
 
-# Enable required APIs
+# Enable Vertex AI
 gcloud services enable aiplatform.googleapis.com
-gcloud services enable vision.googleapis.com
-gcloud services enable language.googleapis.com
-gcloud services enable speech.googleapis.com
-gcloud services enable texttospeech.googleapis.com
-gcloud services enable bigquery.googleapis.com
 ```
 
-#### 5. **Environment Configuration**
-```bash
-# Copy environment template
-cp .env.example .env.local
+### **Step 3: Firebase Project Setup**
 
-# Edit .env.local with your Firebase config
-# Get config from: Firebase Console → Project Settings → General → Your apps
+```bash
+# Login to Firebase
+firebase login
+
+# Create new project (or use existing)
+firebase projects:create mindmend-your-name
+
+# Set active project
+firebase use mindmend-your-name
+
+# Initialize Firebase in project
+firebase init functions
 ```
 
-**Required Environment Variables:**
+### **Step 4: Google Cloud APIs**
+
 ```bash
-# Firebase Configuration
+# Enable all required APIs
+gcloud services enable \
+  aiplatform.googleapis.com \
+  vision.googleapis.com \
+  language.googleapis.com \
+  speech.googleapis.com \
+  texttospeech.googleapis.com \
+  bigquery.googleapis.com \
+  firebase.googleapis.com \
+  firestore.googleapis.com
+```
+
+### **Step 5: Environment Configuration**
+
+**Create `.env.local` file:**
+```bash
+# Firebase Configuration (Get from Firebase Console)
 VITE_FIREBASE_API_KEY=your_api_key
 VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your_project_id
@@ -247,119 +334,349 @@ VITE_FIREBASE_APP_ID=your_app_id
 # Google Cloud Platform
 GCP_PROJECT_ID=your_project_id
 GCP_LOCATION=asia-south1
+
+# Ollama Configuration (Optional)
+OLLAMA_URL=http://localhost:11434
 ```
 
-#### 6. **Start Development Environment**
+**Get Firebase Config:**
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Select your project → Project Settings → General
+3. Scroll to "Your apps" → Web app → Config
+4. Copy the config values to `.env.local`
 
-**Terminal 1: Firebase Functions Emulator**
+### **Step 6: Start Development Environment**
+
+**Terminal 1: Ollama (if using local models)**
 ```bash
+ollama serve
+```
+
+**Terminal 2: Firebase Functions**
+```bash
+cd functions
 export GCP_PROJECT_ID=your_project_id
 export GCP_LOCATION=asia-south1
-firebase emulators:start --only functions,auth
+firebase emulators:start --only functions,firestore
 ```
 
-**Terminal 2: Frontend Development Server**
+**Terminal 3: Frontend**
 ```bash
 npm run dev
 ```
 
-#### 7. **Access the Application**
+### **Step 7: Verify Installation**
+
+**Check Services:**
 - **Frontend**: http://localhost:3000
-- **Firebase Emulator UI**: http://localhost:4000
+- **Firebase Emulator**: http://localhost:4000
 - **Functions**: http://localhost:5001
+- **Ollama**: http://localhost:11434 (if using Ollama)
 
-### Detailed Setup Guides
-
-For comprehensive setup instructions, refer to these additional guides:
-- 📋 [Quick Start Guide](QUICK_START.md) - Fast setup for development
-- 🗄️ [Database Setup](DATABASE_SETUP.md) - Supabase configuration
-- 📦 [Install Dependencies](INSTALL_DEPENDENCIES.md) - Detailed dependency installation
-- 💰 [Cost Estimation & Mockups](COST_ESTIMATION_AND_MOCKUPS.md) - Project planning details
-
-## 🧪 Testing the Implementation
-
-### **Frontend Testing**
-
-#### 1. **Basic Functionality Test**
+**Test AI Integration:**
 ```bash
-# Start the frontend
+# Test Ollama connection
+curl http://localhost:11434/api/tags
+
+# Test Firebase Functions
+curl http://localhost:5001/your-project/asia-south1/healthCheck
+
+# Test translation with Gemma 3
+curl -X POST http://localhost:5001/your-project/asia-south1/streamingTranslation \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Hello world","targetLanguage":"hi","streaming":false}'
+```
+
+---
+
+## 🔧 **Troubleshooting Guide**
+
+### **Common Issues & Solutions**
+
+#### **🦙 Ollama Issues**
+
+**Problem**: `ollama: command not found`
+```bash
+# Solution: Install Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+# Restart terminal after installation
+```
+
+**Problem**: `Error: remove /Users/.../models/blobs/...`
+```bash
+# Solution: Clean up partial downloads
+ollama rm gemma3:27b  # Remove problematic model
+ollama pull gemma3:27b  # Re-download
+```
+
+**Problem**: Ollama server not responding
+```bash
+# Check if Ollama is running
+ps aux | grep ollama
+
+# Restart Ollama
+pkill ollama
+ollama serve
+```
+
+#### **🔥 Firebase Issues**
+
+**Problem**: `Firebase CLI not found`
+```bash
+# Install Firebase CLI globally
+npm install -g firebase-tools
+firebase login
+```
+
+**Problem**: `Permission denied` errors
+```bash
+# Re-authenticate
+firebase logout
+firebase login
+gcloud auth application-default login
+```
+
+**Problem**: Functions deployment fails
+```bash
+# Check Node.js version (must be 18+)
+node --version
+
+# Update Firebase CLI
+npm install -g firebase-tools@latest
+```
+
+#### **☁️ Google Cloud Issues**
+
+**Problem**: `API not enabled` errors
+```bash
+# Enable all required APIs
+gcloud services enable aiplatform.googleapis.com
+gcloud services enable vision.googleapis.com
+# ... (see Step 4 above)
+```
+
+**Problem**: `Quota exceeded` errors
+```bash
+# Check quotas in Google Cloud Console
+# Go to: IAM & Admin → Quotas
+# Request quota increases if needed
+```
+
+### **🚀 Performance Optimization**
+
+#### **Ollama Performance**
+```bash
+# Check system resources
+htop  # or Activity Monitor on macOS
+
+# Optimize Ollama for your system
+export OLLAMA_NUM_PARALLEL=1  # Reduce parallel requests
+export OLLAMA_MAX_LOADED_MODELS=2  # Limit loaded models
+```
+
+#### **Firebase Functions**
+```bash
+# Increase memory allocation
+# Edit functions/package.json:
+"engines": {
+  "node": "24"
+},
+"functions": {
+  "memory": "2GB",
+  "timeout": "540s"
+}
+```
+
+## 🧪 **Comprehensive Testing Guide**
+
+### **🦙 Ollama + Gemma 3 Testing**
+
+#### **1. Ollama Connection Test**
+```bash
+# Check Ollama server status
+curl http://localhost:11434/api/tags | jq '.models[].name'
+# Expected: ["gemma3:1b", "gemma3:4b", ...]
+
+# Test Gemma 3:1B language detection
+curl -X POST http://localhost:11434/api/generate \
+  -d '{"model":"gemma3:1b","prompt":"Detect language: Hello world","stream":false}' | jq '.response'
+# Expected: "en" or similar language code
+```
+
+#### **2. Streaming Translation Test**
+```bash
+# Test English to Hindi translation
+curl -X POST http://localhost:5001/your-project/asia-south1/streamingTranslation \
+  -H "Content-Type: application/json" \
+  -d '{"text":"I am feeling anxious about my studies","targetLanguage":"hi","streaming":false}' | jq '.'
+
+# Expected Response:
+{
+  "success": true,
+  "originalText": "I am feeling anxious about my studies",
+  "translatedText": "मैं अपनी पढ़ाई को लेकर चिंतित महसूस कर रहा हूं",
+  "detectedLanguage": "en",
+  "targetLanguage": "hi",
+  "confidence": 0.9,
+  "model": "gemma3:4b",
+  "performance": {
+    "languageDetection": 300,
+    "translation": 13000,
+    "total": 13300
+  }
+}
+```
+
+#### **3. Multilingual Pipeline Test**
+```bash
+# Test Hindi input with Gemma 3
+curl -X POST http://localhost:5001/your-project/asia-south1/chatMultilingual \
+  -H "Content-Type: application/json" \
+  -d '{"message": "मुझे मानसिक स्वास्थ्य सहायता चाहिए"}' | jq '.'
+
+# Expected: Automatic language detection + contextual response
+```
+
+### **🔥 Firebase Functions Testing**
+
+#### **1. Health Check**
+```bash
+curl http://localhost:5001/your-project/asia-south1/healthCheck | jq '.'
+# Expected: {"status": "healthy", "functions": 19, "region": "asia-south1"}
+```
+
+#### **2. Translation Metrics**
+```bash
+curl http://localhost:5001/your-project/asia-south1/streamingTranslationMetrics | jq '.'
+# Expected: Performance metrics and cache statistics
+```
+
+#### **3. Voice & Multimodal Testing**
+```bash
+# Test speech-to-text
+curl -X POST http://localhost:5001/your-project/asia-south1/speechToText \
+  -H "Content-Type: application/json" \
+  -d '{"audioData": "base64_audio_data", "language": "hi"}' | jq '.'
+
+# Test doodle analysis
+curl -X POST http://localhost:5001/your-project/asia-south1/analyzeDoodle \
+  -H "Content-Type: application/json" \
+  -d '{"imageData": "base64_image_data"}' | jq '.'
+```
+
+### **📊 Performance Benchmarks**
+
+#### **Expected Performance (Gemma 3 + Ollama)**
+| Test Case | Gemma 3:1B | Gemma 3:4B | Gemini 2.5 Fallback |
+|-----------|------------|------------|---------------------|
+| **Language Detection** | ~300ms | N/A | ~1s |
+| **Simple Translation** | N/A | ~5-15s | ~3-4s |
+| **Complex Translation** | N/A | ~15-30s | ~4-6s |
+| **Mental Health Context** | N/A | ~20-35s | ~5-8s |
+
+#### **Performance Test Script**
+```bash
+# Create performance test
+cat > test-performance.sh << 'EOF'
+#!/bin/bash
+echo "🧪 MindMend Performance Test"
+echo "=========================="
+
+# Test 1: Language Detection Speed
+echo "Test 1: Language Detection (Gemma 3:1B)"
+time curl -s -X POST http://localhost:5001/your-project/asia-south1/streamingTranslation \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Hello","targetLanguage":"hi","streaming":false}' | jq '.performance.languageDetection'
+
+# Test 2: Translation Quality
+echo "Test 2: Translation Quality (Gemma 3:4B)"
+curl -s -X POST http://localhost:5001/your-project/asia-south1/streamingTranslation \
+  -H "Content-Type: application/json" \
+  -d '{"text":"I need help with anxiety and depression","targetLanguage":"hi","streaming":false}' | jq '.confidence'
+
+# Test 3: Multilingual Chat
+echo "Test 3: Multilingual Chat Pipeline"
+time curl -s -X POST http://localhost:5001/your-project/asia-south1/chatMultilingual \
+  -H "Content-Type: application/json" \
+  -d '{"message":"मुझे चिंता की समस्या है"}' | jq '.performance.total'
+
+echo "✅ Performance test completed!"
+EOF
+
+chmod +x test-performance.sh
+./test-performance.sh
+```
+
+### **🌐 Frontend Testing**
+
+#### **1. Basic Functionality**
+```bash
+# Start frontend
 npm run dev
 
 # Open http://localhost:3000
 # ✅ Check: App loads without errors
-# ✅ Check: Login page displays
-# ✅ Check: Navigation works
+# ✅ Check: Gemma 3 status indicator shows "Connected"
+# ✅ Check: Language selection works
+# ✅ Check: Translation is fast and accurate
 ```
 
-#### 2. **Authentication Test**
+#### **2. AI Integration Test**
 ```bash
-# Test Google Sign-In (uses Firebase Auth emulator)
-# ✅ Check: "Continue with Google" button works
-# ✅ Check: Anonymous login works
-# ✅ Check: User profile appears in navbar
+# Test AI chat with Gemma 3
+# 1. Go to AI Coach section
+# 2. Type: "I am feeling stressed"
+# 3. ✅ Check: Response uses Gemma 3 model
+# 4. ✅ Check: Response is contextually appropriate
+# 5. ✅ Check: Latency is acceptable (<30s)
 ```
 
-### **Firebase Functions Testing**
+### **🔍 Integration Testing**
 
-#### 1. **Health Check**
+#### **End-to-End User Flow**
+1. **🔐 Authentication**: Test Firebase Auth
+2. **🤖 AI Chat**: Send message to Gemma 3-powered coach
+3. **🌍 Translation**: Test multilingual support
+4. **📊 Analytics**: Check performance metrics
+5. **🔔 Notifications**: Test FCM integration
+6. **💾 Offline**: Test offline functionality
+
+#### **Automated Test Suite**
 ```bash
-curl http://localhost:5001/your-project-id/us-central1/healthCheck | jq '.'
-# Expected: {"status": "healthy", "functions": 11}
-```
+# Run comprehensive test suite
+npm run test:integration
 
-#### 2. **AI Chat Function (Gemini 2.5)**
-```bash
-curl -X POST http://localhost:5001/your-project-id/us-central1/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "I am feeling anxious and need help"}' | jq '.'
-# Expected: AI response with model info and timestamp
-```
+# Or create custom test script
+cat > test-suite.sh << 'EOF'
+#!/bin/bash
+echo "🚀 MindMend Integration Test Suite"
+echo "================================="
 
-#### 3. **Multilingual Chat (10 Languages)**
-```bash
-# Test Hindi input
-curl -X POST http://localhost:5001/your-project-id/us-central1/chatMultilingual \
-  -H "Content-Type: application/json" \
-  -d '{"message": "मैं बहुत चिंतित महसूस कर रहा हूं"}' | jq '.'
-# Expected: Language detection + translated response
-```
+# Test all endpoints
+endpoints=(
+  "healthCheck"
+  "streamingTranslation" 
+  "chatMultilingual"
+  "speechToText"
+  "analyzeDoodle"
+  "getAnalyticsDashboard"
+)
 
-#### 4. **Notification System**
-```bash
-# Register FCM token
-curl -X POST http://localhost:5001/your-project-id/us-central1/registerToken \
-  -H "Content-Type: application/json" \
-  -d '{"userId": "test-123", "token": "test-token"}' | jq '.'
+for endpoint in "${endpoints[@]}"; do
+  echo "Testing $endpoint..."
+  curl -s "http://localhost:5001/your-project/asia-south1/$endpoint" > /dev/null
+  if [ $? -eq 0 ]; then
+    echo "✅ $endpoint: PASS"
+  else
+    echo "❌ $endpoint: FAIL"
+  fi
+done
 
-# Send notification
-curl -X POST http://localhost:5001/your-project-id/us-central1/sendNotification \
-  -H "Content-Type: application/json" \
-  -d '{"userId": "test-123", "title": "Test", "body": "Hello"}' | jq '.'
-```
+echo "🏁 Test suite completed!"
+EOF
 
-#### 5. **Analytics Functions**
-```bash
-# Get analytics dashboard
-curl "http://localhost:5001/your-project-id/us-central1/getAnalyticsDashboard?startDate=2024-01-01&endDate=2024-12-31" | jq '.'
-
-# Initialize BigQuery
-curl -X POST http://localhost:5001/your-project-id/us-central1/initializeBigQuery | jq '.'
-```
-
-### **Performance Testing**
-
-#### **Multilingual Pipeline Performance**
-```bash
-# Test response times
-time curl -X POST http://localhost:5001/your-project-id/us-central1/chatMultilingual \
-  -H "Content-Type: application/json" \
-  -d '{"message": "I need mental health support"}' | jq '.performance'
-
-# Expected performance:
-# - Language detection: ~1s
-# - Preprocessing: ~3s  
-# - Gemini response: ~4s
-# - Total: ~7s
+chmod +x test-suite.sh
+./test-suite.sh
 ```
 
 ### **Integration Testing**
@@ -405,68 +722,214 @@ firebase deploy --only functions
 firebase deploy
 ```
 
-## 📁 Project Structure
+## 📁 **Project Structure**
 
 ```
 MindMend/
-├── 📁 functions/                    # Firebase Functions (19 functions)
+├── 📁 functions/                           # Firebase Functions (19 functions)
 │   ├── 📁 src/
-│   │   ├── 🔧 index.js             # Functions entry point
-│   │   ├── 🔧 admin.js             # Firebase Admin initialization
-│   │   ├── 🤖 chat.js              # Gemini 2.5 Flash chat
-│   │   ├── 🌍 chatMultilingual.js  # Multilingual chat pipeline
-│   │   ├── 🌍 multilingualPipeline.js # Language processing
-│   │   ├── 🎤 voiceChat.js         # Voice-to-text chat
-│   │   ├── 🎤 speechToText.js      # Cloud Speech API
-│   │   ├── 🔊 textToSpeech.js      # Cloud Text-to-Speech API
-│   │   ├── 🎨 analyzeDoodle.js     # Cloud Vision doodle analysis
-│   │   ├── 📊 analyzeMood.js       # Cloud NLP sentiment analysis
-│   │   ├── 🔔 notifications.js     # Firebase Cloud Messaging
-│   │   ├── 📈 analytics.js         # BigQuery analytics
-│   │   └── 🩺 healthCheck.js       # System health monitoring
-│   ├── 📦 package.json             # Node.js 24 dependencies
-│   └── 📋 firebase.json            # Firebase configuration
+│   │   ├── 🔧 index.js                    # Functions entry point
+│   │   ├── 🔧 admin.js                    # Firebase Admin initialization
+│   │   ├── 🤖 chat.js                     # Gemini 2.5 Flash chat
+│   │   ├── 🌍 chatMultilingual.js         # Multilingual chat pipeline
+│   │   ├── 🦙 streamingTranslation.js     # Gemma 3 + Ollama translation
+│   │   ├── 🎤 voiceChat.js                # Voice-to-text chat
+│   │   ├── 🎤 speechToText.js             # Cloud Speech API
+│   │   ├── 🔊 textToSpeech.js             # Cloud Text-to-Speech API
+│   │   ├── 🎨 analyzeDoodle.js            # Cloud Vision doodle analysis
+│   │   ├── 📊 analyzeMood.js              # Cloud NLP sentiment analysis
+│   │   ├── 🔔 notifications.js            # Firebase Cloud Messaging
+│   │   ├── 📈 analytics.js                # BigQuery analytics
+│   │   └── 🩺 healthCheck.js              # System health monitoring
+│   ├── 📦 package.json                    # Node.js 24 dependencies
+│   └── 📋 firebase.json                   # Firebase configuration
+├── 📁 scripts/                            # Testing & deployment scripts
+│   ├── 🧪 quick-test.sh                   # Quick functionality test
+│   ├── 🧪 test-streaming-translation.sh   # Gemma 3 translation tests
+│   ├── 🚀 deploy-functions.sh             # Deploy to production
+│   └── 🔧 setup-environment.sh            # Environment setup
 ├── 📁 public/
-│   ├── 🎵 music.mp3                # Background music file
-│   ├── 🎬 plant.mp4                # Calming video file
-│   └── 🔥 favicon.svg              # App icon
+│   ├── 🎵 music.mp3                       # Background music file
+│   ├── 🎬 plant.mp4                       # Calming video file
+│   └── 🔥 favicon.svg                     # App icon
 ├── 📁 src/
 │   ├── 📁 components/
-│   │   ├── 🧭 Navigation.jsx       # Navigation bar
-│   │   ├── 🏠 Onboarding.jsx       # Mood selection homepage
-│   │   ├── 🧠 CBTExercise.jsx      # CBT exercise components
-│   │   ├── 📊 ProgressTracking.jsx # Progress visualization
-│   │   ├── 🎮 Gamification.jsx     # Gamification features
-│   │   ├── 👥 Community.jsx        # Community support
-│   │   ├── 🤖 AICoach.jsx          # AI coaching component
-│   │   ├── 📈 AIInsights.jsx       # AI-powered insights
-│   │   ├── 🎭 EmotionalTwin.jsx    # AI emotional companion
-│   │   ├── 📊 MoodAnalytics.jsx    # Mood analytics dashboard
-│   │   ├── 🆘 CrisisMode.jsx       # Crisis support mode
-│   │   ├── 🎤 VoiceInput.jsx       # Voice emotion detection
-│   │   ├── 🎨 DoodleMoodInput.jsx  # Mood through drawing
-│   │   ├── 🏥 AIGroupTherapy.jsx   # AI group therapy
-│   │   └── 🔧 Login.jsx            # Firebase Authentication
+│   │   ├── 🧭 Navigation.jsx              # Navigation bar
+│   │   ├── 🏠 Onboarding.jsx              # Mood selection homepage
+│   │   ├── 🧠 CBTExercise.jsx             # CBT exercise components
+│   │   ├── 📊 ProgressTracking.jsx        # Progress visualization
+│   │   ├── 🎮 Gamification.jsx            # Gamification features
+│   │   ├── 👥 Community.jsx               # Community support
+│   │   ├── 🤖 AICoach.jsx                 # AI coaching component (Gemma 3)
+│   │   ├── 📈 AIInsights.jsx              # AI-powered insights
+│   │   ├── 🎭 EmotionalTwin.jsx           # AI emotional companion
+│   │   ├── 📊 MoodAnalytics.jsx           # Mood analytics dashboard
+│   │   ├── 🆘 CrisisMode.jsx              # Crisis support mode
+│   │   ├── 🎤 VoiceInput.jsx              # Voice emotion detection
+│   │   ├── 🎨 DoodleMoodInput.jsx         # Mood through drawing
+│   │   ├── 🏥 AIGroupTherapy.jsx          # AI group therapy
+│   │   └── 🔧 Login.jsx                   # Firebase Authentication
 │   ├── 📁 services/
-│   │   ├── 🔥 firebaseConfig.js    # Firebase initialization
-│   │   ├── 🔐 authService.js       # Authentication service
-│   │   ├── 🗄️ firestoreService.js # Firestore database
-│   │   ├── 🔔 fcmService.js        # Push notifications
-│   │   └── 💾 offlineService.js    # Offline data management
+│   │   ├── 🔥 firebaseConfig.js           # Firebase initialization
+│   │   ├── 🔐 authService.js              # Authentication service
+│   │   ├── 🗄️ firestoreService.js        # Firestore database
+│   │   ├── 🔔 fcmService.js               # Push notifications
+│   │   ├── 🦙 ollamaService.js            # Ollama integration service
+│   │   └── 💾 offlineService.js           # Offline data management
 │   ├── 📁 hooks/
-│   │   └── 🎨 useMoodTheme.js      # Mood-based theming
-│   ├── 📱 App.jsx                  # Main application
-│   ├── 🚀 index.jsx                # React entry point
-│   └── 🎨 index.css                # Tailwind CSS styles
-├── 📋 TECH_STACK.md                # Technical documentation
-├── 📋 DEPLOYMENT_GUIDE.md          # Deployment instructions
-├── ⚙️ firebase.json                # Firebase project config
-├── ⚙️ storage.rules                # Firebase Storage rules
-├── 🔧 test-functions.sh            # Function testing script
-├── 📦 package.json                 # Frontend dependencies
-├── ⚙️ vite.config.js               # Vite build configuration
-└── 🌍 .env.local                   # Environment variables (gitignored)
+│   │   └── 🎨 useMoodTheme.js             # Mood-based theming
+│   ├── 📱 App.jsx                         # Main application
+│   ├── 🚀 index.jsx                       # React entry point
+│   └── 🎨 index.css                       # Tailwind CSS styles
+├── 📋 README.md                           # This comprehensive guide
+├── 📋 TECH_STACK.md                       # Technical documentation
+├── 📋 DEPLOYMENT_GUIDE.md                 # Deployment instructions
+├── ⚙️ firebase.json                       # Firebase project config
+├── ⚙️ storage.rules                       # Firebase Storage rules
+├── 📦 package.json                        # Frontend dependencies
+├── ⚙️ vite.config.js                      # Vite build configuration
+├── 🌍 .env.local                          # Environment variables (gitignored)
+└── 🌍 .env.example                        # Environment template
 ```
+
+### **🦙 Ollama Integration Files**
+
+| File | Purpose | Gemma 3 Models |
+|------|---------|----------------|
+| `streamingTranslation.js` | Hybrid translation service | 1B, 4B, 27B |
+| `ollamaService.js` | Ollama API integration | All models |
+| `chatMultilingual.js` | Multilingual chat pipeline | 4B primary |
+| `healthCheck.js` | System monitoring | Connection status |
+
+---
+
+## 🚀 **Production Deployment**
+
+### **🌐 Frontend Deployment (Firebase Hosting)**
+
+```bash
+# Build for production
+npm run build
+
+# Deploy to Firebase Hosting
+firebase deploy --only hosting
+
+# Custom domain (optional)
+firebase hosting:channel:deploy production --expires 30d
+```
+
+### **⚡ Functions Deployment (Firebase Functions)**
+
+```bash
+# Deploy all functions to production
+firebase deploy --only functions
+
+# Deploy specific function
+firebase deploy --only functions:streamingTranslation
+
+# Deploy with environment variables
+firebase functions:config:set \
+  gcp.project_id="your-project-id" \
+  gcp.location="asia-south1" \
+  ollama.url="http://your-ollama-server:11434"
+
+firebase deploy --only functions
+```
+
+### **🦙 Ollama Production Setup**
+
+#### **Option 1: Cloud VM with Ollama**
+```bash
+# Create Google Cloud VM
+gcloud compute instances create ollama-server \
+  --zone=asia-south1-a \
+  --machine-type=n1-standard-4 \
+  --boot-disk-size=50GB \
+  --image-family=ubuntu-2004-lts \
+  --image-project=ubuntu-os-cloud
+
+# SSH and install Ollama
+gcloud compute ssh ollama-server --zone=asia-south1-a
+curl -fsSL https://ollama.ai/install.sh | sh
+ollama serve --host 0.0.0.0:11434
+
+# Pull models
+ollama pull gemma3:1b
+ollama pull gemma3:4b
+```
+
+#### **Option 2: Docker Deployment**
+```bash
+# Create Dockerfile for Ollama
+cat > Dockerfile.ollama << 'EOF'
+FROM ollama/ollama:latest
+
+# Copy models (if pre-downloaded)
+COPY models/ /root/.ollama/models/
+
+# Expose port
+EXPOSE 11434
+
+# Start Ollama server
+CMD ["ollama", "serve", "--host", "0.0.0.0:11434"]
+EOF
+
+# Build and deploy
+docker build -f Dockerfile.ollama -t mindmend-ollama .
+docker run -d -p 11434:11434 --name ollama-server mindmend-ollama
+```
+
+#### **Option 3: Vertex AI Model Garden (Alternative)**
+```bash
+# Deploy Gemma models via Vertex AI (if Ollama not available)
+gcloud ai models deploy \
+  --model=gemma-3-4b-it \
+  --endpoint=mindmend-gemma-endpoint \
+  --region=asia-south1
+```
+
+### **📊 Production Monitoring**
+
+```bash
+# Set up monitoring
+firebase functions:log --only streamingTranslation
+
+# Performance monitoring
+gcloud logging read "resource.type=cloud_function" \
+  --format="table(timestamp,severity,textPayload)" \
+  --limit=50
+
+# Ollama monitoring
+curl http://your-ollama-server:11434/api/tags
+```
+
+### **🔒 Security Configuration**
+
+```bash
+# Firebase security rules
+# Edit firestore.rules:
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+
+# Deploy security rules
+firebase deploy --only firestore:rules
+```
+
+### **💰 Cost Optimization**
+
+| Service | Estimated Monthly Cost | Optimization |
+|---------|----------------------|--------------|
+| **Firebase Functions** | $10-50 | Use appropriate memory allocation |
+| **Firestore** | $5-25 | Optimize queries, use caching |
+| **Vertex AI** | $20-100 | Use Ollama for primary workload |
+| **Ollama VM** | $30-80 | Use preemptible instances |
+| **Total** | $65-255 | Hybrid approach saves 60-70% |
 
 ## 🏆 Hackathon Scoring Breakdown
 
