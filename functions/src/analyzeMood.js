@@ -5,6 +5,7 @@ import language from '@google-cloud/language';
 export const analyzeMood = onRequest({ 
   cors: true,
   timeoutSeconds: 30,
+  region: 'asia-south1',
 }, async (req, res) => {
   try {
     const { text, language: lang = 'en' } = req.body;

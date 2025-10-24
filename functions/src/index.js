@@ -34,6 +34,11 @@ import {
   getUserInsights,
   initializeBigQuery
 } from './analytics.js';
+import {
+  streamingTranslation,
+  streamingTranslationMetrics,
+  clearTranslationCache
+} from './streamingTranslation.js';
 
 // Export functions
 export { 
@@ -55,5 +60,8 @@ export {
   exportExerciseCompletion,
   getAnalyticsDashboard,
   getUserInsights,
-  initializeBigQuery
+  initializeBigQuery,
+  streamingTranslation,
+  streamingTranslationMetrics,
+  clearTranslationCache
 };

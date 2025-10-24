@@ -11,6 +11,7 @@ export const chat = onRequest({
   cors: true,
   timeoutSeconds: 60,
   memory: '512MiB',
+  region: 'asia-south1',
 }, async (req, res) => {
   try {
     const { message, moodHistory = [], userProgress = {}, language = 'en' } = req.body;

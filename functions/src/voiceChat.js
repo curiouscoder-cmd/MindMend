@@ -14,6 +14,7 @@ export const voiceChat = onRequest({
   cors: true,
   timeoutSeconds: 120,
   memory: '1GiB',
+  region: 'asia-south1',
 }, async (req, res) => {
   try {
     const { audioContent, moodHistory = [], userProgress = {} } = req.body;

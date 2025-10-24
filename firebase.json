@@ -37,7 +37,8 @@
       "port": 9099
     },
     "functions": {
-      "port": 5001
+      "port": 5001,
+      "host": "127.0.0.1"
     },
     "firestore": {
       "port": 8080
@@ -50,8 +51,12 @@
     },
     "ui": {
       "enabled": true,
-      "port": 4000
+      "port": 4000,
+      "host": "127.0.0.1"
     },
-    "singleProjectMode": true
+    "singleProjectMode": false,
+    "hub": {
+      "port": 4400
+    }
   }
 }
