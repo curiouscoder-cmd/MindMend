@@ -1,10 +1,10 @@
 // Gemini 2.5 Chat Function
 import { onRequest } from 'firebase-functions/v2/https';
-import { VertexAI } from '@google-cloud/aiplatform';
+import { VertexAI } from '@google-cloud/vertexai';
 
 const vertexAI = new VertexAI({
-  project: process.env.GCP_PROJECT_ID || 'mindmend-ai',
-  location: 'us-central1',
+  project: process.env.GCP_PROJECT_ID || 'mindmend-25dca',
+  location: 'asia-south1', // Mumbai, India
 });
 
 export const chat = onRequest({ 
@@ -76,7 +76,7 @@ User message: "${message}"
 Your empathetic response:`;
     
     const result = await model.generateContent(systemPrompt);
-    const response = result.response.text();
+    const response = result.response.text;
     
     console.log(`Response generated successfully with ${modelName}`);
     

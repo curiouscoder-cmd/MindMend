@@ -10,11 +10,12 @@
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "20"
+    "node": "24"
   },
   "main": "src/index.js",
   "dependencies": {
-    "@google-cloud/aiplatform": "^5.10.0",
+    "@google-cloud/vertexai": "^1.10.0",
+    "@google-cloud/bigquery": "^8.1.1",
     "@google-cloud/vision": "^5.3.4",
     "@google-cloud/language": "^7.2.1",
     "@google-cloud/speech": "^7.2.1",

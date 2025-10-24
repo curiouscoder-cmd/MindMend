@@ -103,7 +103,7 @@ import { VertexAI } from '@google-cloud/vertexai';
 export const chat = onRequest(async (req, res) => {
   const vertexAI = new VertexAI({
     project: process.env.GCP_PROJECT_ID,
-    location: 'us-central1',
+    location: 'asia-south1',
   });
   
   const model = vertexAI.getGenerativeModel({
@@ -567,7 +567,7 @@ VITE_FIREBASE_VAPID_KEY=
 
 # GCP
 GCP_PROJECT_ID=
-GCP_LOCATION=us-central1
+GCP_LOCATION=asia-south1
 ```
 
 ### Deploy
