@@ -7,8 +7,8 @@ import {
 } from './multilingualPipeline.js';
 
 const vertexAI = new VertexAI({
-  project: process.env.GCP_PROJECT_ID || 'mindmend-ai',
-  location: 'us-central1',
+  project: process.env.GCP_PROJECT_ID || 'mindmend-25dca',
+  location: 'asia-south1', // Mumbai, India
 });
 
 export const chatMultilingual = onRequest({ 

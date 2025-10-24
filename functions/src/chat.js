@@ -3,8 +3,8 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { VertexAI } from '@google-cloud/vertexai';
 
 const vertexAI = new VertexAI({
-  project: process.env.GCP_PROJECT_ID || 'mindmend-ai',
-  location: 'us-central1',
+  project: process.env.GCP_PROJECT_ID || 'mindmend-25dca',
+  location: 'asia-south1', // Mumbai, India
 });
 
 export const chat = onRequest({ 

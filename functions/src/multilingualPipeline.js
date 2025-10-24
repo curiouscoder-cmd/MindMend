@@ -3,8 +3,8 @@
 import { VertexAI } from '@google-cloud/vertexai';
 
 const vertexAI = new VertexAI({
-  project: process.env.GCP_PROJECT_ID || 'mindmend-ai',
-  location: 'us-central1',
+  project: process.env.GCP_PROJECT_ID || 'mindmend-25dca',
+  location: process.env.GCP_LOCATION || 'asia-south1', // Mumbai, India
 });
 
 // Supported languages
@@ -26,20 +26,12 @@ const LANGUAGES = {
  */
 export async function detectLanguage(text) {
   try {
-    const gemma2B = vertexAI.preview.getGenerativeModel({
-      model: 'gemma-2-2b-it',
-      generationConfig: {
-        temperature: 0.1,
-        maxOutputTokens: 10,
-      },
-    });
-    
     const prompt = `Detect the language of this text. Reply with only the ISO 639-1 code (en, hi, ta, te, bn, mr, gu, kn, ml, pa):
 "${text.substring(0, 200)}"
 
 Language code:`;
     
-    const result = await gemma2B.generateContent(prompt);
+    const result = await geminiFlash.generateContent(prompt);
     const langCode = result.response.text.trim().toLowerCase();
     
     // Validate and return
@@ -80,28 +72,20 @@ English translation:`;
 }
 
 /**
- * Step 3: Translate from English using Gemma 3 27B (high quality)
+ * Step 3: Translate from English using Gemini 2.5 Pro (high quality)
  */
 export async function translateFromEnglish(text, targetLang) {
   if (targetLang === 'en') return text;
   
   try {
-    const gemma27B = vertexAI.preview.getGenerativeModel({
-      model: 'gemma-2-27b-it',
-      generationConfig: {
-        temperature: 0.3,
-        maxOutputTokens: 512,
-      },
-    });
-    
     const prompt = `Translate this English mental health response to ${LANGUAGES[targetLang]}. Maintain empathetic tone and cultural appropriateness for Indian context:
 
 English text: "${text}"
 
 ${LANGUAGES[targetLang]} translation:`;
     
-    const result = await gemma27B.generateContent(prompt);
-    return result.response.text().trim();
+    const result = await geminiPro.generateContent(prompt);
+    return result.response.text.trim();
   } catch (error) {
     console.error('Translation from English error:', error);
     return text; // Return English if translation fails
@@ -113,13 +97,8 @@ ${LANGUAGES[targetLang]} translation:`;
  */
 export async function preprocessInput(text, language) {
   try {
-    const gemma9B = vertexAI.preview.getGenerativeModel({
-      model: 'gemma-2-9b-it',
-      generationConfig: {
-        temperature: 0.3,
-        maxOutputTokens: 256,
-      },
-    });
+    // Use Gemini 2.5 Flash for preprocessing (fast and efficient)
+    const model = geminiFlash;
     
     const prompt = `Analyze this mental health message. Extract:
 1. Intent: mood_logging, seeking_help, crisis, casual_chat, exercise_request
@@ -131,8 +110,8 @@ Message: "${text}"
 
 Respond in JSON format only:`;
     
-    const result = await gemma9B.generateContent(prompt);
-    const responseText = result.response.text().trim();
+    const result = await model.generateContent(prompt);
+    const responseText = result.response.text.trim();
     
     // Extract JSON from response
     const jsonMatch = responseText.match(/\{[\s\S]*\}/);
