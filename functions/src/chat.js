@@ -76,7 +76,7 @@ User message: "${message}"
 Your empathetic response:`;
     
     const result = await model.generateContent(systemPrompt);
-    const response = result.response.text();
+    const response = result.response.text;
     
     console.log(`Response generated successfully with ${modelName}`);
     

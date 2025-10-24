@@ -40,7 +40,7 @@ export async function detectLanguage(text) {
 Language code:`;
     
     const result = await gemma2B.generateContent(prompt);
-    const langCode = result.response.text().trim().toLowerCase();
+    const langCode = result.response.text.trim().toLowerCase();
     
     // Validate and return
     return LANGUAGES[langCode] ? langCode : 'en';
@@ -71,8 +71,8 @@ ${LANGUAGES[sourceLang]} text: "${text}"
 
 English translation:`;
     
-    const result = await gemma9B.generateContent(prompt);
-    return result.response.text().trim();
+    const result = await geminiPro.generateContent(prompt);
+    return result.response.text.trim();
   } catch (error) {
     console.error('Translation to English error:', error);
     return text; // Return original if translation fails

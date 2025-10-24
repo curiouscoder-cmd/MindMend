@@ -80,7 +80,7 @@ Your empathetic response in English:`;
     
     const geminiStart = Date.now();
     const result = await model.generateContent(systemPrompt);
-    const englishResponse = result.response.text();
+    const englishResponse = result.response.text;
     const geminiTime = Date.now() - geminiStart;
     
     console.log(`Gemini ${modelName} response: ${geminiTime}ms`);
