@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import elevenLabsService from '../services/elevenLabsService';
+import  { useState, useRef, useEffect } from 'react';
+import * as ttsService from '../services/ttsService';
 
 const VoiceEnabledMessage = ({ 
   message, 
@@ -26,11 +26,29 @@ const VoiceEnabledMessage = ({
     }
   }, [message.content, autoPlay]);
 
+  // Listen for speech synthesis end
+  useEffect(() => {
+    const handleSpeechEnd = () => {
+      setIsPlaying(false);
+    };
+
+    // Web Speech API doesn't have a global event listener
+    // The onend callback in generateSpeech handles this
+    return () => {
+      // Cleanup if component unmounts while speaking
+      ttsService.stopSpeech();
+    };
+  }, []);
+
   const handlePlayMessage = async () => {
     if (isPlaying) {
       handleStopMessage();
       return;
     }
+
+    console.log('🔊 VoiceEnabledMessage: Starting playback');
+    console.log('📝 Message:', message.content.substring(0, 50) + '...');
+    console.log('🎭 Emotion:', emotion);
 
     setIsLoading(true);
     setError(null);
@@ -39,47 +57,47 @@ const VoiceEnabledMessage = ({
       let url = audioUrl;
       
       if (!url) {
-        // Generate speech if not cached
-        url = await elevenLabsService.generateSpeech(
+        console.log('🎙️ Generating new audio...');
+        // Generate speech with Web Speech API (high quality)
+        url = await ttsService.generateSpeech(
           message.content, 
-          persona,
-          { emotion }
+          { 
+            emotion,
+            gender: 'female',
+            useCache: true,
+            onEnd: () => {
+              console.log('🎵 Speech ended, updating UI');
+              setIsPlaying(false);
+            },
+            onStart: () => {
+              console.log('🎵 Speech started');
+              setIsLoading(false);
+            }
+          }
         );
+        console.log('✅ Audio generated:', url ? 'Success' : 'Failed');
         setAudioUrl(url);
+      } else {
+        console.log('💾 Using cached audio');
+        // For cached audio, we need to speak it again
+        await ttsService.generateSpeech(
+          message.content,
+          {
+            emotion,
+            gender: 'female',
+            useCache: false,
+            onEnd: () => setIsPlaying(false),
+            onStart: () => setIsLoading(false)
+          }
+        );
       }
 
-      if (url && url !== 'browser_tts') {
-        // Play ElevenLabs generated audio
-        const audio = new Audio(url);
-        audioRef.current = audio;
-        
-        audio.playbackRate = playbackSpeed;
-        audio.volume = 0.8;
-        
-        audio.addEventListener('loadstart', () => setIsLoading(true));
-        audio.addEventListener('canplay', () => setIsLoading(false));
-        audio.addEventListener('play', () => setIsPlaying(true));
-        audio.addEventListener('pause', () => setIsPlaying(false));
-        audio.addEventListener('ended', () => {
-          setIsPlaying(false);
-          audioRef.current = null;
-        });
-        audio.addEventListener('error', (e) => {
-          setError('Audio playback failed');
-          setIsPlaying(false);
-          setIsLoading(false);
-        });
-
-        await audio.play();
-      } else if (url === 'browser_tts') {
-        // Browser TTS is already playing
+      if (url === 'browser_tts') {
         setIsPlaying(true);
-        setIsLoading(false);
-        
-        // Simulate end event for browser TTS
-        setTimeout(() => {
-          setIsPlaying(false);
-        }, message.content.length * 50); // Rough estimate
+      } else if (url) {
+        setError('Unexpected audio format');
+      } else {
+        setError('Failed to generate audio');
       }
     } catch (err) {
       console.error('Error playing message:', err);
@@ -91,16 +109,14 @@ const VoiceEnabledMessage = ({
   };
 
   const handleStopMessage = () => {
+    // Stop Web Speech API or audio element
+    ttsService.stopSpeech();
+    
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
+      audioRef.current = null;
     }
-    
-    // Stop browser TTS if active
-    if ('speechSynthesis' in window) {
-      speechSynthesis.cancel();
-    }
-    
     setIsPlaying(false);
   };
 
@@ -196,11 +212,9 @@ const VoiceEnabledMessage = ({
 
               {/* Voice Status */}
               <div className="flex items-center space-x-1">
-                <div className={`w-2 h-2 rounded-full ${
-                  elevenLabsService.isAvailable() ? 'bg-green-400' : 'bg-orange-400'
-                }`}></div>
+                <div className="w-2 h-2 rounded-full bg-green-400"></div>
                 <span className="text-xs text-calm-500">
-                  {elevenLabsService.isAvailable() ? 'AI Voice' : 'Browser TTS'}
+                  High-Quality Voice • Mira
                 </span>
               </div>
             </div>

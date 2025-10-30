@@ -7,7 +7,7 @@ import VoiceButton from './VoiceButton.jsx';
 import RealTimeVoiceChat from './RealTimeVoiceChat.jsx';
 import VoiceEnabledMessage from './VoiceEnabledMessage';
 import { mockData } from '../data/mockData';
-import elevenLabsService from '../services/elevenLabsService';
+import * as ttsService from '../services/ttsService';
 
 const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   const [messages, setMessages] = useState([]);
@@ -179,14 +179,20 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   };
 
   const playResponseVoice = async (text) => {
-    if (!autoPlayVoice || isPlayingVoice) return;
+    if (!text) return;
     
     try {
       setIsPlayingVoice(true);
-      await api.textToSpeech(text);
+      await ttsService.generateSpeech(text, { 
+        emotion: 'supportive',
+        gender: 'female',
+        volume: 0.9,
+        useCache: true,
+        onEnd: () => setIsPlayingVoice(false),
+        onStart: () => console.log('🎵 AI response voice started')
+      });
     } catch (error) {
       console.error('TTS error:', error);
-    } finally {
       setIsPlayingVoice(false);
     }
   };

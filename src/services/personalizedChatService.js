@@ -180,8 +180,11 @@ export async function generatePersonalizedResponse(
       content: userMessage
     });
     
-    // Call Gemini API via backend
-    const response = await fetch('/.netlify/functions/chat-personalized', {
+    // Call Gemini API via Firebase Functions
+    const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 
+      'https://asia-south1-mindmend-25dca.cloudfunctions.net';
+    
+    const response = await fetch(`${FUNCTIONS_URL}/chatPersonalized`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

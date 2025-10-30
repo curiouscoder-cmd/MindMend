@@ -1,58 +1,64 @@
 /**
  * Gemini 2.5 Flash TTS Integration
- * Uses Google Cloud Text-to-Speech with Gemini 2.5 Flash TTS model
+ * Model: gemini-2.5-flash-tts
  * Voice: Aoede (Female)
- * Audio Encoding: LINEAR16
+ * Audio Encoding: LINEAR16 (PCM 16-bit)
  * Sample Rate: 44100 Hz
  */
 
 import { onRequest } from 'firebase-functions/v2/https';
-import { TextToSpeechClient } from '@google-cloud/text-to-speech';
+import { GoogleGenAI } from '@google/genai';
 
-const ttsClient = new TextToSpeechClient();
+// Initialize Gemini AI client with correct configuration
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+  // Use beta API for preview models like TTS
+  apiVersion: 'v1beta'
+});
 
 /**
  * Gemini 2.5 Flash TTS - High-quality, low-latency text-to-speech
  * @param {string} text - Text to synthesize
- * @param {string} prompt - Style prompt for delivery (optional)
- * @param {object} options - Additional configuration
- * @returns {Promise<Buffer>} Audio buffer
+ * @param {string} voiceName - Voice name (Aoede, Kore, Puck, etc.)
+ * @param {string} stylePrompt - Optional style prompt for delivery
+ * @returns {Promise<Buffer>} Audio buffer (LINEAR16 @ 44100Hz)
  */
-export async function synthesizeSpeech(text, prompt = '', options = {}) {
-  const {
-    languageCode = 'en-US',
-    voiceName = 'Aoede', // Female voice optimized for empathetic dialogue
-    audioEncoding = 'LINEAR16',
-    sampleRateHertz = 44100,
-    speakingRate = 1.0,
-    pitch = 0.0,
-    volumeGainDb = 0.0,
-    effectsProfileId = ['small-bluetooth-speaker-class-device']
-  } = options;
-
+export async function synthesizeSpeech(text, voiceName = 'Aoede', stylePrompt = '') {
   try {
-    const request = {
-      input: {
-        text: text,
-        ...(prompt && { prompt: prompt })
-      },
-      voice: {
-        languageCode: languageCode,
-        name: voiceName,
-        model_name: 'gemini-2.5-flash-tts'
-      },
-      audioConfig: {
-        audioEncoding: audioEncoding,
-        sampleRateHertz: sampleRateHertz,
-        speakingRate: speakingRate,
-        pitch: pitch,
-        volumeGainDb: volumeGainDb,
-        effectsProfileId: effectsProfileId
-      }
-    };
+    // Add style prompt if provided
+    const finalText = stylePrompt ? `${stylePrompt}: ${text}` : text;
 
-    const [response] = await ttsClient.synthesizeSpeech(request);
-    return response.audioContent;
+    console.log('🎙️ Synthesizing speech with Gemini 2.5 Flash TTS');
+    console.log('📝 Text:', finalText.substring(0, 100));
+    console.log('🎭 Voice:', voiceName);
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-tts', // Correct model ID
+      contents: finalText,
+      generationConfig: {
+        responseModalities: ['AUDIO'],
+        speechConfig: {
+          voiceConfig: {
+            prebuiltVoiceConfig: {
+              voiceName: voiceName // Aoede (Female)
+            }
+          },
+          // Audio encoding configuration
+          audioEncoding: 'LINEAR16',
+          sampleRateHertz: 44100
+        }
+      }
+    });
+
+    // Extract audio data from response
+    const audioData = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    
+    if (!audioData) {
+      throw new Error('No audio data in response');
+    }
+
+    // Convert base64 to buffer
+    return Buffer.from(audioData, 'base64');
   } catch (error) {
     console.error('Gemini TTS Error:', error);
     throw new Error(`TTS synthesis failed: ${error.message}`);
@@ -98,19 +104,10 @@ export const geminiTTS = onRequest({
       compassionate: 'Say the following with deep compassion and understanding'
     };
 
-    const finalPrompt = prompt || emotionPrompts[emotion] || emotionPrompts.supportive;
+    const stylePrompt = prompt || emotionPrompts[emotion] || emotionPrompts.supportive;
 
     const startTime = Date.now();
-    const audioContent = await synthesizeSpeech(text, finalPrompt, {
-      languageCode,
-      voiceName: 'Aoede',
-      audioEncoding: 'LINEAR16',
-      sampleRateHertz: 44100,
-      speakingRate: speakingRate,
-      pitch: 0.0,
-      volumeGainDb: 0.0,
-      effectsProfileId: ['small-bluetooth-speaker-class-device']
-    });
+    const audioContent = await synthesizeSpeech(text, 'Aoede', stylePrompt);
 
     const duration = Date.now() - startTime;
     console.log(`✅ TTS generated in ${duration}ms`);
@@ -122,11 +119,11 @@ export const geminiTTS = onRequest({
       audioBase64,
       contentType: 'audio/l16',
       sampleRate: 44100,
+      channels: 1,
       encoding: 'LINEAR16',
-      duration: duration,
       model: 'gemini-2.5-flash-tts',
       voice: 'Aoede',
-      timestamp: new Date().toISOString()
+      emotion
     });
 
   } catch (error) {
@@ -174,13 +171,23 @@ export const geminiTTSStream = onRequest({
     // Stream each chunk
     for (let i = 0; i < chunks.length; i++) {
       const chunk = chunks[i];
-      const audioContent = await synthesizeSpeech(chunk, prompt, {
-        voiceName: 'Aoede',
-        audioEncoding: 'LINEAR16',
-        sampleRateHertz: 44100
+      const audioContent = await ai.models.generateContent({
+        model: 'gemini-2.5-flash-preview-tts',
+        contents: [{ parts: [{ text: chunk }] }],
+        config: {
+          responseModalities: ['AUDIO'],
+          speechConfig: {
+            voiceConfig: {
+              prebuiltVoiceConfig: {
+                voiceName: 'Aoede'
+              }
+            }
+          }
+        }
       });
 
-      const audioBase64 = audioContent.toString('base64');
+      const audioData = audioContent.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      const audioBase64 = Buffer.from(audioData, 'base64').toString('base64');
       
       res.write(JSON.stringify({
         chunk: i + 1,

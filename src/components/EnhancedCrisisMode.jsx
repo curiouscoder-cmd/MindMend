@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { mockData } from '../data/mockData';
-import elevenLabsService from '../services/elevenLabsService';
+import geminiTTSService from '../services/geminiTTSService';
 
 const EnhancedCrisisMode = ({ onClose, onExerciseComplete, userLocation }) => {
   const [currentStep, setCurrentStep] = useState('assessment');
@@ -63,7 +63,10 @@ const EnhancedCrisisMode = ({ onClose, onExerciseComplete, userLocation }) => {
   const playCalmingAudio = async () => {
     try {
       const calmingMessage = "You're safe now. Take a deep breath with me. You're going to be okay.";
-      const audioUrl = await elevenLabsService.generateSpeech(calmingMessage, 'meditation');
+      const audioUrl = await geminiTTSService.generateSpeech(calmingMessage, { 
+        emotion: 'calming',
+        useCache: true 
+      });
       
       if (audioUrl && audioUrl !== 'browser_tts') {
         audioRef.current = new Audio(audioUrl);
@@ -145,7 +148,10 @@ const EnhancedCrisisMode = ({ onClose, onExerciseComplete, userLocation }) => {
         if (!breathingActive) break;
         
         try {
-          const audioUrl = await elevenLabsService.generateSpeech(instruction, 'meditation');
+          const audioUrl = await geminiTTSService.generateSpeech(instruction, { 
+            emotion: 'calming',
+            useCache: true 
+          });
           if (audioUrl && audioUrl !== 'browser_tts') {
             const audio = new Audio(audioUrl);
             audio.volume = 0.8;

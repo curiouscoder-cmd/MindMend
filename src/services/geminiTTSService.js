@@ -4,7 +4,10 @@
  * Features: LOW latency, HIGH quality, emotion-aware synthesis
  */
 
-const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 'http://localhost:5001/mindmend-ai/asia-south1';
+// Get functions URL from environment
+const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 'http://127.0.0.1:5001/mindmend-25dca/asia-south1';
+
+console.log('🔧 Gemini TTS Service initialized with URL:', FUNCTIONS_URL);
 
 class GeminiTTSService {
   constructor() {
@@ -37,6 +40,8 @@ class GeminiTTSService {
 
     try {
       console.log('🎙️ Generating speech with Gemini 2.5 Flash TTS...');
+      console.log('📍 URL:', `${FUNCTIONS_URL}/geminiTTS`);
+      console.log('📝 Text:', text.substring(0, 50) + '...');
       const startTime = Date.now();
 
       const response = await fetch(`${FUNCTIONS_URL}/geminiTTS`, {
@@ -51,16 +56,21 @@ class GeminiTTSService {
         })
       });
 
+      console.log('📡 Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`TTS API error: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ TTS API error:', response.status, errorText);
+        throw new Error(`TTS API error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
       const duration = Date.now() - startTime;
       console.log(`✅ Speech generated in ${duration}ms`);
 
-      // Convert base64 to blob URL
-      const audioBlob = this.base64ToBlob(data.audioBase64, 'audio/l16');
+      // Convert base64 PCM to WAV blob for browser playback
+      // Sample rate: 44100Hz (from Gemini TTS)
+      const audioBlob = this.base64ToWavBlob(data.audioBase64, data.sampleRate || 44100);
       const audioUrl = URL.createObjectURL(audioBlob);
 
       // Cache the result
@@ -71,7 +81,9 @@ class GeminiTTSService {
       return audioUrl;
 
     } catch (error) {
-      console.error('Gemini TTS Error:', error);
+      console.error('❌ Gemini TTS Error:', error);
+      console.error('⚠️ Falling back to browser TTS');
+      console.error('💡 Check that Firebase emulators are running on:', FUNCTIONS_URL);
       // Fallback to browser TTS
       return this.fallbackTTS(text);
     }
@@ -206,6 +218,70 @@ class GeminiTTSService {
         resolve(null);
       }
     });
+  }
+
+  /**
+   * Convert base64 PCM to WAV blob with proper headers
+   * @param {string} base64 - Base64 encoded PCM audio
+   * @param {number} sampleRate - Sample rate (44100Hz for Gemini TTS)
+   * @returns {Blob} WAV audio blob
+   */
+  base64ToWavBlob(base64, sampleRate = 44100) {
+    // Decode base64 to PCM data
+    const pcmData = atob(base64);
+    const pcmBytes = new Uint8Array(pcmData.length);
+    for (let i = 0; i < pcmData.length; i++) {
+      pcmBytes[i] = pcmData.charCodeAt(i);
+    }
+
+    // Create WAV header
+    const numChannels = 1; // Mono
+    const bitsPerSample = 16; // LINEAR16
+    const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+    const blockAlign = numChannels * (bitsPerSample / 8);
+    const dataSize = pcmBytes.length;
+    const fileSize = 36 + dataSize;
+
+    // Create WAV file buffer
+    const wavBuffer = new ArrayBuffer(44 + dataSize);
+    const view = new DataView(wavBuffer);
+
+    // RIFF chunk descriptor
+    this.writeString(view, 0, 'RIFF');
+    view.setUint32(4, fileSize, true);
+    this.writeString(view, 8, 'WAVE');
+
+    // fmt sub-chunk
+    this.writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true); // Subchunk1Size (16 for PCM)
+    view.setUint16(20, 1, true); // AudioFormat (1 for PCM)
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, byteRate, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitsPerSample, true);
+
+    // data sub-chunk
+    this.writeString(view, 36, 'data');
+    view.setUint32(40, dataSize, true);
+
+    // Copy PCM data
+    const wavBytes = new Uint8Array(wavBuffer);
+    wavBytes.set(pcmBytes, 44);
+
+    return new Blob([wavBuffer], { type: 'audio/wav' });
+  }
+
+  /**
+   * Helper to write string to DataView
+   * @param {DataView} view - DataView to write to
+   * @param {number} offset - Offset position
+   * @param {string} string - String to write
+   */
+  writeString(view, offset, string) {
+    for (let i = 0; i < string.length; i++) {
+      view.setUint8(offset + i, string.charCodeAt(i));
+    }
   }
 
   /**

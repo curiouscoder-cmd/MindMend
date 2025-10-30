@@ -43,12 +43,29 @@ import {
   geminiTTS,
   geminiTTSStream
 } from './geminiTTS.js';
+import { chatPersonalized } from './chatPersonalized.js';
+import {
+  streamingChat,
+  functionCallingChat,
+  chatSession,
+  multimodalAnalysis,
+  cachedChat,
+  structuredOutput
+} from './geminiAdvanced.js';
 
 // Export functions
 export { 
   healthCheck,
   chat,
+  chatPersonalized,
   chatMultilingual,
+  // Advanced Gemini features
+  streamingChat,
+  functionCallingChat,
+  chatSession,
+  multimodalAnalysis,
+  cachedChat,
+  structuredOutput,
   analyzeMood,
   analyzeDoodle,
   speechToText,
