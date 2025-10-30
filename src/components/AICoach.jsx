@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/apiService.js';
+import VoiceButton from './VoiceButton.jsx';
+import RealTimeVoiceChat from './RealTimeVoiceChat.jsx';
 import VoiceEnabledMessage from './VoiceEnabledMessage';
 import { mockData } from '../data/mockData';
 import elevenLabsService from '../services/elevenLabsService';
@@ -15,6 +17,9 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   const textareaRef = useRef(null);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const [autoPlayVoice, setAutoPlayVoice] = useState(true);
+  const [isPlayingVoice, setIsPlayingVoice] = useState(false);
+  const [currentEmotion, setCurrentEmotion] = useState(null);
+  const [showRealTimeChat, setShowRealTimeChat] = useState(false);
 
   // Initialize with welcome message
   useEffect(() => {
@@ -131,6 +136,30 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
     }
   };
 
+  const playResponseVoice = async (text) => {
+    if (!autoPlayVoice || isPlayingVoice) return;
+    
+    try {
+      setIsPlayingVoice(true);
+      await api.textToSpeech(text);
+    } catch (error) {
+      console.error('TTS error:', error);
+    } finally {
+      setIsPlayingVoice(false);
+    }
+  };
+
+  const handleVoiceTranscription = (transcription) => {
+    setInputMessage(transcription);
+    // Auto-send after voice input
+    setTimeout(() => handleSendMessage(transcription), 500);
+  };
+
+  const handleEmotionDetected = (emotion) => {
+    setCurrentEmotion(emotion);
+    console.log('Real-time emotion:', emotion);
+  };
+
   const handleSendMessage = async (overrideText) => {
     const text = (overrideText ?? inputMessage).trim();
     if (!text) return;
@@ -140,11 +169,13 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
       id: Date.now(),
       type: 'user',
       content: text,
-      timestamp: new Date()
+      timestamp: new Date(),
+      emotion: currentEmotion
     };
 
     setMessages(prev => [...prev, userMsg]);
     setInputMessage('');
+    setCurrentEmotion(null);
     setIsTyping(true);
 
     // Generate AI response
@@ -160,6 +191,11 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
 
       setMessages(prev => [...prev, aiMsg]);
       setIsTyping(false);
+      
+      // Play voice response
+      if (autoPlayVoice) {
+        playResponseVoice(aiResponse);
+      }
     } catch (error) {
       console.error('Error generating AI response:', error);
       setIsTyping(false);
@@ -224,6 +260,16 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
           >
             <span>{autoPlayVoice ? '🔊' : '🔇'}</span>
             <span>Auto-speak</span>
+          </button>
+          
+          {/* Real-Time Voice Chat Button */}
+          <button
+            onClick={() => setShowRealTimeChat(true)}
+            className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg transition-all text-xs font-medium"
+            title="Start instant voice conversation"
+          >
+            <span>⚡</span>
+            <span>Real-Time Voice</span>
           </button>
         </div>
       </div>
@@ -322,12 +368,19 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
 
         {/* Input */}
         <div className="p-4 border-t border-calm-100 sticky bottom-0 bg-white">
-          <div className="flex space-x-3">
+          <div className="flex items-end space-x-3">
+            {/* Voice Button */}
+            <VoiceButton
+              onTranscription={handleVoiceTranscription}
+              onEmotionDetected={handleEmotionDetected}
+              disabled={isTyping}
+            />
+            
             <textarea
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Share what's on your mind..."
+              placeholder="Share what's on your mind... (or use voice 🎤)"
               className="flex-1 p-3 border border-calm-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none shadow-sm"
               rows="1"
               ref={textareaRef}
@@ -340,6 +393,16 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
               Send
             </button>
           </div>
+          
+          {/* Current emotion indicator */}
+          {currentEmotion && (
+            <div className="mt-2 flex items-center gap-2 text-sm text-navy/60">
+              <span>Detected emotion:</span>
+              <span className="px-2 py-1 bg-mint rounded-full capitalize font-medium">
+                {currentEmotion.primaryMood}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -363,6 +426,11 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
           <p className="text-sm text-purple-600">Helping you build resilience and coping skills</p>
         </div>
       </div>
+
+      {/* Real-Time Voice Chat Modal */}
+      {showRealTimeChat && (
+        <RealTimeVoiceChat onClose={() => setShowRealTimeChat(false)} />
+      )}
     </div>
   );
 };

@@ -270,6 +270,8 @@ export const initializeBigQuery = onRequest({
   cors: true,
   timeoutSeconds: 120,
   region: 'asia-south1',
+  memory: '256MiB',
+  cpu: 1,
 }, async (req, res) => {
   try {
     const dataset = bigquery.dataset(DATASET_ID);

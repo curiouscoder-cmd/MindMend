@@ -12,6 +12,8 @@ export const sendNotification = onRequest({
   cors: true,
   timeoutSeconds: 30,
   region: 'asia-south1',
+  memory: '256MiB',
+  cpu: 1,
 }, async (req, res) => {
   try {
     const { userId, title, body, data = {}, imageUrl } = req.body;

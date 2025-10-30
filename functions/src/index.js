@@ -40,16 +40,24 @@ import {
   clearTranslationCache
 } from './streamingTranslation.js';
 
+// Real-time voice chat
+import { realtimeVoiceChat, realtimeVoiceChatHealth } from './realtimeVoiceChat.js';
+
 // Export functions
 export { 
   healthCheck,
   chat,
   chatMultilingual,
-  analyzeMood, 
+  analyzeMood,
   analyzeDoodle,
   speechToText,
   textToSpeech,
   voiceChat,
+  realtimeVoiceChat,
+  realtimeVoiceChatHealth,
+  streamingTranslation,
+  streamingTranslationMetrics,
+  clearTranslationCache,
   sendNotification,
   registerToken,
   sendDailyReminder,
@@ -61,7 +69,4 @@ export {
   getAnalyticsDashboard,
   getUserInsights,
   initializeBigQuery,
-  streamingTranslation,
-  streamingTranslationMetrics,
-  clearTranslationCache
 };

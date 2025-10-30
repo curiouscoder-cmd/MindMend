@@ -8,16 +8,13 @@ import OfflineIndicator from './components/OfflineIndicator.jsx';
 // Lazy load heavy components
 const CBTExercise = lazy(() => import('./components/CBTExercise.jsx'));
 const ProgressTracking = lazy(() => import('./components/ProgressTracking.jsx'));
-const Gamification = lazy(() => import('./components/Gamification.jsx'));
 const Community = lazy(() => import('./components/Community.jsx'));
 const AICoach = lazy(() => import('./components/AICoach.jsx'));
 const AIInsights = lazy(() => import('./components/AIInsights.jsx'));
 const MoodAnalytics = lazy(() => import('./components/MoodAnalytics.jsx'));
 const CrisisMode = lazy(() => import('./components/CrisisMode.jsx'));
-const EmotionalTwin = lazy(() => import('./components/EmotionalTwin.jsx'));
 const VoiceInput = lazy(() => import('./components/VoiceInput.jsx'));
 const DoodleMoodInput = lazy(() => import('./components/DoodleMoodInput.jsx'));
-const AIGroupTherapy = lazy(() => import('./components/AIGroupTherapy.jsx'));
 import LoadingSpinner from './components/LoadingSpinner.jsx';
 import { useMoodTheme } from './hooks/useMoodTheme.js';
 import offlineService from './services/offlineService.js';
@@ -183,13 +180,6 @@ function App() {
                   onBack={() => setCurrentView('onboarding')}
                 />
               );
-            case 'gamification':
-              return (
-                <Gamification
-                  userProgress={userProgress}
-                  onLevelUp={handleLevelUp}
-                />
-              );
             case 'community':
               return (
                 <Community
@@ -218,14 +208,6 @@ function App() {
                   userProgress={userProgress}
                 />
               );
-            case 'emotional-twin':
-              return (
-                <EmotionalTwin
-                  moodHistory={moodHistory}
-                  userProgress={userProgress}
-                  personalityTraits={{}}
-                />
-              );
             case 'voice-input':
               return (
                 <VoiceInput
@@ -250,13 +232,6 @@ function App() {
                   onDoodleComplete={(data) => {
                     console.log('Doodle complete:', data);
                   }}
-                />
-              );
-            case 'group-therapy':
-              return (
-                <AIGroupTherapy
-                  userProgress={userProgress}
-                  currentMood={currentMood}
                 />
               );
             default:
