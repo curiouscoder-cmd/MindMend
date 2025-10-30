@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/apiService.js';
+import { generatePersonalizedResponse } from '../services/personalizedChatService.js';
+import { getCurrentUser } from '../services/authService.js';
 import VoiceButton from './VoiceButton.jsx';
 import RealTimeVoiceChat from './RealTimeVoiceChat.jsx';
 import VoiceEnabledMessage from './VoiceEnabledMessage';
@@ -58,24 +60,64 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   const generateWelcomeMessage = () => {
     const timeOfDay = new Date().getHours();
     const greeting = timeOfDay < 12 ? 'Good morning' : timeOfDay < 18 ? 'Good afternoon' : 'Good evening';
+    const user = getCurrentUser();
+    const userName = user?.displayName?.split(' ')[0] || 'friend';
     
-    const welcomeMessages = [
-      `${greeting}! I'm Mira, your AI wellness coach. I'm here to support you on your mental wellness journey. How are you feeling today?`,
-      `${greeting}! I'm so glad you're here. Taking time for your mental wellness shows real strength. What's on your mind?`,
-      `${greeting}! I'm Mira, and I'm here to listen and support you. Every step you take toward wellness matters. How can I help you today?`
-    ];
+    // Personalized welcome based on user progress
+    const streak = userProgress?.streak || 0;
+    const exercises = userProgress?.completedExercises || 0;
+    
+    let welcomeMessages = [];
+    
+    if (streak > 0 && exercises > 0) {
+      welcomeMessages = [
+        `${greeting}, ${userName}! 🌟 I see you're on a ${streak}-day streak with ${exercises} exercises completed. That's amazing dedication! How are you feeling today?`,
+        `${greeting}, ${userName}! Your ${streak}-day streak shows real commitment to your wellness. I'm here to support you. What's on your mind?`,
+        `${greeting}, ${userName}! ${exercises} exercises completed and counting! I'm proud of your progress. How can I help you today?`
+      ];
+    } else if (user && !user.isAnonymous) {
+      welcomeMessages = [
+        `${greeting}, ${userName}! I'm Mira, your AI wellness coach. I'm here to support you on your mental wellness journey. How are you feeling today?`,
+        `${greeting}, ${userName}! I'm so glad you're here. Taking time for your mental wellness shows real strength. What's on your mind?`,
+        `${greeting}, ${userName}! Every step you take toward wellness matters. How can I help you today?`
+      ];
+    } else {
+      welcomeMessages = [
+        `${greeting}! I'm Mira, your AI wellness coach. I'm here to support you on your mental wellness journey. How are you feeling today?`,
+        `${greeting}! I'm so glad you're here. Taking time for your mental wellness shows real strength. What's on your mind?`,
+        `${greeting}! I'm Mira, and I'm here to listen and support you. Every step you take toward wellness matters. How can I help you today?`
+      ];
+    }
     
     return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
   };
 
   const generateAIResponse = async (userMessage) => {
     try {
-      console.log('🌍 Calling Backend API:', { userMessage, moodHistory, userProgress });
-      const result = await api.chat(userMessage, moodHistory, userProgress);
-      console.log('✅ AI response:', result);
+      console.log('🤖 Generating personalized response with Mira...');
+      console.log('📊 Context:', { 
+        userMessage, 
+        moodCount: moodHistory?.length || 0, 
+        streak: userProgress?.streak || 0,
+        exercises: userProgress?.completedExercises || 0
+      });
+      
+      // Use personalized chat service with full context
+      const result = await generatePersonalizedResponse(
+        userMessage,
+        moodHistory,
+        userProgress,
+        messages // Pass current conversation as context
+      );
+      
+      console.log('✅ Personalized response generated:', {
+        personalized: result.personalized,
+        fallback: result.fallback,
+        length: result.response?.length
+      });
       
       // Return the response text
-      return result.response || result.message || 'I understand. How can I help you further?';
+      return result.response || 'I understand. How can I help you further?';
     } catch (error) {
       console.error('AI Response Error:', error);
       // Fallback with intent handling and varied templates
@@ -239,13 +281,35 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-calm-800">Meet Mira</h1>
-            <p className="text-blue-900">Your AI Wellness Coach</p>
+            <p className="text-blue-900">Your Personalized AI Wellness Coach</p>
           </div>
         </div>
+        
+        {/* User Context Indicator */}
+        {getCurrentUser() && (
+          <div className="mb-3 inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-200">
+            <span className="text-xs font-medium text-purple-700">
+              {getCurrentUser().isAnonymous ? '🔒 Anonymous Mode' : `👤 ${getCurrentUser().displayName?.split(' ')[0] || 'User'}`}
+            </span>
+            {userProgress?.streak > 0 && (
+              <>
+                <span className="text-purple-300">•</span>
+                <span className="text-xs text-purple-600">🔥 {userProgress.streak} day streak</span>
+              </>
+            )}
+            {userProgress?.completedExercises > 0 && (
+              <>
+                <span className="text-purple-300">•</span>
+                <span className="text-xs text-purple-600">✅ {userProgress.completedExercises} exercises</span>
+              </>
+            )}
+          </div>
+        )}
+        
         <div className="flex items-center justify-center space-x-4 text-sm text-blue-900">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span>Online and ready to help</span>
+            <span>Gemini 2.5 Flash • Personalized</span>
           </div>
           
           {/* Auto-play toggle */}

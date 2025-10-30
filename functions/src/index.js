@@ -39,9 +39,10 @@ import {
   streamingTranslationMetrics,
   clearTranslationCache
 } from './streamingTranslation.js';
-
-// Real-time voice chat
-import { realtimeVoiceChat, realtimeVoiceChatHealth } from './realtimeVoiceChat.js';
+import {
+  geminiTTS,
+  geminiTTSStream
+} from './geminiTTS.js';
 
 // Export functions
 export { 
@@ -53,8 +54,8 @@ export {
   speechToText,
   textToSpeech,
   voiceChat,
-  realtimeVoiceChat,
-  realtimeVoiceChatHealth,
+  geminiTTS,
+  geminiTTSStream,
   streamingTranslation,
   streamingTranslationMetrics,
   clearTranslationCache,

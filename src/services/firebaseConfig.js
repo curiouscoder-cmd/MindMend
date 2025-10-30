@@ -43,37 +43,44 @@ try {
   db = getFirestore(app);
   storage = getStorage(app);
   
-  // Connect to emulators in development (optional - won't block if emulators not running)
-  if (import.meta.env.DEV && window.location.hostname === 'localhost') {
+  // Connect to emulators in development (ONLY if explicitly enabled)
+  // Set VITE_USE_EMULATORS=true in .env to enable emulators
+  if (import.meta.env.DEV && 
+      import.meta.env.VITE_USE_EMULATORS === 'true' && 
+      window.location.hostname === 'localhost') {
+    console.log('🔧 Attempting to connect to Firebase emulators...');
+    
     // Try to connect to emulators, but don't block if they're not running
     setTimeout(() => {
       import('firebase/auth').then(({ connectAuthEmulator }) => {
         try {
           connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
-          console.log('🔧 Connected to Auth emulator');
+          console.log('✅ Connected to Auth emulator');
         } catch (e) {
-          console.log('ℹ️ Auth emulator not available');
+          console.warn('⚠️ Auth emulator connection failed:', e.message);
         }
       }).catch(() => {});
       
       import('firebase/firestore').then(({ connectFirestoreEmulator }) => {
         try {
           connectFirestoreEmulator(db, '127.0.0.1', 8080);
-          console.log('🔧 Connected to Firestore emulator');
+          console.log('✅ Connected to Firestore emulator');
         } catch (e) {
-          console.log('ℹ️ Firestore emulator not available');
+          console.warn('⚠️ Firestore emulator connection failed:', e.message);
         }
       }).catch(() => {});
       
       import('firebase/storage').then(({ connectStorageEmulator }) => {
         try {
           connectStorageEmulator(storage, '127.0.0.1', 9199);
-          console.log('🔧 Connected to Storage emulator');
+          console.log('✅ Connected to Storage emulator');
         } catch (e) {
-          console.log('ℹ️ Storage emulator not available');
+          console.warn('⚠️ Storage emulator connection failed:', e.message);
         }
       }).catch(() => {});
     }, 100);
+  } else {
+    console.log('✅ Using production Firebase services');
   }
   
   // Enable offline persistence for Firestore
