@@ -7,6 +7,7 @@ import VoiceButton from './VoiceButton.jsx';
 import RealTimeVoiceChat from './RealTimeVoiceChat.jsx';
 import VoiceEnabledMessage from './VoiceEnabledMessage';
 import { mockData } from '../data/mockData';
+import * as elevenLabsService from '../services/elevenLabsService';
 import * as ttsService from '../services/ttsService';
 
 const AICoach = ({ userProgress, moodHistory, currentMood }) => {
@@ -183,10 +184,18 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
     
     try {
       setIsPlayingVoice(true);
-      await ttsService.generateSpeech(text, { 
-        emotion: 'supportive',
-        gender: 'female',
-        volume: 0.9,
+      
+      // Create Gemini context for voice adaptation
+      const geminiContext = {
+        userMessage: messages[messages.length - 2]?.content || '',
+        sentiment: currentMood?.sentiment || 'neutral',
+        mood: currentMood?.mood || 'neutral',
+        conversationHistory: messages.slice(-5) // Last 5 messages
+      };
+
+      // Use context-aware speech generation
+      await elevenLabsService.generateContextAwareSpeech(text, geminiContext, {
+        voice: 'rachel', // Best female voice for India
         useCache: true,
         onEnd: () => setIsPlayingVoice(false),
         onStart: () => console.log('🎵 AI response voice started')

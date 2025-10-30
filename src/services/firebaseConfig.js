@@ -3,7 +3,7 @@
 
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore';
+import { initializeFirestore, CACHE_SIZE_UNLIMITED, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getMessaging, isSupported } from 'firebase/messaging';
 // Don't import analytics - it gets blocked by ad blockers
@@ -40,7 +40,16 @@ try {
   
   // Initialize Firebase services
   auth = getAuth(app);
-  db = getFirestore(app);
+  
+  // Initialize Firestore with modern persistence (non-deprecated)
+  db = initializeFirestore(app, {
+    cacheSizeBytes: CACHE_SIZE_UNLIMITED,
+    localCache: persistentLocalCache({
+      tabManager: persistentMultipleTabManager() // Enable multi-tab support
+    })
+  });
+  console.log('✅ Firestore initialized with offline persistence (multi-tab)');
+  
   storage = getStorage(app);
   
   // Connect to emulators in development (ONLY if explicitly enabled)
@@ -82,15 +91,6 @@ try {
   } else {
     console.log('✅ Using production Firebase services');
   }
-  
-  // Enable offline persistence for Firestore
-  enableIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn('⚠️ Multiple tabs open, persistence enabled in first tab only');
-    } else if (err.code === 'unimplemented') {
-      console.warn('⚠️ Browser doesn\'t support offline persistence');
-    }
-  });
   
   // Initialize Firebase Cloud Messaging (only if supported)
   isSupported().then((supported) => {

@@ -1,4 +1,5 @@
-import  { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import * as elevenLabsService from '../services/elevenLabsService';
 import * as ttsService from '../services/ttsService';
 
 const VoiceEnabledMessage = ({ 
@@ -57,13 +58,14 @@ const VoiceEnabledMessage = ({
       let url = audioUrl;
       
       if (!url) {
-        console.log('🎙️ Generating new audio...');
-        // Generate speech with Web Speech API (high quality)
-        url = await ttsService.generateSpeech(
+        console.log('🎙️ Generating new audio with ElevenLabs...');
+        // Generate speech with ElevenLabs (auto-fallback to Web Speech)
+        url = await elevenLabsService.generateSpeech(
           message.content, 
           { 
             emotion,
-            gender: 'female',
+            voice: 'rachel', // Best female voice for India
+            language: 'en',
             useCache: true,
             onEnd: () => {
               console.log('🎵 Speech ended, updating UI');
@@ -79,24 +81,16 @@ const VoiceEnabledMessage = ({
         setAudioUrl(url);
       } else {
         console.log('💾 Using cached audio');
-        // For cached audio, we need to speak it again
-        await ttsService.generateSpeech(
-          message.content,
-          {
-            emotion,
-            gender: 'female',
-            useCache: false,
-            onEnd: () => setIsPlaying(false),
-            onStart: () => setIsLoading(false)
-          }
-        );
+        // For cached audio, play it
+        const audio = new Audio(url);
+        audio.onended = () => setIsPlaying(false);
+        audio.onplay = () => setIsLoading(false);
+        await audio.play();
       }
 
-      if (url === 'browser_tts') {
+      if (url && (url.startsWith('blob:') || url === 'browser_tts')) {
         setIsPlaying(true);
-      } else if (url) {
-        setError('Unexpected audio format');
-      } else {
+      } else if (!url) {
         setError('Failed to generate audio');
       }
     } catch (err) {
@@ -214,7 +208,7 @@ const VoiceEnabledMessage = ({
               <div className="flex items-center space-x-1">
                 <div className="w-2 h-2 rounded-full bg-green-400"></div>
                 <span className="text-xs text-calm-500">
-                  High-Quality Voice • Mira
+                  ElevenLabs Rachel • Premium Voice
                 </span>
               </div>
             </div>
