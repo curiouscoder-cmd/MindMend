@@ -5,10 +5,11 @@ const Navigation = ({ currentView, onNavigate, calmPoints, user }) => {
   const navItems = [
     { id: 'onboarding', label: 'Home', icon: '🏠' },
     { id: 'coach', label: 'AI Coach', icon: '🤖' },
+    { id: 'your-friend', label: 'Your Friend', icon: '👥' },
     { id: 'voice-input', label: 'Voice', icon: '🎤' },
     { id: 'doodle-mood', label: 'Express', icon: '🎨' },
     { id: 'analytics', label: 'Analytics', icon: '📊' },
-    { id: 'community', label: 'Community', icon: '👥' },
+    { id: 'community', label: 'Community', icon: '🌐' },
     { id: 'insights', label: 'Insights', icon: '💡' }
   ];
 

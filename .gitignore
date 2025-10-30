@@ -54,3 +54,4 @@ serviceAccountKey.json
 
 # Firebase cache
 .runtimeconfig.json
+.env.production

@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import * as elevenLabsService from '../services/elevenLabsService';
 import * as ttsService from '../services/ttsService';
 
@@ -33,8 +35,6 @@ const VoiceEnabledMessage = ({
       setIsPlaying(false);
     };
 
-    // Web Speech API doesn't have a global event listener
-    // The onend callback in generateSpeech handles this
     return () => {
       // Cleanup if component unmounts while speaking
       ttsService.stopSpeech();
@@ -151,7 +151,30 @@ const VoiceEnabledMessage = ({
           {getPersonaIcon(persona)}
         </div>
         <div className="flex-1">
-          <p className="text-calm-700 leading-relaxed">{message.content}</p>
+          <div className="text-calm-700 leading-relaxed prose prose-sm max-w-none">
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                // Custom styling for markdown elements
+                p: ({node, ...props}) => <p className="mb-3 last:mb-0" {...props} />,
+                strong: ({node, ...props}) => <strong className="font-semibold text-calm-800" {...props} />,
+                em: ({node, ...props}) => <em className="italic" {...props} />,
+                ul: ({node, ...props}) => <ul className="list-disc list-inside mb-3 space-y-1" {...props} />,
+                ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-3 space-y-1" {...props} />,
+                li: ({node, ...props}) => <li className="ml-2" {...props} />,
+                h1: ({node, ...props}) => <h1 className="text-xl font-bold mb-2 text-calm-900" {...props} />,
+                h2: ({node, ...props}) => <h2 className="text-lg font-bold mb-2 text-calm-900" {...props} />,
+                h3: ({node, ...props}) => <h3 className="text-base font-semibold mb-2 text-calm-800" {...props} />,
+                code: ({node, inline, ...props}) => 
+                  inline 
+                    ? <code className="bg-calm-100 px-1 py-0.5 rounded text-sm font-mono" {...props} />
+                    : <code className="block bg-calm-100 p-2 rounded text-sm font-mono overflow-x-auto" {...props} />,
+                blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-calm-300 pl-4 italic my-3" {...props} />,
+              }}
+            >
+              {message.content}
+            </ReactMarkdown>
+          </div>
           
           {/* Voice Controls */}
           {showControls && (

@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import api from '../services/apiService.js';
 import { generatePersonalizedResponse } from '../services/personalizedChatService.js';
 import { getCurrentUser } from '../services/authService.js';
@@ -180,30 +182,10 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   };
 
   const playResponseVoice = async (text) => {
-    if (!text) return;
-    
-    try {
-      setIsPlayingVoice(true);
-      
-      // Create Gemini context for voice adaptation
-      const geminiContext = {
-        userMessage: messages[messages.length - 2]?.content || '',
-        sentiment: currentMood?.sentiment || 'neutral',
-        mood: currentMood?.mood || 'neutral',
-        conversationHistory: messages.slice(-5) // Last 5 messages
-      };
-
-      // Use context-aware speech generation
-      await elevenLabsService.generateContextAwareSpeech(text, geminiContext, {
-        voice: 'rachel', // Best female voice for India
-        useCache: true,
-        onEnd: () => setIsPlayingVoice(false),
-        onStart: () => console.log('🎵 AI response voice started')
-      });
-    } catch (error) {
-      console.error('TTS error:', error);
-      setIsPlayingVoice(false);
-    }
+    // Don't auto-play voice - let VoiceEnabledMessage handle it
+    // This prevents duplicate voice playback
+    console.log('ℹ️ Voice playback handled by VoiceEnabledMessage component');
+    return;
   };
 
   const handleVoiceTranscription = (transcription) => {
@@ -368,7 +350,25 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
               {message.type === 'user' ? (
                 <div className="max-w-[80%] lg:max-w-[70%] flex items-start space-x-2">
                   <div className="flex-1 px-4 py-3 rounded-2xl bg-primary-500 text-white shadow-sm">
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                    <div className="text-sm leading-relaxed prose prose-sm prose-invert max-w-none">
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                          strong: ({node, ...props}) => <strong className="font-semibold" {...props} />,
+                          em: ({node, ...props}) => <em className="italic" {...props} />,
+                          ul: ({node, ...props}) => <ul className="list-disc list-inside mb-2 space-y-1" {...props} />,
+                          ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-2 space-y-1" {...props} />,
+                          li: ({node, ...props}) => <li className="ml-2" {...props} />,
+                          code: ({node, inline, ...props}) => 
+                            inline 
+                              ? <code className="bg-primary-600 px-1 py-0.5 rounded text-xs font-mono" {...props} />
+                              : <code className="block bg-primary-600 p-2 rounded text-xs font-mono overflow-x-auto" {...props} />,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
                     <div className="text-[10px] mt-1 text-primary-100 text-right">
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>

@@ -1,9 +1,15 @@
 // Firebase Configuration and Initialization
 // This file sets up Firebase services for MindMend AI
 
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { initializeFirestore, CACHE_SIZE_UNLIMITED, persistentLocalCache, persistentMultipleTabManager } from 'firebase/firestore';
+import { 
+  initializeFirestore,
+  getFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  CACHE_SIZE_UNLIMITED
+} from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getMessaging, isSupported } from 'firebase/messaging';
 // Don't import analytics - it gets blocked by ad blockers
@@ -35,20 +41,40 @@ let messaging;
 let analytics;
 
 try {
-  app = initializeApp(firebaseConfig);
-  console.log('✅ Firebase initialized successfully');
+  // Check if Firebase is already initialized
+  try {
+    app = initializeApp(firebaseConfig);
+    console.log('✅ Firebase initialized successfully');
+  } catch (error) {
+    if (error.code === 'app/duplicate-app') {
+      console.log('ℹ️ Firebase already initialized, using existing instance');
+      app = getApp();
+    } else {
+      throw error;
+    }
+  }
   
   // Initialize Firebase services
   auth = getAuth(app);
   
   // Initialize Firestore with modern persistence (non-deprecated)
-  db = initializeFirestore(app, {
-    cacheSizeBytes: CACHE_SIZE_UNLIMITED,
-    localCache: persistentLocalCache({
-      tabManager: persistentMultipleTabManager() // Enable multi-tab support
-    })
-  });
-  console.log('✅ Firestore initialized with offline persistence (multi-tab)');
+  // Check if Firestore is already initialized
+  try {
+    db = initializeFirestore(app, {
+      localCache: persistentLocalCache({
+        tabManager: persistentMultipleTabManager(), 
+        cacheSizeBytes: CACHE_SIZE_UNLIMITED 
+      })
+    });
+    console.log('✅ Firestore initialized with offline persistence (multi-tab)');
+  } catch (error) {
+    if (error.code === 'failed-precondition') {
+      console.log('ℹ️ Firestore already initialized, using existing instance');
+      db = getFirestore(app);
+    } else {
+      throw error;
+    }
+  }
   
   storage = getStorage(app);
   

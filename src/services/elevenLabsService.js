@@ -285,21 +285,71 @@ const detectLanguageFromContext = (context) => {
 
   const message = context.userMessage.toLowerCase();
 
-  // Simple language detection (can be enhanced with ML)
-  const hindiPatterns = ['मैं', 'है', 'हूं', 'का', 'की'];
-  const tamilPatterns = ['நான்', 'என்', 'இது'];
-  const teluguPatterns = ['నేను', 'ఇది'];
-
-  if (hindiPatterns.some(pattern => message.includes(pattern))) {
+  // Detect Devanagari script (Hindi, Marathi, Sanskrit)
+  const devanagariRegex = /[\u0900-\u097F]/;
+  if (devanagariRegex.test(message)) {
+    console.log('🌍 Detected Hindi/Devanagari script');
     return 'hi';
   }
-  if (tamilPatterns.some(pattern => message.includes(pattern))) {
+
+  // Detect common Hindi words in Roman script (Hinglish)
+  const hindiWords = ['mera', 'tera', 'hai', 'nahi', 'kya', 'kaise', 'bahut', 'kharab', 'achha', 'theek', 'yaar', 'dost', 'bhai', 'aaj', 'kal', 'abhi', 'kuch', 'sab', 'hoon', 'ho', 'gaya', 'kar', 'karo', 'karna'];
+  const wordCount = hindiWords.filter(word => message.includes(word)).length;
+  if (wordCount >= 2) { // If 2 or more Hindi words found
+    console.log('🌍 Detected Hindi (Hinglish) - found', wordCount, 'Hindi words');
+    return 'hi';
+  }
+
+  // Detect Tamil script
+  const tamilRegex = /[\u0B80-\u0BFF]/;
+  if (tamilRegex.test(message)) {
+    console.log('🌍 Detected Tamil script');
     return 'ta';
   }
-  if (teluguPatterns.some(pattern => message.includes(pattern))) {
+
+  // Detect Telugu script
+  const teluguRegex = /[\u0C00-\u0C7F]/;
+  if (teluguRegex.test(message)) {
+    console.log('🌍 Detected Telugu script');
     return 'te';
   }
 
+  // Detect Bengali script
+  const bengaliRegex = /[\u0980-\u09FF]/;
+  if (bengaliRegex.test(message)) {
+    console.log('🌍 Detected Bengali script');
+    return 'bn';
+  }
+
+  // Detect Gujarati script
+  const gujaratiRegex = /[\u0A80-\u0AFF]/;
+  if (gujaratiRegex.test(message)) {
+    console.log('🌍 Detected Gujarati script');
+    return 'gu';
+  }
+
+  // Detect Kannada script
+  const kannadaRegex = /[\u0C80-\u0CFF]/;
+  if (kannadaRegex.test(message)) {
+    console.log('🌍 Detected Kannada script');
+    return 'kn';
+  }
+
+  // Detect Malayalam script
+  const malayalamRegex = /[\u0D00-\u0D7F]/;
+  if (malayalamRegex.test(message)) {
+    console.log('🌍 Detected Malayalam script');
+    return 'ml';
+  }
+
+  // Detect Punjabi script (Gurmukhi)
+  const punjabiRegex = /[\u0A00-\u0A7F]/;
+  if (punjabiRegex.test(message)) {
+    console.log('🌍 Detected Punjabi script');
+    return 'pa';
+  }
+
+  console.log('🌍 Defaulting to English');
   return 'en'; // Default to English
 };
 
