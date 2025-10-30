@@ -1,5 +1,5 @@
-// Hybrid Streaming Multilingual Pipeline
-// Gemma 3 Primary + Gemini 2.5 Live API Fallback
+// Streaming Multilingual Pipeline (Gemini-only)
+// Gemini 2.5 Flash for detection/translation; Gemini Live optional
 // Real-time streaming with <2s latency target
 import { VertexAI } from '@google-cloud/vertexai';
 
@@ -10,23 +10,7 @@ const vertexAI = new VertexAI({
 
 console.log(`🌍 Vertex AI initialized: ${process.env.GCP_PROJECT_ID || 'mindmend-25dca'} @ ${process.env.GCP_LOCATION || 'asia-south1'}`);
 
-// Hybrid model initialization - Gemma 3 primary, Gemini 2.5 fallback
-const gemma1B = vertexAI.preview.getGenerativeModel({
-  model: 'gemma-3-1b-it',
-  generationConfig: {
-    maxOutputTokens: 10,
-    temperature: 0.1,
-  },
-});
-
-const gemma4B = vertexAI.preview.getGenerativeModel({
-  model: 'gemma-3-4b-it', 
-  generationConfig: {
-    maxOutputTokens: 512,
-    temperature: 0.2,
-  },
-});
-
+// Gemini models
 const geminiLive = vertexAI.preview.getGenerativeModel({
   model: 'gemini-live-2.5-flash',
   generationConfig: {
@@ -35,7 +19,7 @@ const geminiLive = vertexAI.preview.getGenerativeModel({
   },
 });
 
-// Fallback to regular Gemini if Live API unavailable
+// Primary Gemini Flash (regular)
 const geminiFlash = vertexAI.getGenerativeModel({
   model: 'gemini-2.5-flash',
   generationConfig: {
@@ -59,7 +43,7 @@ const LANGUAGES = {
 };
 
 /**
- * Step 1: Ultra-fast language detection using Gemma 3 1B (<50ms target)
+ * Step 1: Language detection using Gemini 2.5 Flash (<100ms target)
  */
 export async function detectLanguage(text) {
   const startTime = Date.now();
@@ -69,54 +53,33 @@ export async function detectLanguage(text) {
 "${text.substring(0, 100)}"
 Code:`;
     
-    // Try Gemma 3 1B first (ultra-fast)
-    const result = await gemma1B.generateContent(prompt);
+    // Gemini 2.5 Flash detection
+    const result = await geminiFlash.generateContent(prompt);
     const responseText = result.response?.text() || '';
     const langCode = responseText.trim().toLowerCase().match(/\b(en|hi|ta|te|bn|mr|gu|kn|ml|pa)\b/)?.[0] || 'en';
     
     const latency = Date.now() - startTime;
-    console.log(`🔍 Gemma 1B language detection: ${langCode} (${latency}ms)`);
+    console.log(`🔍 Gemini detection: ${langCode} (${latency}ms)`);
     
     return {
       language: langCode,
       confidence: 0.95,
       latency,
-      model: 'gemma-3-1b',
+      model: 'gemini-2.5-flash',
     };
   } catch (error) {
-    console.error('Gemma language detection failed, using fallback:', error);
-    
-    // Fallback to Gemini Flash
-    try {
-      const prompt = `Detect language. Reply with ISO code only:
-"${text.substring(0, 200)}"`;
-      const result = await geminiFlash.generateContent(prompt);
-      const responseText = result.response?.text() || '';
-      const langCode = responseText.trim().toLowerCase().match(/\b(en|hi|ta|te|bn|mr|gu|kn|ml|pa)\b/)?.[0] || 'en';
-      
-      const latency = Date.now() - startTime;
-      console.log(`🔄 Gemini fallback detection: ${langCode} (${latency}ms)`);
-      
-      return {
-        language: langCode,
-        confidence: 0.90,
-        latency,
-        model: 'gemini-fallback',
-      };
-    } catch (fallbackError) {
-      console.error('All language detection failed:', fallbackError);
-      return {
-        language: 'en',
-        confidence: 0.50,
-        latency: Date.now() - startTime,
-        model: 'default',
-      };
-    }
+    console.error('Language detection failed:', error);
+    return {
+      language: 'en',
+      confidence: 0.50,
+      latency: Date.now() - startTime,
+      model: 'default',
+    };
   }
 }
 
 /**
- * Step 2: Streaming translation to English using Gemma 3 4B with confidence monitoring
+ * Step 2: Streaming translation to English using Gemini 2.5 with confidence monitoring
  */
 export async function translateToEnglish(text, sourceLang, onProgress) {
   if (sourceLang === 'en') return { translation: text, confidence: 1.0, latency: 0, model: 'passthrough' };
@@ -130,14 +93,14 @@ export async function translateToEnglish(text, sourceLang, onProgress) {
 
 English translation:`;
     
-    // Try Gemma 3 4B first
-    const result = await gemma4B.generateContent(prompt);
+    // Gemini 2.5 translation
+    const result = await geminiFlash.generateContent(prompt);
     const translation = result.response?.text()?.trim() || text;
     
     const latency = Date.now() - startTime;
     const confidence = calculateTranslationConfidence(text, translation, sourceLang, 'en');
     
-    console.log(`🌐 Gemma 4B translation: ${sourceLang}→en (${latency}ms, confidence: ${confidence})`);
+    console.log(`🌐 Gemini translation: ${sourceLang}→en (${latency}ms, confidence: ${confidence})`);
     
     if (onProgress) {
       onProgress({
@@ -154,10 +117,10 @@ English translation:`;
       return await translateToEnglishFallback(text, sourceLang, onProgress);
     }
     
-    return { translation, confidence, latency, model: 'gemma-3-4b' };
+    return { translation, confidence, latency, model: 'gemini-2.5-flash' };
     
   } catch (error) {
-    console.error('Gemma translation failed:', error);
+    console.error('Translation failed:', error);
     return await translateToEnglishFallback(text, sourceLang, onProgress);
   }
 }
@@ -224,7 +187,7 @@ function calculateTranslationConfidence(originalText, translation, sourceLang, t
 }
 
 /**
- * Step 3: Streaming translation from English using hybrid approach
+ * Step 3: Streaming translation from English using Gemini 2.5
  */
 export async function translateFromEnglish(text, targetLang, onProgress) {
   if (targetLang === 'en') return { translation: text, confidence: 1.0, latency: 0, model: 'passthrough' };
@@ -238,14 +201,14 @@ export async function translateFromEnglish(text, targetLang, onProgress) {
 
 ${LANGUAGES[targetLang]} translation:`;
     
-    // Try Gemma 3 4B first
-    const result = await gemma4B.generateContent(prompt);
+    // Gemini 2.5 translation
+    const result = await geminiFlash.generateContent(prompt);
     const translation = result.response?.text()?.trim() || text;
     
     const latency = Date.now() - startTime;
     const confidence = calculateTranslationConfidence(text, translation, 'en', targetLang);
     
-    console.log(`🌐 Gemma 4B translation: en→${targetLang} (${latency}ms, confidence: ${confidence})`);
+    console.log(`🌐 Gemini translation: en→${targetLang} (${latency}ms, confidence: ${confidence})`);
     
     if (onProgress) {
       onProgress({
@@ -262,10 +225,10 @@ ${LANGUAGES[targetLang]} translation:`;
       return await translateFromEnglishFallback(text, targetLang, onProgress);
     }
     
-    return { translation, confidence, latency, model: 'gemma-3-4b' };
+    return { translation, confidence, latency, model: 'gemini-2.5-flash' };
     
   } catch (error) {
-    console.error('Gemma translation failed:', error);
+    console.error('Translation failed:', error);
     return await translateFromEnglishFallback(text, targetLang, onProgress);
   }
 }

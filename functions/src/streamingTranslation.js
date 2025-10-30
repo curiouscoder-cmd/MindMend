@@ -19,8 +19,8 @@ const vertexAI = new VertexAI({
 
 // Module state for models, cache, and metrics
 let models = {
-  gemma1B: null,
-  gemma4B: null, 
+  detector: null,
+  translator: null,
   geminiLive: null,
 };
 
@@ -38,135 +38,30 @@ const LANGUAGES = {
   kn: 'Kannada', ml: 'Malayalam', pa: 'Punjabi',
 };
 
-// Ollama API configuration for local Gemma 3 models
-const OLLAMA_BASE_URL = process.env.OLLAMA_URL || 'http://localhost:11434';
-const GEMMA3_MODELS = {
-  small: 'gemma3:1b',      // Fast language detection (Gemma 3 1B)
-  medium: 'gemma3:4b',     // Primary translation (Gemma 3 4B)
-  large: 'gemma3:27b'      // High-quality fallback (Gemma 3 27B)
-};
-
-// Initialize models (functional approach with Ollama support)
+// Gemini-only implementation
 async function initModels() {
   try {
-    // Check if Ollama is available for Gemma 3 models
-    const ollamaAvailable = await checkOllamaAvailability();
-    
-    if (ollamaAvailable) {
-      console.log('🦙 Ollama detected - using local Gemma 3 models');
-      models.gemma1B = { type: 'ollama', model: GEMMA3_MODELS.small };
-      models.gemma4B = { type: 'ollama', model: GEMMA3_MODELS.medium };
-      models.geminiLive = { type: 'ollama', model: GEMMA3_MODELS.large };
-      
-      console.log('🚀 Gemma 3 models initialized via Ollama');
-      console.log('✨ Models: 1B (detection), 4B (translation), 27B (fallback)');
-      console.log('🌟 Features: 128K context, 140+ languages, multimodal support');
-    } else {
-      // Fallback to Vertex AI Gemma 2 models
-      console.log('⚠️ Ollama not available, using Vertex AI Gemma 2');
-      models.gemma1B = vertexAI.getGenerativeModel({
-        model: 'gemma-2-2b-it',
-        generationConfig: { 
-          maxOutputTokens: 100, 
-          temperature: 0.1,
-          topP: 0.95
-        },
-      });
+    models.detector = vertexAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      generationConfig: { maxOutputTokens: 32, temperature: 0.1, topP: 0.95 },
+    });
 
-      models.gemma4B = vertexAI.getGenerativeModel({
-        model: 'gemma-2-9b-it', 
-        generationConfig: { 
-          maxOutputTokens: 512, 
-          temperature: 0.2,
-          topP: 0.95
-        },
-      });
+    models.translator = vertexAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      generationConfig: { maxOutputTokens: 512, temperature: 0.2, topP: 0.95 },
+    });
 
-      // Gemini 2.5 Flash for fallback
-      models.geminiLive = vertexAI.getGenerativeModel({
-        model: 'gemini-2.5-flash',
-        generationConfig: { 
-          maxOutputTokens: 512, 
-          temperature: 0.3,
-          topP: 0.95
-        },
-      });
-      
-      console.log('🚀 Vertex AI models initialized (Gemma 2 + Gemini 2.5)');
-    }
+    models.geminiLive = vertexAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      generationConfig: { maxOutputTokens: 512, temperature: 0.3, topP: 0.95 },
+    });
+
+    console.log('🚀 Vertex AI models initialized (Gemini 2.5 only)');
   } catch (error) {
     console.error('Model init error:', error);
-    console.log('⚠️ Falling back to Gemini 2.5 Flash for all models');
-    // Final fallback to Gemini Flash
-    models.gemma1B = vertexAI.getGenerativeModel({ 
-      model: 'gemini-2.5-flash',
-      generationConfig: { maxOutputTokens: 100, temperature: 0.1 }
-    });
-    models.gemma4B = vertexAI.getGenerativeModel({ 
-      model: 'gemini-2.5-flash',
-      generationConfig: { maxOutputTokens: 512, temperature: 0.2 }
-    });
-    models.geminiLive = vertexAI.getGenerativeModel({ 
-      model: 'gemini-2.5-flash',
-      generationConfig: { maxOutputTokens: 512, temperature: 0.3 }
-    });
-  }
-}
-
-// Check if Ollama is available
-async function checkOllamaAvailability() {
-  try {
-    const response = await fetch(`${OLLAMA_BASE_URL}/api/tags`, {
-      method: 'GET',
-      timeout: 3000
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      const availableModels = data.models?.map(m => m.name) || [];
-      
-      // Check if required Gemma 3 models are available
-      const hasGemma1B = availableModels.some(m => m.includes('gemma3:1b'));
-      const hasGemma4B = availableModels.some(m => m.includes('gemma3:4b'));
-      
-      console.log(`🦙 Ollama models available: ${availableModels.join(', ')}`);
-      return hasGemma1B && hasGemma4B;
-    }
-    return false;
-  } catch (error) {
-    console.log('🦙 Ollama not available:', error.message);
-    return false;
-  }
-}
-
-// Ollama API call function
-async function callOllamaModel(modelName, prompt, options = {}) {
-  try {
-    const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: modelName,
-        prompt: prompt,
-        stream: false,
-        options: {
-          temperature: options.temperature || 0.2,
-          top_p: options.topP || 0.95,
-          num_predict: options.maxTokens || 512,
-        }
-      }),
-      timeout: 30000
-    });
-
-    if (!response.ok) {
-      throw new Error(`Ollama API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return { response: { text: () => data.response } };
-  } catch (error) {
-    console.error('Ollama API call failed:', error);
-    throw error;
+    models.detector = vertexAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    models.translator = vertexAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    models.geminiLive = vertexAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
   }
 }
 
@@ -187,19 +82,9 @@ async function detectLanguage(text) {
   if (/[\u0980-\u09FF]/.test(sample)) return { language: 'bn', confidence: 0.95, latency: Date.now() - start, model: 'heuristic' };
   
   try {
-    // Fallback to AI detection for complex cases
-    const prompt = `Detect language. Reply only with code: en, hi, ta, te, bn, mr, gu, kn, ml, pa
-Text: "${sample}"
-Language:`;
-
-    // Use appropriate model based on type
-    let result;
-    if (models.gemma1B.type === 'ollama') {
-      result = await callOllamaModel(models.gemma1B.model, prompt, { maxTokens: 10, temperature: 0.1 });
-    } else {
-      result = await models.gemma1B.generateContent(prompt);
-    }
-    
+    // AI detection via Gemini
+    const prompt = `Detect language. Reply only with code: en, hi, ta, te, bn, mr, gu, kn, ml, pa\nText: "${sample}"\nLanguage:`;
+    const result = await models.detector.generateContent(prompt);
     const response = result.response?.text()?.trim().toLowerCase() || 'en';
     
     const detectedLang = Object.keys(LANGUAGES).find(code => 
@@ -212,7 +97,7 @@ Language:`;
       language: detectedLang, 
       confidence, 
       latency: Date.now() - start, 
-      model: models.gemma1B.type === 'ollama' ? 'gemma3:1b' : 'gemma-2-2b' 
+      model: 'gemini-2.5-flash'
     };
     
   } catch (error) {
@@ -239,7 +124,7 @@ async function translateStreaming(text, sourceLang, targetLang, streamCallback) 
   }
 
   try {
-    // Primary: Gemma 2 9B translation (multilingual support)
+    // Primary: Gemini 2.5 translation (multilingual support)
     const prompt = `You are an expert multilingual translator specializing in mental health contexts. 
 Translate the following ${LANGUAGES[sourceLang]} text to ${LANGUAGES[targetLang]}.
 
@@ -253,15 +138,8 @@ ${LANGUAGES[sourceLang]} text: "${text}"
 
 ${LANGUAGES[targetLang]} translation:`;
 
-    console.log(`🔄 Attempting ${models.gemma4B.type === 'ollama' ? 'Ollama Gemma3:4B' : 'Vertex AI Gemma 2-9B'} translation...`);
-    
-    // Use appropriate model based on type
-    let result;
-    if (models.gemma4B.type === 'ollama') {
-      result = await callOllamaModel(models.gemma4B.model, prompt, { maxTokens: 512, temperature: 0.2 });
-    } else {
-      result = await models.gemma4B.generateContent(prompt);
-    }
+    console.log('🔄 Attempting Gemini 2.5 translation...');
+    const result = await models.translator.generateContent(prompt);
     
     // Better response parsing
     let translation = text; // Default fallback
@@ -275,7 +153,7 @@ ${LANGUAGES[targetLang]} translation:`;
       }
     }
     
-    console.log(`✅ Gemma translation successful: "${translation.substring(0, 50)}..."`);
+    console.log(`✅ Gemini translation successful: "${translation.substring(0, 50)}..."`);
     
     const confidence = calculateConfidence(text, translation, sourceLang, targetLang);
     const latency = Date.now() - start;
@@ -294,10 +172,15 @@ ${LANGUAGES[targetLang]} translation:`;
       return await translateFallback(text, sourceLang, targetLang, streamCallback);
     }
 
-    return { translation, confidence, latency, model: models.gemma4B.type === 'ollama' ? 'gemma3:4b' : 'gemma-2-9b' };
+    return { 
+      translation, 
+      confidence, 
+      latency, 
+      model: 'gemini-2.5-flash' 
+    };
     
   } catch (error) {
-    console.error('❌ Gemma translation failed:', error.message);
+    console.error('❌ Translation failed:', error.message);
     console.log('🔄 Falling back to Gemini 2.5 Flash...');
     metrics.fallbacks++;
     return await translateFallback(text, sourceLang, targetLang, streamCallback);

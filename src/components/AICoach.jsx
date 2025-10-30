@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { callMultilingualChat } from '../services/cloudFunctions.js';
+import { motion, AnimatePresence } from 'framer-motion';
+import api from '../services/apiService.js';
 import VoiceEnabledMessage from './VoiceEnabledMessage';
 import { mockData } from '../data/mockData';
 import elevenLabsService from '../services/elevenLabsService';
@@ -64,16 +65,12 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
 
   const generateAIResponse = async (userMessage) => {
     try {
-      console.log('🌍 Calling Multilingual Pipeline (Gemma 3 + Gemini 2.5):', { userMessage, moodHistory, userProgress });
-      const result = await callMultilingualChat(
-        userMessage, 
-        moodHistory, 
-        userProgress
-      );
-      console.log('✅ Multilingual response:', result);
-      console.log(`📊 Performance: ${result.performance?.total}ms (Preprocessing: ${result.performance?.preprocessing}ms, Gemini: ${result.performance?.gemini}ms, Translation: ${result.performance?.translation}ms)`);
-      console.log(`🌐 Language: ${result.detectedLanguage}, Urgency: ${result.preprocessing?.urgency}`);
-      return result.response;
+      console.log('🌍 Calling Backend API:', { userMessage, moodHistory, userProgress });
+      const result = await api.chat(userMessage, moodHistory, userProgress);
+      console.log('✅ AI response:', result);
+      
+      // Return the response text
+      return result.response || result.message || 'I understand. How can I help you further?';
     } catch (error) {
       console.error('AI Response Error:', error);
       // Fallback with intent handling and varied templates
