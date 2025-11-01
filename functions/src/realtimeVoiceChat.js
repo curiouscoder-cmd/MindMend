@@ -24,6 +24,15 @@ export const realtimeVoiceChat = onRequest({
   memory: '512MiB',
   region: 'asia-south1',
 }, async (req, res) => {
+
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
+  
   // Upgrade HTTP to WebSocket
   if (req.headers.upgrade !== 'websocket') {
     return res.status(400).json({ error: 'WebSocket upgrade required' });
@@ -224,6 +233,15 @@ export const realtimeVoiceChatHealth = onRequest({
   cors: true,
   region: 'asia-south1',
 }, async (req, res) => {
+
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
+  
   res.json({
     status: 'healthy',
     service: 'realtime-voice-chat',

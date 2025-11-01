@@ -18,6 +18,13 @@ export const chatMultilingual = onRequest({
   memory: '1GiB',
   region: 'asia-south1',
 }, async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
   try {
     const { message, moodHistory = [], userProgress = {} } = req.body;
     

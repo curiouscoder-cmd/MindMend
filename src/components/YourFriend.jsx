@@ -197,47 +197,34 @@ const YourFriend = () => {
     setMessages(prev => [...prev, message]);
   };
 
-  const speakMessage = async (text) => {
-    // Update UI immediately
-    setIsSpeaking(true);
-    setIsListening(false);
-    
-    // CRITICAL: Stop recognition while speaking to prevent echo
-    if (recognitionRef.current) {
-      try {
-        recognitionRef.current.stop();
-        console.log('🔇 Stopped listening to prevent echo');
-      } catch (e) {
-        console.log('Recognition already stopped');
-      }
+const speakMessage = async (text) => {
+  setIsSpeaking(true);
+  setIsListening(false);
+
+  // Stop listening before speaking (prevent echo)
+  if (recognitionRef.current) {
+    try {
+      recognitionRef.current.stop();
+      console.log('🔇 Stopped listening to prevent echo');
+    } catch (e) {
+      console.log('Recognition already stopped');
     }
-    
-    await friendService.speakResponse(text, {
-      onStart: () => {
-        console.log('🔊 Friend speaking...');
-        setIsListening(false);
-        setIsSpeaking(true);
-      },
-      onEnd: () => {
-        console.log('✅ Friend finished speaking');
-        setIsSpeaking(false);
-        
-        // Restart listening after speaking with LONGER delay
-        if (isConnected && recognitionRef.current) {
-          setTimeout(() => {
-            try {
-              recognitionRef.current.start();
-              setIsListening(true);
-              console.log('🎤 Listening resumed after speaking');
-            } catch (e) {
-              console.log('Could not restart:', e);
-              setIsListening(false);
-            }
-          }, 1000); // Increased to 1 second
-        }
-      }
-    });
-  };
+  }
+
+  await friendService.speakResponse(text, {
+    onStart: () => {
+      console.log('🔊 Friend speaking...');
+      setIsListening(false);
+      setIsSpeaking(true);
+    },
+    onEnd: () => {
+      console.log('✅ Friend finished speaking');
+      setIsSpeaking(false);
+      setIsListening(true); // Reflect resumed listening in UI
+    },
+  });
+};
+
 
   const changeLanguage = (lang) => {
     setCurrentLanguage(lang);
@@ -307,14 +294,20 @@ const YourFriend = () => {
 
           {/* Status Indicators */}
           {isConnected && (
-            <div className="mt-4 flex items-center space-x-6 text-sm">
-              <div className={`flex items-center space-x-2 transition-all ${isListening ? 'text-green-600' : 'text-gray-400'}`}>
-                <div className={`w-3 h-3 rounded-full transition-all ${isListening ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
-                <span className="font-medium">{isListening ? '🎤 Listening...' : '⏸️ Paused'}</span>
-              </div>
-              <div className={`flex items-center space-x-2 transition-all ${isSpeaking ? 'text-blue-600' : 'text-gray-400'}`}>
-                <div className={`w-3 h-3 rounded-full transition-all ${isSpeaking ? 'bg-blue-500 animate-pulse' : 'bg-gray-300'}`}></div>
-                <span className="font-medium">{isSpeaking ? '🔊 Speaking...' : '🔇 Silent'}</span>
+            <div className={`mt-4 p-3 rounded-lg transition-all ${
+              isListening 
+                ? 'bg-gradient-to-r from-green-50 to-cyan-50 border border-green-200' 
+                : 'bg-gray-50 border border-gray-200'
+            }`}>
+              <div className="flex items-center space-x-6 text-sm">
+                <div className={`flex items-center space-x-2 transition-all ${isListening ? 'text-green-600' : 'text-gray-400'}`}>
+                  <div className={`w-3 h-3 rounded-full transition-all ${isListening ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                  <span className="font-medium">{isListening ? '🎤 Listening...' : '⏸️ Paused'}</span>
+                </div>
+                <div className={`flex items-center space-x-2 transition-all ${isSpeaking ? 'text-blue-600' : 'text-gray-400'}`}>
+                  <div className={`w-3 h-3 rounded-full transition-all ${isSpeaking ? 'bg-blue-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                  <span className="font-medium">{isSpeaking ? '🔊 Speaking...' : '🔇 Silent'}</span>
+                </div>
               </div>
             </div>
           )}

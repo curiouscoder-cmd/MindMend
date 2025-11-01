@@ -7,6 +7,13 @@ export const analyzeMood = onRequest({
   timeoutSeconds: 30,
   region: 'us-central1',
 }, async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
   try {
     const { text, language: lang = 'en' } = req.body;
     

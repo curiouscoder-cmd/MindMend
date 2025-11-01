@@ -87,6 +87,14 @@ export const registerToken = onRequest({
   timeoutSeconds: 10,
   region: 'us-central1', // Moved to bypass asia-south1 CPU quota
 }, async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
+
   try {
     const { userId, token } = req.body;
     
@@ -123,6 +131,15 @@ export const sendDailyReminder = onRequest({
   timeoutSeconds: 300,
   region: 'asia-south1',
 }, async (req, res) => {
+
+    res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
+
   try {
     // Get all users with notifications enabled
     const usersSnapshot = await db.collection('users')

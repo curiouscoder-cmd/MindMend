@@ -130,16 +130,19 @@ export const pauseListening = () => {
  * Resume listening after pause
  */
 export const resumeListening = () => {
-  shouldAutoRestart = true; // Re-enable auto-restart
-  if (recognition && !isListening) {
+  shouldAutoRestart = true;
+  if (recognition && !isListening && !isSpeaking) {
     try {
       recognition.start();
       console.log('🎤 Listening resumed');
     } catch (e) {
-      console.log('Could not resume:', e);
+      console.log('⚠️ Could not resume:', e);
     }
+  } else {
+    console.log('🎧 Skipping resume — still speaking or already listening');
   }
 };
+
 
 /**
  * Update conversation context
@@ -251,10 +254,10 @@ export const generateFriendResponse = async (userInput, context = {}) => {
     const topics = detectTopics(userInput);
     
     // Detect if user is speaking Hindi/Hinglish
-    const hindiWords = ['mera', 'tera', 'hai', 'nahi', 'kya', 'kaise', 'bahut', 'kharab', 'achha', 'theek', 'yaar', 'dost', 'bhai', 'aaj', 'kal', 'gaya', 'karun', 'samajh'];
+    const hindiWords = ['mera', 'tera', 'hai', 'nahi', 'nahin', 'kya', 'kaise', 'bahut', 'kharab', 'achha', 'acche', 'theek', 'yaar', 'dost', 'bhai', 'aaj', 'kal', 'gaya', 'karun', 'samajh', 'dimag', 'kam', 'kiya', 'apne', 'aap', 'jabardasti', 'nautanki', 'karti', 'rahti', 'roj', 'kuchh'];
     const lowerInput = userInput.toLowerCase();
     const hindiWordCount = hindiWords.filter(word => lowerInput.includes(word)).length;
-    const isHindi = hindiWordCount >= 3; // Increased threshold to 3 words
+    const isHindi = hindiWordCount >= 2; // Reduced threshold to 2 words for better detection
 
     // Update context
     updateContext({ 
@@ -310,7 +313,12 @@ ${isHindi ?
 Respond as a caring friend would in a natural conversation.`;
 
     // Call Gemini API via Firebase Functions
-    const response = await fetch(`${import.meta.env.VITE_FUNCTIONS_URL}/chatPersonalized`, {
+    const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 
+      'http://localhost:5001/mindmend-25dca/us-central1';
+    
+    console.log('📡 Calling API:', `${FUNCTIONS_URL}/chatPersonalized`);
+    
+    const response = await fetch(`${FUNCTIONS_URL}/chatPersonalized`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -318,6 +326,9 @@ Respond as a caring friend would in a natural conversation.`;
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userInput }
         ],
+        userContext: {
+          language: conversationContext.language || 'en'
+        },
         context: conversationContext,
         maxTokens: 100 // Keep responses short
       })
@@ -388,11 +399,11 @@ const getFallbackResponse = (mood) => {
 export const speakResponse = async (text, callbacks = {}) => {
   try {
     isSpeaking = true;
-    shouldAutoRestart = false; // Disable auto-restart while speaking
+    shouldAutoRestart = false;
 
     await elevenLabsService.generateContextAwareSpeech(text, conversationContext, {
       voice: 'rachel',
-      useCache: false, // Real-time, no caching
+      useCache: false,
       onStart: () => {
         console.log('🔊 Friend speaking...');
         if (callbacks.onStart) callbacks.onStart();
@@ -400,18 +411,41 @@ export const speakResponse = async (text, callbacks = {}) => {
       onEnd: () => {
         console.log('✅ Friend finished speaking');
         isSpeaking = false;
-        shouldAutoRestart = true; // Re-enable auto-restart
-        if (callbacks.onEnd) callbacks.onEnd();
-      }
-    });
+        shouldAutoRestart = true;
 
+        // 🩵 FIX: Safely resume listening after speech ends
+        setTimeout(() => {
+          if (!isSpeaking && recognition && !isListening) {
+            try {
+              recognition.start();
+              console.log('🎤 Listening resumed after speaking (via friendService)');
+            } catch (e) {
+              console.warn('⚠️ Could not restart recognition:', e);
+            }
+          }
+        }, 500); // Reduced delay for faster response
+
+        if (callbacks.onEnd) callbacks.onEnd();
+      },
+    });
   } catch (error) {
     console.error('❌ Error speaking:', error);
     isSpeaking = false;
-    shouldAutoRestart = true; // Re-enable even on error
+    shouldAutoRestart = true;
+    setTimeout(() => {
+      if (recognition && !isListening) {
+        try {
+          recognition.start();
+          console.log('🎤 Listening resumed after speech error recovery');
+        } catch (e) {
+          console.warn('⚠️ Could not resume after error:', e);
+        }
+      }
+    }, 800);
     if (callbacks.onEnd) callbacks.onEnd();
   }
 };
+
 
 /**
  * Get conversation state

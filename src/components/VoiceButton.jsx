@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import api from '../services/apiService.js';
 
-const VoiceButton = ({ onTranscription, onEmotionDetected, disabled = false }) => {
+const VoiceButton = ({ onTranscription, onEmotionDetected, onListeningStart, disabled = false }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
@@ -99,6 +99,11 @@ const VoiceButton = ({ onTranscription, onEmotionDetected, disabled = false }) =
       setIsRecording(true);
       setTranscription('');
       setEmotion(null);
+      
+      // Notify parent that listening started
+      if (onListeningStart) {
+        onListeningStart(true);
+      }
 
       // Start speech recognition
       if (recognitionRef.current) {
@@ -168,10 +173,12 @@ const VoiceButton = ({ onTranscription, onEmotionDetected, disabled = false }) =
 
     // Send final transcription
     if (transcription && onTranscription) {
+      console.log('🎤 Sending transcription:', transcription);
       onTranscription(transcription);
     }
 
     setAudioLevel(0);
+    setTranscription('');
   };
 
   const toggleRecording = () => {

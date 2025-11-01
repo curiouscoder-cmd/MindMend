@@ -123,6 +123,13 @@ export const getAnalyticsDashboard = onRequest({
   timeoutSeconds: 60,
   region: 'us-central1',
 }, async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
   try {
     const { startDate, endDate } = req.query;
     
@@ -214,6 +221,13 @@ export const getUserInsights = onRequest({
   timeoutSeconds: 30,
   region: 'us-central1',
 }, async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
   try {
     const { userId } = req.query;
     
@@ -272,6 +286,13 @@ export const initializeBigQuery = onRequest({
   region: 'us-central1',
   memory: '256MiB',
 }, async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
   try {
     const dataset = bigquery.dataset(DATASET_ID);
     

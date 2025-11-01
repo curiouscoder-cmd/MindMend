@@ -8,6 +8,13 @@ export const analyzeDoodle = onRequest({
   region: 'asia-south1',
 }, async (req, res) => {
   try {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (req.method === 'OPTIONS') {
+      return res.status(204).send('');
+    }
     const { imageBase64 } = req.body;
     
     if (!imageBase64) {

@@ -75,6 +75,13 @@ export const geminiTTS = onRequest({
   memory: '256MiB',
   region: 'us-central1', // Moved to bypass asia-south1 CPU quota
 }, async (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
   try {
     const { 
       text, 

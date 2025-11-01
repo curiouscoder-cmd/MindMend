@@ -17,17 +17,17 @@ const MAX_HISTORY_LENGTH = 10;
  */
 async function getUserProfile(userId) {
   try {
-    if (!db) return null;
+    if (!db) return { displayName: 'friend' };
     
     const userDoc = await getDocs(
       query(collection(db, 'users'), where('uid', '==', userId), limit(1))
-    );
+    ).catch(() => null);
     
-    if (userDoc.empty) return null;
+    if (!userDoc || userDoc.empty) return { displayName: 'friend' };
     return userDoc.docs[0].data();
   } catch (error) {
     console.warn('Could not fetch user profile:', error);
-    return null;
+    return { displayName: 'friend' };
   }
 }
 
@@ -46,7 +46,7 @@ async function getConversationHistory(userId) {
     const messagesQuery = query(
       collection(db, 'chatSessions', userId, 'messages'),
       orderBy('timestamp', 'desc'),
-      limit(MAX_HISTORY_LENGTH)
+      limit(5)
     );
     
     const snapshot = await getDocs(messagesQuery);
@@ -94,48 +94,41 @@ async function saveMessage(userId, role, content, metadata = {}) {
  * Build personalized system prompt
  */
 function buildPersonalizedPrompt(userProfile, moodHistory, userProgress) {
-  const userName = userProfile?.displayName || 'friend';
-  const recentMoods = moodHistory?.slice(-5) || [];
+  const userName = userProfile?.displayName?.split(' ')[0] || 'friend';
+  const recentMoods = moodHistory?.slice(-3) || [];
   const streak = userProgress?.streak || 0;
   const completedExercises = userProgress?.completedExercises || 0;
   
   // Analyze mood patterns
   const moodSummary = recentMoods.length > 0 
-    ? `Recent mood pattern: ${recentMoods.join(' → ')}`
+    ? `Recent moods: ${recentMoods.join(' → ')}`
     : 'No recent mood data';
   
-  // Build context-aware prompt
-  return `You are Mira, an empathetic AI mental wellness coach specializing in Cognitive Behavioral Therapy (CBT) techniques.
+  // Build context-aware prompt - OPTIMIZED FOR SPEED
+  return `You are Mira, an empathetic AI mental wellness coach. KEEP RESPONSES SHORT (1-2 sentences max).
 
 **User Context:**
 - Name: ${userName}
 - ${moodSummary}
-- Progress: ${completedExercises} CBT exercises completed, ${streak}-day streak
-- Primary audience: Young adults in India dealing with academic and social pressure
+- Progress: ${completedExercises} exercises, ${streak}-day streak
 
 **Your Personality:**
-- Warm, supportive, and non-judgmental
-- Use evidence-based CBT and mindfulness techniques
+- Warm, supportive, non-judgmental
+- Use CBT and mindfulness techniques
 - Culturally sensitive to Indian context
-- Conversational and relatable (like talking to a supportive friend)
 
 **Guidelines:**
-1. **Personalization**: Reference their name, acknowledge their progress, and connect to their mood patterns
-2. **Empathy First**: Validate feelings before offering solutions
-3. **Actionable Advice**: Provide specific, practical CBT techniques they can use right now
-4. **Brevity**: Keep responses concise (2-4 sentences) but meaningful
-5. **Safety**: If self-harm/suicide is mentioned, immediately provide crisis resources:
+1. **BREVITY FIRST**: 1-2 sentences max - NO LONG RESPONSES
+2. **Empathy + Action**: Validate + offer ONE specific technique
+3. **Safety**: If self-harm/suicide mentioned:
    - AASRA: 91-22-27546669
    - Vandrevala Foundation: 1860-2662-345
-6. **Encourage Growth**: Celebrate small wins and progress
-7. **Cultural Awareness**: Use language and examples relevant to Indian youth
+4. **Cultural**: Use language relevant to Indian youth
 
 **Response Style:**
-- Start with empathy and validation
-- Offer 1-2 specific techniques or insights
-- End with encouragement or a gentle question
-- Use "you" and "your" to make it personal
-- Avoid clinical jargon; be conversational`;
+- Empathy + ONE action
+- Be conversational, avoid jargon
+- Use "you" to make it personal`;
 }
 
 /**
@@ -152,10 +145,10 @@ export async function generatePersonalizedResponse(
     const userId = currentUser?.uid || 'anonymous';
     
     // Get user profile for personalization
-    const userProfile = currentUser ? await getUserProfile(userId) : null;
+    const userProfile = currentUser ? await getUserProfile(userId) : { displayName: 'friend' };
     
     // Get conversation history
-    const history = currentUser ? await getConversationHistory(userId) : conversationContext;
+    const history = currentUser ? await getConversationHistory(userId) : conversationContext.slice(-3);
     
     // Build personalized system prompt
     const systemPrompt = buildPersonalizedPrompt(userProfile, moodHistory, userProgress);
@@ -165,8 +158,8 @@ export async function generatePersonalizedResponse(
       { role: 'system', content: systemPrompt }
     ];
     
-    // Add recent conversation history (last 5 exchanges)
-    const recentHistory = history.slice(-5);
+    // Add recent conversation history (last 3 exchanges only)
+    const recentHistory = history.slice(-3);
     recentHistory.forEach(msg => {
       messages.push({
         role: msg.role === 'coach' ? 'assistant' : 'user',
@@ -182,7 +175,7 @@ export async function generatePersonalizedResponse(
     
     // Call Gemini API via Firebase Functions
     const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 
-      'https://us-central1-mindmend-25dca.cloudfunctions.net';
+      'http://localhost:5001/mindmend-25dca/us-central1';
     
     const response = await fetch(`${FUNCTIONS_URL}/chatPersonalized`, {
       method: 'POST',
@@ -192,7 +185,7 @@ export async function generatePersonalizedResponse(
         userContext: {
           userId,
           userName: userProfile?.displayName || 'friend',
-          moodHistory: moodHistory.slice(-5),
+          moodHistory: moodHistory.slice(-3),
           progress: userProgress
         }
       })
@@ -207,8 +200,9 @@ export async function generatePersonalizedResponse(
     
     // Save to conversation history
     if (currentUser) {
-      await saveMessage(userId, 'user', userMessage, { mood: moodHistory[moodHistory.length - 1] });
-      await saveMessage(userId, 'coach', aiResponse);
+      const currentMood = moodHistory && moodHistory.length > 0 ? moodHistory[moodHistory.length - 1] : 'neutral';
+      await saveMessage(userId, 'user', userMessage, { mood: currentMood });
+      await saveMessage(userId, 'coach', aiResponse, { mood: 'supportive' });
     }
     
     return {

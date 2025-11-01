@@ -128,11 +128,12 @@ export const generateSpeech = async (text, options = {}) => {
           text,
           model_id: modelId,
           voice_settings: {
-            stability: getStabilityForEmotion(emotion),
+            stability: 0.5, // Fixed for faster generation
             similarity_boost: 0.75,
-            style: getStyleForEmotion(emotion),
+            style: 0, // Neutral style for speed
             use_speaker_boost: true
           },
+          optimize_streaming_latency: 4, // Maximum optimization
           language_code: language
         })
       }
