@@ -350,6 +350,16 @@ export const streamingTranslation = onRequest({
   memory: '512MiB',
   region: 'us-central1',
 }, async (req, res) => {
+
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
+
+
   try {
     const { text, targetLanguage = 'en', streaming = true } = req.body;
     
@@ -401,6 +411,17 @@ export const streamingTranslationMetrics = onRequest({
   cors: true,
   region: 'asia-south1',
 }, async (req, res) => {
+
+
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
+
+
   try {
     const metricsData = {
       ...metrics,
@@ -431,6 +452,16 @@ export const clearTranslationCache = onRequest({
   cors: true,
   region: 'us-central1',
 }, async (req, res) => {
+
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
+
+
   try {
     cache.clear();
     res.json({

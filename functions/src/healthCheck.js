@@ -5,6 +5,13 @@ export const healthCheck = onRequest({
   cors: true,
   region: 'asia-south1'
 }, (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),

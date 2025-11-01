@@ -9,6 +9,15 @@ export const speechToText = onRequest({
   region: 'us-central1',
 }, async (req, res) => {
   try {
+
+      res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
+  
     const { audioContent, languageCode = 'en-IN' } = req.body;
     
     if (!audioContent) {

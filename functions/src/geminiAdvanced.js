@@ -106,6 +106,13 @@ export const functionCallingChat = onRequest({
   timeoutSeconds: 60,
   memory: '512MiB'
 }, async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
   try {
     const { message, userId } = req.body;
 
@@ -272,6 +279,13 @@ export const chatSession = onRequest({
   timeoutSeconds: 60,
   memory: '512MiB'
 }, async (req, res) => {
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
   try {
     const { message, sessionId, history = [] } = req.body;
 
@@ -336,6 +350,13 @@ export const multimodalAnalysis = onRequest({
   timeoutSeconds: 60,
   memory: '256MiB'
 }, async (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
   try {
     const { text, imageBase64, mimeType = 'image/jpeg' } = req.body;
 
@@ -391,6 +412,14 @@ export const cachedChat = onRequest({
   timeoutSeconds: 60,
   memory: '512MiB'
 }, async (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
+
   try {
     const { message, userId, useCache = true } = req.body;
 
@@ -461,6 +490,13 @@ export const structuredOutput = onRequest({
   timeoutSeconds: 60,
   memory: '512MiB'
 }, async (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send('');
+  }
   try {
     const { text, outputType = 'moodAnalysis' } = req.body;
 
