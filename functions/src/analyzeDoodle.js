@@ -5,6 +5,7 @@ import vision from '@google-cloud/vision';
 export const analyzeDoodle = onRequest({ 
   cors: true,
   timeoutSeconds: 30,
+  region: 'asia-south1',
 }, async (req, res) => {
   try {
     const { imageBase64 } = req.body;

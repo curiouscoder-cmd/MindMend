@@ -11,6 +11,8 @@ import { db } from './admin.js';
 export const sendNotification = onRequest({ 
   cors: true,
   timeoutSeconds: 30,
+  region: 'us-central1',
+  memory: '256MiB',
 }, async (req, res) => {
   try {
     const { userId, title, body, data = {}, imageUrl } = req.body;
@@ -83,6 +85,7 @@ export const sendNotification = onRequest({
 export const registerToken = onRequest({ 
   cors: true,
   timeoutSeconds: 10,
+  region: 'us-central1', // Moved to bypass asia-south1 CPU quota
 }, async (req, res) => {
   try {
     const { userId, token } = req.body;
@@ -118,6 +121,7 @@ export const registerToken = onRequest({
 export const sendDailyReminder = onRequest({ 
   cors: true,
   timeoutSeconds: 300,
+  region: 'asia-south1',
 }, async (req, res) => {
   try {
     // Get all users with notifications enabled
@@ -190,7 +194,10 @@ export const sendDailyReminder = onRequest({
 /**
  * Trigger: Notify on streak milestone
  */
-export const onStreakMilestone = onDocumentUpdated('users/{userId}', async (event) => {
+export const onStreakMilestone = onDocumentUpdated({
+  document: 'users/{userId}',
+  region: 'asia-south1'
+}, async (event) => {
   try {
     const before = event.data.before.data();
     const after = event.data.after.data();
@@ -227,7 +234,10 @@ export const onStreakMilestone = onDocumentUpdated('users/{userId}', async (even
 /**
  * Trigger: Notify on crisis detection
  */
-export const onCrisisDetected = onDocumentCreated('crisisInterventions/{interventionId}', async (event) => {
+export const onCrisisDetected = onDocumentCreated({
+  document: 'crisisInterventions/{interventionId}',
+  region: 'asia-south1'
+}, async (event) => {
   try {
     const intervention = event.data.data();
     const userId = intervention.userId;

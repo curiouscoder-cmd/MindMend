@@ -1,24 +1,36 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { logout } from '../services/authService.js';
 
 const Navigation = ({ currentView, onNavigate, calmPoints, user }) => {
   const navItems = [
     { id: 'onboarding', label: 'Home', icon: '🏠' },
     { id: 'coach', label: 'AI Coach', icon: '🤖' },
-    { id: 'group-therapy', label: 'Group', icon: '👥' },
+    { id: 'your-friend', label: 'Your Friend', icon: '👥' },
     { id: 'voice-input', label: 'Voice', icon: '🎤' },
     { id: 'doodle-mood', label: 'Express', icon: '🎨' },
-    { id: 'emotional-twin', label: 'Twin', icon: '🌱' },
     { id: 'analytics', label: 'Analytics', icon: '📊' },
-    { id: 'gamification', label: 'Achievements', icon: '🏆' },
-    { id: 'community', label: 'Community', icon: '👥' },
+    { id: 'community', label: 'Community', icon: '🌐' },
     { id: 'insights', label: 'Insights', icon: '💡' }
   ];
 
+  const menuRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Close on outside click
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <nav className="bg-white/90 backdrop-blur border-b border-ocean/10 shadow-soft">
+    <nav className="bg-white/90 backdrop-blur border-b border-ocean/10 shadow-soft relative z-40">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between min-h-16 py-2 gap-3 overflow-hidden">
+        <div className="flex items-center justify-between min-h-16 py-2 gap-3 overflow-visible">
           {/* Logo */}
           <div className="flex items-center space-x-3 shrink-0">
             <div className="w-9 h-9 bg-gradient-to-r from-ocean to-highlight rounded-2xl flex items-center justify-center shadow-soft">
@@ -55,8 +67,13 @@ const Navigation = ({ currentView, onNavigate, calmPoints, user }) => {
             
             {/* User Menu */}
             {user && (
-              <div className="relative group">
-                <button className="flex items-center space-x-2 px-3 py-2 rounded-2xl hover:bg-mint/60 transition-all">
+              <div className="relative" ref={menuRef}>
+                <button
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
+                  onClick={() => setMenuOpen((v) => !v)}
+                  className="flex items-center space-x-2 px-3 py-2 rounded-2xl hover:bg-mint/60 transition-all focus:outline-none focus:ring-2 focus:ring-ocean/40"
+                >
                   {user.photoURL ? (
                     <img src={user.photoURL} alt="Profile" className="w-8 h-8 rounded-full" />
                   ) : (
@@ -64,23 +81,33 @@ const Navigation = ({ currentView, onNavigate, calmPoints, user }) => {
                       {user.displayName?.[0] || '?'}
                     </div>
                   )}
-                  <span className="text-sm text-navy hidden md:inline max-w-[100px] truncate">
+                  <span className="text-sm text-navy hidden md:inline max-w-[120px] truncate">
                     {user.displayName || 'User'}
                   </span>
+                  <span className="text-navy/60 text-xs">▾</span>
                 </button>
-                
+
                 {/* Dropdown Menu */}
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-elevated border border-ocean/10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
-                  <div className="p-2">
-                    <button
-                      onClick={logout}
-                      className="w-full text-left px-4 py-2 text-sm text-navy hover:bg-mint/60 rounded-lg transition-all flex items-center space-x-2"
-                    >
-                      <span>🚪</span>
-                      <span>Sign Out</span>
-                    </button>
+                {menuOpen && (
+                  <div
+                    role="menu"
+                    className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-elevated border border-ocean/10 z-[999]"
+                  >
+                    <div className="px-4 py-3 border-b border-ocean/10">
+                      <p className="text-sm text-navy font-medium truncate">{user.displayName || 'User'}</p>
+                      <p className="text-xs text-navy/60 truncate">{user.email || ''}</p>
+                    </div>
+                    <div className="p-2">
+                      <button
+                        onClick={logout}
+                        className="w-full text-left px-4 py-2 text-sm text-navy hover:bg-mint/60 rounded-lg transition-all flex items-center gap-2"
+                      >
+                        <span>🚪</span>
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             )}
           </div>

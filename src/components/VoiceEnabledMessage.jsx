@@ -1,5 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import elevenLabsService from '../services/elevenLabsService';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import * as elevenLabsService from '../services/elevenLabsService';
+import * as ttsService from '../services/ttsService';
 
 const VoiceEnabledMessage = ({ 
   message, 
@@ -26,11 +29,27 @@ const VoiceEnabledMessage = ({
     }
   }, [message.content, autoPlay]);
 
+  // Listen for speech synthesis end
+  useEffect(() => {
+    const handleSpeechEnd = () => {
+      setIsPlaying(false);
+    };
+
+    return () => {
+      // Cleanup if component unmounts while speaking
+      ttsService.stopSpeech();
+    };
+  }, []);
+
   const handlePlayMessage = async () => {
     if (isPlaying) {
       handleStopMessage();
       return;
     }
+
+    console.log('🔊 VoiceEnabledMessage: Starting playback');
+    console.log('📝 Message:', message.content.substring(0, 50) + '...');
+    console.log('🎭 Emotion:', emotion);
 
     setIsLoading(true);
     setError(null);
@@ -39,47 +58,40 @@ const VoiceEnabledMessage = ({
       let url = audioUrl;
       
       if (!url) {
-        // Generate speech if not cached
+        console.log('🎙️ Generating new audio with ElevenLabs...');
+        // Generate speech with ElevenLabs (auto-fallback to Web Speech)
         url = await elevenLabsService.generateSpeech(
           message.content, 
-          persona,
-          { emotion }
+          { 
+            emotion,
+            voice: 'rachel', // Best female voice for India
+            language: 'en',
+            useCache: true,
+            onEnd: () => {
+              console.log('🎵 Speech ended, updating UI');
+              setIsPlaying(false);
+            },
+            onStart: () => {
+              console.log('🎵 Speech started');
+              setIsLoading(false);
+            }
+          }
         );
+        console.log('✅ Audio generated:', url ? 'Success' : 'Failed');
         setAudioUrl(url);
+      } else {
+        console.log('💾 Using cached audio');
+        // For cached audio, play it
+        const audio = new Audio(url);
+        audio.onended = () => setIsPlaying(false);
+        audio.onplay = () => setIsLoading(false);
+        await audio.play();
       }
 
-      if (url && url !== 'browser_tts') {
-        // Play ElevenLabs generated audio
-        const audio = new Audio(url);
-        audioRef.current = audio;
-        
-        audio.playbackRate = playbackSpeed;
-        audio.volume = 0.8;
-        
-        audio.addEventListener('loadstart', () => setIsLoading(true));
-        audio.addEventListener('canplay', () => setIsLoading(false));
-        audio.addEventListener('play', () => setIsPlaying(true));
-        audio.addEventListener('pause', () => setIsPlaying(false));
-        audio.addEventListener('ended', () => {
-          setIsPlaying(false);
-          audioRef.current = null;
-        });
-        audio.addEventListener('error', (e) => {
-          setError('Audio playback failed');
-          setIsPlaying(false);
-          setIsLoading(false);
-        });
-
-        await audio.play();
-      } else if (url === 'browser_tts') {
-        // Browser TTS is already playing
+      if (url && (url.startsWith('blob:') || url === 'browser_tts')) {
         setIsPlaying(true);
-        setIsLoading(false);
-        
-        // Simulate end event for browser TTS
-        setTimeout(() => {
-          setIsPlaying(false);
-        }, message.content.length * 50); // Rough estimate
+      } else if (!url) {
+        setError('Failed to generate audio');
       }
     } catch (err) {
       console.error('Error playing message:', err);
@@ -91,16 +103,14 @@ const VoiceEnabledMessage = ({
   };
 
   const handleStopMessage = () => {
+    // Stop Web Speech API or audio element
+    ttsService.stopSpeech();
+    
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
+      audioRef.current = null;
     }
-    
-    // Stop browser TTS if active
-    if ('speechSynthesis' in window) {
-      speechSynthesis.cancel();
-    }
-    
     setIsPlaying(false);
   };
 
@@ -141,7 +151,30 @@ const VoiceEnabledMessage = ({
           {getPersonaIcon(persona)}
         </div>
         <div className="flex-1">
-          <p className="text-calm-700 leading-relaxed">{message.content}</p>
+          <div className="text-calm-700 leading-relaxed prose prose-sm max-w-none">
+            <ReactMarkdown 
+              remarkPlugins={[remarkGfm]}
+              components={{
+                // Custom styling for markdown elements
+                p: ({node, ...props}) => <p className="mb-3 last:mb-0" {...props} />,
+                strong: ({node, ...props}) => <strong className="font-semibold text-calm-800" {...props} />,
+                em: ({node, ...props}) => <em className="italic" {...props} />,
+                ul: ({node, ...props}) => <ul className="list-disc list-inside mb-3 space-y-1" {...props} />,
+                ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-3 space-y-1" {...props} />,
+                li: ({node, ...props}) => <li className="ml-2" {...props} />,
+                h1: ({node, ...props}) => <h1 className="text-xl font-bold mb-2 text-calm-900" {...props} />,
+                h2: ({node, ...props}) => <h2 className="text-lg font-bold mb-2 text-calm-900" {...props} />,
+                h3: ({node, ...props}) => <h3 className="text-base font-semibold mb-2 text-calm-800" {...props} />,
+                code: ({node, inline, ...props}) => 
+                  inline 
+                    ? <code className="bg-calm-100 px-1 py-0.5 rounded text-sm font-mono" {...props} />
+                    : <code className="block bg-calm-100 p-2 rounded text-sm font-mono overflow-x-auto" {...props} />,
+                blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-calm-300 pl-4 italic my-3" {...props} />,
+              }}
+            >
+              {message.content}
+            </ReactMarkdown>
+          </div>
           
           {/* Voice Controls */}
           {showControls && (
@@ -196,11 +229,9 @@ const VoiceEnabledMessage = ({
 
               {/* Voice Status */}
               <div className="flex items-center space-x-1">
-                <div className={`w-2 h-2 rounded-full ${
-                  elevenLabsService.isAvailable() ? 'bg-green-400' : 'bg-orange-400'
-                }`}></div>
+                <div className="w-2 h-2 rounded-full bg-green-400"></div>
                 <span className="text-xs text-calm-500">
-                  {elevenLabsService.isAvailable() ? 'AI Voice' : 'Browser TTS'}
+                  ElevenLabs Rachel • Premium Voice
                 </span>
               </div>
             </div>

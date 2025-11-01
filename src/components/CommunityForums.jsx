@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { mockData } from '../data/mockData';
-import elevenLabsService from '../services/elevenLabsService';
 
 const CommunityForums = ({ userProgress, currentUser }) => {
   const [activeTab, setActiveTab] = useState('forums');

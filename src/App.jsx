@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navigation from './components/Navigation.jsx';
 import Onboarding from './components/Onboarding.jsx';
-import CBTExercise from './components/CBTExercise.jsx';
-import ProgressTracking from './components/ProgressTracking.jsx';
-import Gamification from './components/Gamification.jsx';
-import Community from './components/Community.jsx';
-import AICoach from './components/AICoach.jsx';
-import AIInsights from './components/AIInsights.jsx';
-import MoodAnalytics from './components/MoodAnalytics.jsx';
-import CrisisMode from './components/CrisisMode.jsx';
-import EmotionalTwin from './components/EmotionalTwin.jsx';
-import VoiceInput from './components/VoiceInput.jsx';
-import DoodleMoodInput from './components/DoodleMoodInput.jsx';
-import AIGroupTherapy from './components/AIGroupTherapy.jsx';
-import OfflineIndicator from './components/OfflineIndicator.jsx';
 import Login from './components/Login.jsx';
+import OfflineIndicator from './components/OfflineIndicator.jsx';
+
+// Lazy load heavy components
+const CBTExercise = lazy(() => import('./components/CBTExercise.jsx'));
+const ProgressTracking = lazy(() => import('./components/ProgressTracking.jsx'));
+const Community = lazy(() => import('./components/Community.jsx'));
+const AICoach = lazy(() => import('./components/AICoach.jsx'));
+const YourFriend = lazy(() => import('./components/YourFriend.jsx'));
+const AIInsights = lazy(() => import('./components/AIInsights.jsx'));
+const MoodAnalytics = lazy(() => import('./components/MoodAnalytics.jsx'));
+const CrisisMode = lazy(() => import('./components/CrisisMode.jsx'));
+const VoiceInput = lazy(() => import('./components/VoiceInput.jsx'));
+const DoodleMoodInput = lazy(() => import('./components/DoodleMoodInput.jsx'));
+import LoadingSpinner from './components/LoadingSpinner.jsx';
 import { useMoodTheme } from './hooks/useMoodTheme.js';
 import offlineService from './services/offlineService.js';
 import { onAuthChange } from './services/authService.js';
@@ -26,6 +27,7 @@ function App() {
   // Authentication state
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [showAuthLoader, setShowAuthLoader] = useState(false);
   
   // App state
   const [currentView, setCurrentView] = useState('onboarding');
@@ -85,6 +87,17 @@ function App() {
     
     return unsubscribe;
   }, []);
+
+  // Debounce the auth loader to avoid flicker
+  useEffect(() => {
+    let t;
+    if (authLoading) {
+      t = setTimeout(() => setShowAuthLoader(true), 250);
+    } else {
+      setShowAuthLoader(false);
+    }
+    return () => clearTimeout(t);
+  }, [authLoading]);
   
   // Listen for foreground notifications
   useEffect(() => {
@@ -147,107 +160,95 @@ function App() {
   };
 
   const renderCurrentView = () => {
-    switch (currentView) {
-      case 'onboarding':
-        return <Onboarding onMoodSelect={handleMoodSelection} />;
-      case 'exercise':
-        return (
-          <CBTExercise
-            mood={selectedMood}
-            onComplete={handleExerciseComplete}
-            onBack={() => setCurrentView('onboarding')}
-          />
-        );
-      case 'progress':
-        return (
-          <ProgressTracking
-            progress={userProgress}
-            onBack={() => setCurrentView('onboarding')}
-          />
-        );
-      case 'gamification':
-        return (
-          <Gamification
-            userProgress={userProgress}
-            onLevelUp={handleLevelUp}
-          />
-        );
-      case 'community':
-        return (
-          <Community
-            userProgress={userProgress}
-          />
-        );
-      case 'coach':
-        return (
-          <AICoach
-            userProgress={userProgress}
-            moodHistory={moodHistory}
-            currentMood={currentMood}
-          />
-        );
-      case 'insights':
-        return (
-          <AIInsights
-            userProgress={userProgress}
-            moodHistory={moodHistory}
-          />
-        );
-      case 'analytics':
-        return (
-          <MoodAnalytics
-            moodHistory={moodHistory}
-            userProgress={userProgress}
-          />
-        );
-      case 'emotional-twin':
-        return (
-          <EmotionalTwin
-            moodHistory={moodHistory}
-            userProgress={userProgress}
-            personalityTraits={{}}
-          />
-        );
-      case 'voice-input':
-        return (
-          <VoiceInput
-            onEmotionDetected={(emotion) => {
-              console.log('Emotion detected:', emotion);
-              if (emotion.urgency === 'high') {
-                setShowCrisisMode(true);
-              }
-            }}
-            onTranscriptionComplete={(text) => {
-              console.log('Transcription:', text);
-            }}
-          />
-        );
-      case 'doodle-mood':
-        return (
-          <DoodleMoodInput
-            onMoodDetected={(analysis) => {
-              console.log('Mood analysis:', analysis);
-              setCurrentMood(analysis.primaryMood);
-            }}
-            onDoodleComplete={(data) => {
-              console.log('Doodle complete:', data);
-            }}
-          />
-        );
-      case 'group-therapy':
-        return (
-          <AIGroupTherapy
-            userProgress={userProgress}
-            currentMood={currentMood}
-          />
-        );
-      default:
-        return <Onboarding onMoodSelect={handleMoodSelection} />;
-    }
+    return (
+      <Suspense fallback={null}> 
+        {(() => {
+          switch (currentView) {
+            case 'onboarding':
+              return <Onboarding onMoodSelect={handleMoodSelection} />;
+            case 'exercise':
+              return (
+                <CBTExercise
+                  mood={selectedMood}
+                  onComplete={handleExerciseComplete}
+                  onBack={() => setCurrentView('onboarding')}
+                />
+              );
+            case 'progress':
+              return (
+                <ProgressTracking
+                  progress={userProgress}
+                  onBack={() => setCurrentView('onboarding')}
+                />
+              );
+            case 'community':
+              return (
+                <Community
+                  userProgress={userProgress}
+                />
+              );
+            case 'coach':
+              return (
+                <AICoach
+                  userProgress={userProgress}
+                  moodHistory={moodHistory}
+                  currentMood={currentMood}
+                />
+              );
+            case 'your-friend':
+              return (
+                <YourFriend />
+              );
+            case 'insights':
+              return (
+                <AIInsights
+                  userProgress={userProgress}
+                  moodHistory={moodHistory}
+                />
+              );
+            case 'analytics':
+              return (
+                <MoodAnalytics
+                  moodHistory={moodHistory}
+                  userProgress={userProgress}
+                />
+              );
+            case 'voice-input':
+              return (
+                <VoiceInput
+                  onEmotionDetected={(emotion) => {
+                    console.log('Emotion detected:', emotion);
+                    if (emotion.urgency === 'high') {
+                      setShowCrisisMode(true);
+                    }
+                  }}
+                  onTranscriptionComplete={(text) => {
+                    console.log('Transcription:', text);
+                  }}
+                />
+              );
+            case 'doodle-mood':
+              return (
+                <DoodleMoodInput
+                  onMoodDetected={(analysis) => {
+                    console.log('Mood analysis:', analysis);
+                    setCurrentMood(analysis.primaryMood);
+                  }}
+                  onDoodleComplete={(data) => {
+                    console.log('Doodle complete:', data);
+                  }}
+                />
+              );
+            default:
+              return <Onboarding onMoodSelect={handleMoodSelection} />;
+          }
+        })()}
+      </Suspense>
+    );
   };
 
-  // Show loading screen while checking auth
   if (authLoading) {
+    if (!showAuthLoader) return null;
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky to-mint">
         <div className="text-center">
@@ -258,12 +259,10 @@ function App() {
     );
   }
 
-  // Show login screen if not authenticated
   if (!user) {
     return <Login onLoginSuccess={setUser} />;
   }
 
-  // Main app (user is authenticated)
   return (
     <div className={`min-h-screen bg-mint/50`}>
       <Navigation
@@ -282,8 +281,6 @@ function App() {
         🆘
       </button>
 
-      {/* Offline Indicator - Removed for cleaner navbar */}
-      {/* <OfflineIndicator /> */}
 
       <main className="container mx-auto px-4 py-8">
         <AnimatePresence mode="wait">
@@ -301,16 +298,18 @@ function App() {
 
       {/* Crisis Mode Modal */}
       {showCrisisMode && (
-        <CrisisMode
-          onClose={() => setShowCrisisMode(false)}
-          onExerciseComplete={() => {
-            setUserProgress(prev => ({
-              ...prev,
-              completedExercises: prev.completedExercises + 1,
-              calmPoints: prev.calmPoints + 20 // Extra points for crisis exercises
-            }));
-          }}
-        />
+        <Suspense fallback={null}> 
+          <CrisisMode
+            onClose={() => setShowCrisisMode(false)}
+            onExerciseComplete={() => {
+              setUserProgress(prev => ({
+                ...prev,
+                completedExercises: prev.completedExercises + 1,
+                calmPoints: prev.calmPoints + 20 // Extra points for crisis exercises
+              }));
+            }}
+          />
+        </Suspense>
       )}
     </div>
   );

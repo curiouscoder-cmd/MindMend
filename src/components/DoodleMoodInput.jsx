@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { GeminiService } from '../services/geminiService';
+import api from '../services/apiService.js';
 
 const DoodleMoodInput = ({ onMoodDetected, onDoodleComplete }) => {
   const canvasRef = useRef(null);
@@ -173,40 +173,28 @@ const DoodleMoodInput = ({ onMoodDetected, onDoodleComplete }) => {
         }
       `;
 
-      // For now, simulate analysis since we can't actually process the image
-      const mockAnalysis = {
-        primaryMood: selectedEmojis.length > 0 ? selectedEmojis[0].mood : 'neutral',
-        secondaryMoods: selectedEmojis.slice(1, 3).map(e => e.mood),
-        emotionalIntensity: Math.min(selectedEmojis.length * 2 + Math.random() * 3, 10),
-        insights: `Your choice of ${selectedEmojis.length} emojis suggests a complex emotional state. The combination indicates you're processing multiple feelings simultaneously.`,
-        recommendations: [
-          'Practice mindful breathing to center yourself',
-          'Journal about the different emotions you\'re experiencing',
-          'Consider talking to someone you trust about your feelings'
-        ],
-        colorAnalysis: `The ${selectedColor} color choice reflects your current emotional tone and creative expression.`,
-        overallAssessment: 'You\'re showing healthy emotional awareness by expressing your feelings through multiple channels.'
-      };
-
-      setDoodleAnalysis(mockAnalysis);
+      // Analyze with backend Cloud Vision API
+      const analysis = await api.analyzeDoodle(imageData, selectedEmojis);
+      
+      setDoodleAnalysis(analysis);
       
       if (onMoodDetected) {
-        onMoodDetected(mockAnalysis);
+        onMoodDetected(analysis);
       }
       
       if (onDoodleComplete) {
         onDoodleComplete({
           imageData,
           emojis: selectedEmojis,
-          analysis: mockAnalysis
+          analysis
         });
       }
-      
     } catch (error) {
-      console.error('Error analyzing doodle:', error);
+      console.error('Doodle analysis error:', error);
+      alert('Failed to analyze doodle. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
     }
-    
-    setIsAnalyzing(false);
   };
 
   return (

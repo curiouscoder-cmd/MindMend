@@ -1,12 +1,12 @@
-# MindMend - Google Cloud AI Mental Wellness Platform
+# MindMend - AI-Powered Mental Wellness Platform
 
 ![Last Commit](https://img.shields.io/badge/Last%20Commit-2025--10--24-blue.svg)
-![Version](https://img.shields.io/badge/Version-2.0.0-green.svg)
+![Version](https://img.shields.io/badge/Version-3.0.0-green.svg)
 [![Primary Language](https://img.shields.io/badge/Language-JavaScript-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Google Cloud](https://img.shields.io/badge/Google%20Cloud-Firebase%20%2B%20Vertex%20AI-4285F4.svg)](https://cloud.google.com/)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Firebase-FF6F00.svg)](https://mindmend-25dca.web.app/)
 
-> **🏆 Google Gen AI Exchange Hackathon Project** - Advanced mental wellness platform powered by Google Cloud's full AI stack, featuring multilingual support, Firebase integration, and Vertex AI models running from Mumbai region.
+> **🏆 Google Gen AI Exchange Hackathon Project** - Advanced mental wellness platform powered by **Gemini 2.5 on Vertex AI**, featuring multilingual support for 10 Indian languages and deep Firebase integration.
 
 ## 🚀 Google Cloud Technology Stack
 
@@ -16,9 +16,11 @@
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4.17-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
-### Google Cloud Services (15 Services)
-![Firebase](https://img.shields.io/badge/Firebase-Functions%20Gen2-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)
+### AI Models & Services
 ![Vertex AI](https://img.shields.io/badge/Vertex%20AI-Gemini%202.5-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-Functions%20Gen2-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)
+
+### Google Cloud Services (15 Services)
 ![Firestore](https://img.shields.io/badge/Firestore-NoSQL-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)
 ![Cloud Vision](https://img.shields.io/badge/Cloud%20Vision-API-4285F4?style=for-the-badge&logo=google&logoColor=white)
 ![Cloud NLP](https://img.shields.io/badge/Cloud%20NLP-API-4285F4?style=for-the-badge&logo=google&logoColor=white)
@@ -28,7 +30,13 @@
 
 ## 📋 Project Overview
 
-**MindMend** is a comprehensive mental wellness platform built for the **Google Gen AI Exchange Hackathon**, showcasing the full power of Google Cloud's AI ecosystem. The platform provides evidence-based Cognitive Behavioral Therapy (CBT) exercises, multilingual AI support, and real-time analytics - all powered by 15+ Google Cloud services running from the Mumbai region (asia-south1) for optimal performance in India.
+**MindMend** is a comprehensive mental wellness platform built for the **Google Gen AI Exchange Hackathon**, showcasing the full power of Google Cloud's AI ecosystem. The platform provides evidence-based Cognitive Behavioral Therapy (CBT) exercises, multilingual AI support, and real-time analytics - all powered by **Vertex AI (Gemini 2.5)** and 15+ Google Cloud services running from the Mumbai region (asia-south1) for optimal performance in India.
+
+## 🤖 AI Architecture
+
+- **Primary**: Vertex AI Gemini 2.5 (Flash/Pro) for reasoning, chat, and translation
+- **Multimodal**: Cloud Vision, Cloud Speech-to-Text, Cloud Text-to-Speech
+- **Data**: Firestore for realtime storage, BigQuery for analytics
 
 ## 🏆 Hackathon Implementation Status
 
@@ -167,76 +175,112 @@
 - **IndexedDB Storage**: Client-side database for offline data persistence
 - **Socket.io Integration**: Real-time messaging and notifications
 
-## 🛠️ Installation & Setup
+### 🤖 Advanced Gemini Features
 
-### Prerequisites
+#### ✅ Implemented Features
+- **Streaming Chat**: Real-time token streaming with Server-Sent Events (SSE)
+- **Function Calling**: getMoodInsights, suggestExercise, scheduleReminder
+- **Multi-turn Chat Sessions**: Stateful conversations with context preservation
+- **Multimodal Analysis**: Image + text input with doodle analysis
+- **Context Caching**: Reduce API costs and get faster responses
+- **Structured Output**: JSON mode with typed responses
+
+#### 📁 Files Created
+- `functions/src/geminiAdvanced.js` - Backend implementations
+- `src/services/geminiAdvancedService.js` - Frontend client
+
+#### 🚀 Next Steps
+1. Restart emulators: `firebase emulators:start`
+2. Test new features
+3. Integrate into UI components
+
+All features use @google/genai v1.27.0 latest API!
+
+## 🛠️ Installation & Setup Guide
+
+### 📋 Prerequisites
+
+#### **System Requirements**
 - **Node.js** (version 24 or higher)
 - **npm** or **yarn** package manager
+- **Git** for version control
+
+#### **Cloud Services**
 - **Google Cloud Account** with billing enabled
 - **Firebase CLI** installed globally
 - **gcloud CLI** installed and authenticated
 
-### 🚀 Quick Start (Local Development)
+#### **AI Models**
+- **Vertex AI (Gemini 2.5)** (Cloud-based)
 
-#### 1. **Clone the Repository**
+---
+
+## 🚀 **Quick Start Guide**
+
+### **Step 1: Clone & Install**
+
 ```bash
+# Clone the repository
 git clone https://github.com/curiouscoder-cmd/MindMend.git
 cd MindMend
-```
 
-#### 2. **Install Dependencies**
-```bash
-# Frontend dependencies
+# Install frontend dependencies
 npm install
 
-# Firebase Functions dependencies
-cd functions
-npm install
-cd ..
+# Install Firebase Functions dependencies
+cd functions && npm install && cd ..
 ```
 
-#### 3. **Firebase Project Setup**
-```bash
-# Login to Firebase
-firebase login
+### **Step 2: Configure Google Cloud (Vertex AI)**
 
-# Create Firebase project (or use existing)
-firebase projects:create mindmend-ai
-
-# Set project
-firebase use mindmend-ai
-```
-
-#### 4. **Google Cloud Setup**
 ```bash
 # Login to Google Cloud
 gcloud auth login
 gcloud auth application-default login
 
-# Set project
-gcloud config set project mindmend-ai
+# Set your project
+gcloud config set project your-project-id
 
-# Enable required APIs
+# Enable Vertex AI
 gcloud services enable aiplatform.googleapis.com
-gcloud services enable vision.googleapis.com
-gcloud services enable language.googleapis.com
-gcloud services enable speech.googleapis.com
-gcloud services enable texttospeech.googleapis.com
-gcloud services enable bigquery.googleapis.com
 ```
 
-#### 5. **Environment Configuration**
-```bash
-# Copy environment template
-cp .env.example .env.local
+### **Step 3: Firebase Project Setup**
 
-# Edit .env.local with your Firebase config
-# Get config from: Firebase Console → Project Settings → General → Your apps
+```bash
+# Login to Firebase
+firebase login
+
+# Create new project (or use existing)
+firebase projects:create mindmend-your-name
+
+# Set active project
+firebase use mindmend-your-name
+
+# Initialize Firebase in project
+firebase init functions
 ```
 
-**Required Environment Variables:**
+### **Step 4: Google Cloud APIs**
+
 ```bash
-# Firebase Configuration
+# Enable all required APIs
+gcloud services enable \
+  aiplatform.googleapis.com \
+  vision.googleapis.com \
+  language.googleapis.com \
+  speech.googleapis.com \
+  texttospeech.googleapis.com \
+  bigquery.googleapis.com \
+  firebase.googleapis.com \
+  firestore.googleapis.com
+```
+
+### **Step 5: Environment Configuration**
+
+**Create `.env.local` file:**
+```bash
+# Firebase Configuration (Get from Firebase Console)
 VITE_FIREBASE_API_KEY=your_api_key
 VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your_project_id
@@ -249,117 +293,255 @@ GCP_PROJECT_ID=your_project_id
 GCP_LOCATION=asia-south1
 ```
 
-#### 6. **Start Development Environment**
+**Get Firebase Config:**
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Select your project → Project Settings → General
+3. Scroll to "Your apps" → Web app → Config
+4. Copy the config values to `.env.local`
 
-**Terminal 1: Firebase Functions Emulator**
+### **Step 6: Start Development Environment**
+
+#### **Starting All Emulators**
+
+Open a terminal and run this command to start all Firebase emulators:
 ```bash
+cd functions
 export GCP_PROJECT_ID=your_project_id
 export GCP_LOCATION=asia-south1
-firebase emulators:start --only functions,auth
+firebase emulators:start --import=./emulator-data --export-on-exit --project=mindmend-emulator \
+  --only functions,firestore,auth,storage,hosting
 ```
 
-**Terminal 2: Frontend Development Server**
+The `--import` and `--export-on-exit` flags persist emulator data between runs.
+
+#### **Starting Frontend Dev Server**
+
+Open another terminal and run:
 ```bash
 npm run dev
 ```
 
-#### 7. **Access the Application**
+#### **Accessing Emulator UI**
+After starting the emulators, you can access the Firebase Emulator Suite UI at:
+http://localhost:4000
+
+### **Step 7: Verify Installation**
+
+**Check Services:**
 - **Frontend**: http://localhost:3000
-- **Firebase Emulator UI**: http://localhost:4000
+- **Emulator UI**: http://localhost:4000
 - **Functions**: http://localhost:5001
+- **Auth**: http://localhost:9099
+- **Firestore**: http://localhost:8080
+- **Storage**: http://localhost:9199
 
-### Detailed Setup Guides
+Need help applying these changes in other docs or scripts?
 
-For comprehensive setup instructions, refer to these additional guides:
-- 📋 [Quick Start Guide](QUICK_START.md) - Fast setup for development
-- 🗄️ [Database Setup](DATABASE_SETUP.md) - Supabase configuration
-- 📦 [Install Dependencies](INSTALL_DEPENDENCIES.md) - Detailed dependency installation
-- 💰 [Cost Estimation & Mockups](COST_ESTIMATION_AND_MOCKUPS.md) - Project planning details
+---
 
-## 🧪 Testing the Implementation
+## 🔧 **Troubleshooting Guide**
 
-### **Frontend Testing**
+### **Common Issues & Solutions**
 
-#### 1. **Basic Functionality Test**
+#### **🔥 Firebase Issues**
+
+**Problem**: `Firebase CLI not found`
 ```bash
-# Start the frontend
+# Install Firebase CLI globally
+npm install -g firebase-tools
+firebase login
+```
+
+**Problem**: `Permission denied` errors
+```bash
+# Re-authenticate
+firebase logout
+firebase login
+gcloud auth application-default login
+```
+
+**Problem**: Functions deployment fails
+```bash
+# Check Node.js version (must be 18+)
+node --version
+
+# Update Firebase CLI
+npm install -g firebase-tools@latest
+```
+
+#### **☁️ Google Cloud Issues**
+
+**Problem**: `API not enabled` errors
+```bash
+# Enable all required APIs
+gcloud services enable aiplatform.googleapis.com
+gcloud services enable vision.googleapis.com
+# ... (see Step 4 above)
+```
+
+**Problem**: `Quota exceeded` errors
+```bash
+# Check quotas in Google Cloud Console
+# Go to: IAM & Admin → Quotas
+# Request quota increases if needed
+```
+
+### **🚀 Performance Optimization**
+
+#### **Firebase Functions**
+```bash
+# Increase memory allocation
+# Edit functions/package.json:
+"engines": {
+  "node": "24"
+},
+"functions": {
+  "memory": "2GB",
+  "timeout": "540s"
+}
+```
+
+## 🧪 **Comprehensive Testing Guide**
+
+### **🔥 Firebase Functions Testing**
+
+#### **1. Health Check**
+```bash
+curl http://localhost:5001/your-project/asia-south1/healthCheck | jq '.'
+# Expected: {"status": "healthy", "functions": 19, "region": "asia-south1"}
+```
+
+#### **2. Translation Metrics**
+```bash
+curl http://localhost:5001/your-project/asia-south1/streamingTranslationMetrics | jq '.'
+# Expected: Performance metrics and cache statistics
+```
+
+#### **3. Voice & Multimodal Testing**
+```bash
+# Test speech-to-text
+curl -X POST http://localhost:5001/your-project/asia-south1/speechToText \
+  -H "Content-Type: application/json" \
+  -d '{"audioData": "base64_audio_data", "language": "hi"}' | jq '.'
+
+# Test doodle analysis
+curl -X POST http://localhost:5001/your-project/asia-south1/analyzeDoodle \
+  -H "Content-Type: application/json" \
+  -d '{"imageData": "base64_image_data"}' | jq '.'
+```
+
+### **📊 Performance Benchmarks**
+
+#### **Expected Performance (Vertex AI)**
+| Test Case | Gemini 2.5 |
+|-----------|------------|
+| **Language Detection** | ~1s |
+| **Simple Translation** | ~3-4s |
+| **Complex Translation** | ~4-6s |
+| **Mental Health Context** | ~5-8s |
+
+#### **Performance Test Script**
+```bash
+# Create performance test
+cat > test-performance.sh << 'EOF'
+#!/bin/bash
+echo "🧪 MindMend Performance Test"
+echo "=========================="
+
+# Test 1: Language Detection Speed
+echo "Test 1: Language Detection (Gemini 2.5)"
+time curl -s -X POST http://localhost:5001/your-project/asia-south1/streamingTranslation \
+  -H "Content-Type: application/json" \
+  -d '{"text":"Hello","targetLanguage":"hi","streaming":false}' | jq '.performance.languageDetection'
+
+# Test 2: Translation Quality
+echo "Test 2: Translation Quality (Gemini 2.5)"
+curl -s -X POST http://localhost:5001/your-project/asia-south1/streamingTranslation \
+  -H "Content-Type: application/json" \
+  -d '{"text":"I need help with anxiety and depression","targetLanguage":"hi","streaming":false}' | jq '.confidence'
+
+# Test 3: Multilingual Chat
+echo "Test 3: Multilingual Chat Pipeline"
+time curl -s -X POST http://localhost:5001/your-project/asia-south1/chatMultilingual \
+  -H "Content-Type: application/json" \
+  -d '{"message":"मुझे चिंता की समस्या है"}' | jq '.performance.total'
+
+echo "✅ Performance test completed!"
+EOF
+
+chmod +x test-performance.sh
+./test-performance.sh
+```
+
+### **🌐 Frontend Testing**
+
+#### **1. Basic Functionality**
+```bash
+# Start frontend
 npm run dev
 
 # Open http://localhost:3000
 # ✅ Check: App loads without errors
-# ✅ Check: Login page displays
-# ✅ Check: Navigation works
+# ✅ Check: Language selection works
+# ✅ Check: Translation is fast and accurate
 ```
 
-#### 2. **Authentication Test**
+#### **2. AI Integration Test**
 ```bash
-# Test Google Sign-In (uses Firebase Auth emulator)
-# ✅ Check: "Continue with Google" button works
-# ✅ Check: Anonymous login works
-# ✅ Check: User profile appears in navbar
+# Test AI chat
+# 1. Go to AI Coach section
+# 2. Type: "I am feeling stressed"
+# 3. ✅ Check: Response uses Gemini 2.5 (Vertex AI)
+# 4. ✅ Check: Response is contextually appropriate
+# 5. ✅ Check: Latency is acceptable (<10s)
 ```
 
-### **Firebase Functions Testing**
+### **🔍 Integration Testing**
 
-#### 1. **Health Check**
+#### **End-to-End User Flow**
+1. **🔐 Authentication**: Test Firebase Auth
+2. **🤖 AI Chat**: Send message to Gemini-powered coach
+3. **🌍 Translation**: Test multilingual support
+4. **📊 Analytics**: Check performance metrics
+5. **🔔 Notifications**: Test FCM integration
+6. **💾 Offline**: Test offline functionality
+
+#### **Automated Test Suite**
 ```bash
-curl http://localhost:5001/your-project-id/us-central1/healthCheck | jq '.'
-# Expected: {"status": "healthy", "functions": 11}
-```
+# Run comprehensive test suite
+npm run test:integration
 
-#### 2. **AI Chat Function (Gemini 2.5)**
-```bash
-curl -X POST http://localhost:5001/your-project-id/us-central1/chat \
-  -H "Content-Type: application/json" \
-  -d '{"message": "I am feeling anxious and need help"}' | jq '.'
-# Expected: AI response with model info and timestamp
-```
+# Or create custom test script
+cat > test-suite.sh << 'EOF'
+#!/bin/bash
+echo "🚀 MindMend Integration Test Suite"
+echo "================================="
 
-#### 3. **Multilingual Chat (10 Languages)**
-```bash
-# Test Hindi input
-curl -X POST http://localhost:5001/your-project-id/us-central1/chatMultilingual \
-  -H "Content-Type: application/json" \
-  -d '{"message": "मैं बहुत चिंतित महसूस कर रहा हूं"}' | jq '.'
-# Expected: Language detection + translated response
-```
+# Test all endpoints
+endpoints=(
+  "healthCheck"
+  "streamingTranslation" 
+  "chatMultilingual"
+  "speechToText"
+  "analyzeDoodle"
+  "getAnalyticsDashboard"
+)
 
-#### 4. **Notification System**
-```bash
-# Register FCM token
-curl -X POST http://localhost:5001/your-project-id/us-central1/registerToken \
-  -H "Content-Type: application/json" \
-  -d '{"userId": "test-123", "token": "test-token"}' | jq '.'
+for endpoint in "${endpoints[@]}"; do
+  echo "Testing $endpoint..."
+  curl -s "http://localhost:5001/your-project/asia-south1/$endpoint" > /dev/null
+  if [ $? -eq 0 ]; then
+    echo "✅ $endpoint: PASS"
+  else
+    echo "❌ $endpoint: FAIL"
+  fi
+done
 
-# Send notification
-curl -X POST http://localhost:5001/your-project-id/us-central1/sendNotification \
-  -H "Content-Type: application/json" \
-  -d '{"userId": "test-123", "title": "Test", "body": "Hello"}' | jq '.'
-```
+echo "🏁 Test suite completed!"
+EOF
 
-#### 5. **Analytics Functions**
-```bash
-# Get analytics dashboard
-curl "http://localhost:5001/your-project-id/us-central1/getAnalyticsDashboard?startDate=2024-01-01&endDate=2024-12-31" | jq '.'
-
-# Initialize BigQuery
-curl -X POST http://localhost:5001/your-project-id/us-central1/initializeBigQuery | jq '.'
-```
-
-### **Performance Testing**
-
-#### **Multilingual Pipeline Performance**
-```bash
-# Test response times
-time curl -X POST http://localhost:5001/your-project-id/us-central1/chatMultilingual \
-  -H "Content-Type: application/json" \
-  -d '{"message": "I need mental health support"}' | jq '.performance'
-
-# Expected performance:
-# - Language detection: ~1s
-# - Preprocessing: ~3s  
-# - Gemini response: ~4s
-# - Total: ~7s
+chmod +x test-suite.sh
+./test-suite.sh
 ```
 
 ### **Integration Testing**
@@ -405,68 +587,142 @@ firebase deploy --only functions
 firebase deploy
 ```
 
-## 📁 Project Structure
+## 📁 **Project Structure**
 
 ```
 MindMend/
-├── 📁 functions/                    # Firebase Functions (19 functions)
+├── 📁 functions/                           # Firebase Functions (19 functions)
 │   ├── 📁 src/
-│   │   ├── 🔧 index.js             # Functions entry point
-│   │   ├── 🔧 admin.js             # Firebase Admin initialization
-│   │   ├── 🤖 chat.js              # Gemini 2.5 Flash chat
-│   │   ├── 🌍 chatMultilingual.js  # Multilingual chat pipeline
-│   │   ├── 🌍 multilingualPipeline.js # Language processing
-│   │   ├── 🎤 voiceChat.js         # Voice-to-text chat
-│   │   ├── 🎤 speechToText.js      # Cloud Speech API
-│   │   ├── 🔊 textToSpeech.js      # Cloud Text-to-Speech API
-│   │   ├── 🎨 analyzeDoodle.js     # Cloud Vision doodle analysis
-│   │   ├── 📊 analyzeMood.js       # Cloud NLP sentiment analysis
-│   │   ├── 🔔 notifications.js     # Firebase Cloud Messaging
-│   │   ├── 📈 analytics.js         # BigQuery analytics
-│   │   └── 🩺 healthCheck.js       # System health monitoring
-│   ├── 📦 package.json             # Node.js 24 dependencies
-│   └── 📋 firebase.json            # Firebase configuration
+│   │   ├── 🔧 index.js                    # Functions entry point
+│   │   ├── 🔧 admin.js                    # Firebase Admin initialization
+│   │   ├── 🤖 chat.js                     # Gemini 2.5 Flash chat
+│   │   ├── 🌐 streamingTranslation.js     # Translation via Vertex AI
+│   │   ├── 🎤 voiceChat.js                # Voice-to-text chat
+│   │   ├── 🎤 speechToText.js             # Cloud Speech API
+│   │   ├── 🔊 textToSpeech.js             # Cloud Text-to-Speech API
+│   │   ├── 🎨 analyzeDoodle.js            # Cloud Vision doodle analysis
+│   │   ├── 📊 analyzeMood.js              # Cloud NLP sentiment analysis
+│   │   ├── 🔔 notifications.js            # Firebase Cloud Messaging
+│   │   ├── 📈 analytics.js                # BigQuery analytics
+│   │   └── 🩺 healthCheck.js              # System health monitoring
+│   ├── 📦 package.json                    # Node.js 24 dependencies
+│   └── 📋 firebase.json                   # Firebase configuration
+├── 📁 scripts/                            # Testing & deployment scripts
+│   ├── 🧪 quick-test.sh                   # Quick functionality test
+│   ├── 🧪 test-streaming-translation.sh   # Translation tests
+│   ├── 🚀 deploy-functions.sh             # Deploy to production
+│   └── 🔧 setup-environment.sh            # Environment setup
 ├── 📁 public/
-│   ├── 🎵 music.mp3                # Background music file
-│   ├── 🎬 plant.mp4                # Calming video file
-│   └── 🔥 favicon.svg              # App icon
+│   ├── 🎵 music.mp3                       # Background music file
+│   ├── 🎬 plant.mp4                       # Calming video file
+│   └── 🔥 favicon.svg                     # App icon
 ├── 📁 src/
 │   ├── 📁 components/
-│   │   ├── 🧭 Navigation.jsx       # Navigation bar
-│   │   ├── 🏠 Onboarding.jsx       # Mood selection homepage
-│   │   ├── 🧠 CBTExercise.jsx      # CBT exercise components
-│   │   ├── 📊 ProgressTracking.jsx # Progress visualization
-│   │   ├── 🎮 Gamification.jsx     # Gamification features
-│   │   ├── 👥 Community.jsx        # Community support
-│   │   ├── 🤖 AICoach.jsx          # AI coaching component
-│   │   ├── 📈 AIInsights.jsx       # AI-powered insights
-│   │   ├── 🎭 EmotionalTwin.jsx    # AI emotional companion
-│   │   ├── 📊 MoodAnalytics.jsx    # Mood analytics dashboard
-│   │   ├── 🆘 CrisisMode.jsx       # Crisis support mode
-│   │   ├── 🎤 VoiceInput.jsx       # Voice emotion detection
-│   │   ├── 🎨 DoodleMoodInput.jsx  # Mood through drawing
-│   │   ├── 🏥 AIGroupTherapy.jsx   # AI group therapy
-│   │   └── 🔧 Login.jsx            # Firebase Authentication
+│   │   ├── 🧭 Navigation.jsx              # Navigation bar
+│   │   ├── 🏠 Onboarding.jsx              # Mood selection homepage
+│   │   ├── 🧠 CBTExercise.jsx             # CBT exercise components
+│   │   ├── 📊 ProgressTracking.jsx        # Progress visualization
+│   │   ├── 🎮 Gamification.jsx            # Gamification features
+│   │   ├── 👥 Community.jsx               # Community support
+│   │   ├── 🤖 AICoach.jsx                 # AI coaching component
+│   │   ├── 📈 AIInsights.jsx              # AI-powered insights
+│   │   ├── 🎭 EmotionalTwin.jsx           # AI emotional companion
+│   │   ├── 📊 MoodAnalytics.jsx           # Mood analytics dashboard
+│   │   ├── 🆘 CrisisMode.jsx              # Crisis support mode
+│   │   ├── 🎤 VoiceInput.jsx              # Voice emotion detection
+│   │   ├── 🎨 DoodleMoodInput.jsx         # Mood through drawing
+│   │   ├── 🏥 AIGroupTherapy.jsx          # AI group therapy
+│   │   └── 🔧 Login.jsx                   # Firebase Authentication
 │   ├── 📁 services/
-│   │   ├── 🔥 firebaseConfig.js    # Firebase initialization
-│   │   ├── 🔐 authService.js       # Authentication service
-│   │   ├── 🗄️ firestoreService.js # Firestore database
-│   │   ├── 🔔 fcmService.js        # Push notifications
-│   │   └── 💾 offlineService.js    # Offline data management
+│   │   ├── 🔥 firebaseConfig.js           # Firebase initialization
+│   │   ├── 🔐 authService.js              # Authentication service
+│   │   ├── 🗄️ firestoreService.js        # Firestore database
+│   │   ├── 🔔 fcmService.js               # Push notifications
+│   │   └── 💾 offlineService.js           # Offline data management
 │   ├── 📁 hooks/
-│   │   └── 🎨 useMoodTheme.js      # Mood-based theming
-│   ├── 📱 App.jsx                  # Main application
-│   ├── 🚀 index.jsx                # React entry point
-│   └── 🎨 index.css                # Tailwind CSS styles
-├── 📋 TECH_STACK.md                # Technical documentation
-├── 📋 DEPLOYMENT_GUIDE.md          # Deployment instructions
-├── ⚙️ firebase.json                # Firebase project config
-├── ⚙️ storage.rules                # Firebase Storage rules
-├── 🔧 test-functions.sh            # Function testing script
-├── 📦 package.json                 # Frontend dependencies
-├── ⚙️ vite.config.js               # Vite build configuration
-└── 🌍 .env.local                   # Environment variables (gitignored)
+│   │   └── 🎨 useMoodTheme.js             # Mood-based theming
+│   ├── 📱 App.jsx                         # Main application
+│   ├── 🚀 index.jsx                       # React entry point
+│   └── 🎨 index.css                       # Tailwind CSS styles
+├── 📋 README.md                           # This comprehensive guide
+├── 📋 TECH_STACK.md                       # Technical documentation
+├── 📋 DEPLOYMENT_GUIDE.md                 # Deployment instructions
+├── ⚙️ firebase.json                       # Firebase project config
+├── ⚙️ storage.rules                       # Firebase Storage rules
+├── 📦 package.json                        # Frontend dependencies
+├── ⚙️ vite.config.js                      # Vite build configuration
+├── 🌍 .env.local                          # Environment variables (gitignored)
+└── 🌍 .env.example                        # Environment template
 ```
+
+### 🚀 Production Deployment
+
+### 🌐 Frontend Deployment (Firebase Hosting)
+
+```bash
+# Build for production
+npm run build
+
+# Deploy to Firebase Hosting
+firebase deploy --only hosting
+
+# Custom domain (optional)
+firebase hosting:channel:deploy production --expires 30d
+```
+
+### ⚡ Functions Deployment (Firebase Functions)
+
+```bash
+# Deploy all functions to production
+firebase deploy --only functions
+
+# Deploy specific function
+firebase deploy --only functions:streamingTranslation
+
+# Deploy with environment variables
+firebase functions:config:set \
+  gcp.project_id="your-project-id" \
+  gcp.location="asia-south1"
+firebase deploy --only functions
+```
+
+### 📊 Production Monitoring
+
+```bash
+# Set up monitoring
+firebase functions:log --only streamingTranslation
+
+# Performance monitoring
+gcloud logging read "resource.type=cloud_function" \
+  --format="table(timestamp,severity,textPayload)" \
+  --limit=50
+```
+
+### 🔒 Security Configuration
+
+```bash
+# Firebase security rules
+# Edit firestore.rules:
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+
+# Deploy security rules
+firebase deploy --only firestore:rules
+```
+
+### 💰 Cost Optimization
+
+| Service | Estimated Monthly Cost | Optimization |
+|---------|----------------------|--------------|
+| **Firebase Functions** | $10-50 | Use appropriate memory allocation |
+| **Firestore** | $5-25 | Optimize queries, use caching |
+| **Vertex AI** | $20-100 | Cache prompts/results, batch where possible, choose Flash vs Pro wisely |
 
 ## 🏆 Hackathon Scoring Breakdown
 
@@ -555,52 +811,29 @@ If you're experiencing a mental health crisis, please reach out immediately:
 - [GreenHacker](https://github.com/GreenHacker420) - Technical Contributor
 - Built for Google Gen AI Exchange Hackathon 2025
 
-**🏆 Achievement**: 95/100 Hackathon Score - Advanced Google Cloud AI Integration
-Customize the color palette in `tailwind.config.js`:
+## 🤖 Advanced Gemini Features
 
-```javascript
-theme: {
-  extend: {
-    colors: {
-      primary: {
-        50: '#fff7ed',
-        // ... custom primary colors
-      },
-      calm: {
-        50: '#f9fafb',
-        // ... custom calm colors
-      },
-      accent: {
-        50: '#fdf6f0',
-        // ... custom accent colors
-      }
-    }
-  }
-}
-```
+#### ✅ Implemented Features
 
-### Custom Media Files
-- **Music**: Replace `public/music.mp3` with your own calming audio
-- **Video**: Replace `public/plant.mp4` with your own peaceful video
-- **Supported formats**: MP3 for audio, MP4 for video
+- **Streaming Chat**: Real-time token streaming with Server-Sent Events (SSE)
+- **Function Calling**: getMoodInsights, suggestExercise, scheduleReminder
+- **Multi-turn Chat Sessions**: Stateful conversations with context preservation
+- **Multimodal Analysis**: Image + text input with doodle analysis
+- **Context Caching**: Reduce API costs and get faster responses
+- **Structured Output**: JSON mode with typed responses
 
-### Adding New CBT Exercises
-Create new exercise components in `src/components/` and integrate them into the main `CBTExercise.jsx` component.
+#### 📁 Files Created
+- `functions/src/geminiAdvanced.js` - Backend implementations
+- `src/services/geminiAdvancedService.js` - Frontend client
 
-### Database Configuration
-The application uses Supabase for backend services. Database migrations are located in `supabase/migrations/`. To set up the database:
+#### 🚀 Next Steps
+1. Restart emulators: `firebase emulators:start`
+2. Test new features
+3. Integrate into UI components
 
-1. Create a Supabase project
-2. Run the migrations using the Supabase CLI
-3. Configure your environment variables
+All features use @google/genai v1.27.0 latest API!
 
-### Deployment Configuration
-The application is configured for Netlify deployment with:
-- `netlify.toml` - Deployment configuration
-- `netlify/functions/` - Serverless functions
-- Automatic builds from the main branch
-
-## 🌐 Browser Support
+### 🌐 Browser Support
 
 | Browser | Version |
 |---------|---------|
@@ -659,3 +892,5 @@ If you're experiencing a mental health crisis, please reach out immediately:
 - [GreenHacker](https://github.com/GreenHacker420) (harsh@greenhacker.tech)
 - [curiouscoder-cmd](https://github.com/curiouscoder-cmd) (nitya@curiouscoder.live)
 
+
+```

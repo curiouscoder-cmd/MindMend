@@ -13,7 +13,8 @@ const vertexAI = new VertexAI({
 export const voiceChat = onRequest({ 
   cors: true,
   timeoutSeconds: 120,
-  memory: '1GiB',
+  memory: '512MiB',
+  region: 'us-central1',
 }, async (req, res) => {
   try {
     const { audioContent, moodHistory = [], userProgress = {} } = req.body;

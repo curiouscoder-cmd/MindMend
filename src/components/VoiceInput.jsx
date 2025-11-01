@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { GeminiService } from '../services/geminiService';
+import api from '../services/apiService.js';
 
 const VoiceInput = ({ onEmotionDetected, onTranscriptionComplete }) => {
   const [isRecording, setIsRecording] = useState(false);
@@ -128,19 +128,20 @@ const VoiceInput = ({ onEmotionDetected, onTranscriptionComplete }) => {
 
   const analyzeEmotion = async (text) => {
     if (!text.trim()) return;
-
+    
     setIsProcessing(true);
     try {
-      const analysis = await GeminiService.detectEmotionalState(text);
+      const analysis = await api.analyzeMood(text, {});
       setEmotionalAnalysis(analysis);
       
       if (onEmotionDetected) {
         onEmotionDetected(analysis);
       }
     } catch (error) {
-      console.error('Error analyzing emotion:', error);
+      console.error('Emotion analysis error:', error);
+    } finally {
+      setIsProcessing(false);
     }
-    setIsProcessing(false);
   };
 
   const formatTime = (seconds) => {

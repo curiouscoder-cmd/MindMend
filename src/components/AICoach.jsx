@@ -1,8 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { callMultilingualChat } from '../services/cloudFunctions.js';
+import { motion, AnimatePresence } from 'framer-motion';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import api from '../services/apiService.js';
+import { generatePersonalizedResponse } from '../services/personalizedChatService.js';
+import { getCurrentUser } from '../services/authService.js';
+import VoiceButton from './VoiceButton.jsx';
+import RealTimeVoiceChat from './RealTimeVoiceChat.jsx';
 import VoiceEnabledMessage from './VoiceEnabledMessage';
 import { mockData } from '../data/mockData';
-import elevenLabsService from '../services/elevenLabsService';
+import * as elevenLabsService from '../services/elevenLabsService';
+import * as ttsService from '../services/ttsService';
 
 const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   const [messages, setMessages] = useState([]);
@@ -14,6 +22,9 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   const textareaRef = useRef(null);
   const [showScrollToBottom, setShowScrollToBottom] = useState(false);
   const [autoPlayVoice, setAutoPlayVoice] = useState(true);
+  const [isPlayingVoice, setIsPlayingVoice] = useState(false);
+  const [currentEmotion, setCurrentEmotion] = useState(null);
+  const [showRealTimeChat, setShowRealTimeChat] = useState(false);
 
   // Initialize with welcome message
   useEffect(() => {
@@ -52,28 +63,64 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   const generateWelcomeMessage = () => {
     const timeOfDay = new Date().getHours();
     const greeting = timeOfDay < 12 ? 'Good morning' : timeOfDay < 18 ? 'Good afternoon' : 'Good evening';
+    const user = getCurrentUser();
+    const userName = user?.displayName?.split(' ')[0] || 'friend';
     
-    const welcomeMessages = [
-      `${greeting}! I'm Mira, your AI wellness coach. I'm here to support you on your mental wellness journey. How are you feeling today?`,
-      `${greeting}! I'm so glad you're here. Taking time for your mental wellness shows real strength. What's on your mind?`,
-      `${greeting}! I'm Mira, and I'm here to listen and support you. Every step you take toward wellness matters. How can I help you today?`
-    ];
+    // Personalized welcome based on user progress
+    const streak = userProgress?.streak || 0;
+    const exercises = userProgress?.completedExercises || 0;
+    
+    let welcomeMessages = [];
+    
+    if (streak > 0 && exercises > 0) {
+      welcomeMessages = [
+        `${greeting}, ${userName}! 🌟 I see you're on a ${streak}-day streak with ${exercises} exercises completed. That's amazing dedication! How are you feeling today?`,
+        `${greeting}, ${userName}! Your ${streak}-day streak shows real commitment to your wellness. I'm here to support you. What's on your mind?`,
+        `${greeting}, ${userName}! ${exercises} exercises completed and counting! I'm proud of your progress. How can I help you today?`
+      ];
+    } else if (user && !user.isAnonymous) {
+      welcomeMessages = [
+        `${greeting}, ${userName}! I'm Mira, your AI wellness coach. I'm here to support you on your mental wellness journey. How are you feeling today?`,
+        `${greeting}, ${userName}! I'm so glad you're here. Taking time for your mental wellness shows real strength. What's on your mind?`,
+        `${greeting}, ${userName}! Every step you take toward wellness matters. How can I help you today?`
+      ];
+    } else {
+      welcomeMessages = [
+        `${greeting}! I'm Mira, your AI wellness coach. I'm here to support you on your mental wellness journey. How are you feeling today?`,
+        `${greeting}! I'm so glad you're here. Taking time for your mental wellness shows real strength. What's on your mind?`,
+        `${greeting}! I'm Mira, and I'm here to listen and support you. Every step you take toward wellness matters. How can I help you today?`
+      ];
+    }
     
     return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
   };
 
   const generateAIResponse = async (userMessage) => {
     try {
-      console.log('🌍 Calling Multilingual Pipeline (Gemma 3 + Gemini 2.5):', { userMessage, moodHistory, userProgress });
-      const result = await callMultilingualChat(
+      console.log('🤖 Generating personalized response with Mira...');
+      console.log('📊 Context:', { 
         userMessage, 
-        moodHistory, 
-        userProgress
+        moodCount: moodHistory?.length || 0, 
+        streak: userProgress?.streak || 0,
+        exercises: userProgress?.completedExercises || 0
+      });
+      
+      // Use personalized chat service with full context
+      const result = await generatePersonalizedResponse(
+        userMessage,
+        moodHistory,
+        userProgress,
+        messages // Pass current conversation as context
       );
-      console.log('✅ Multilingual response:', result);
-      console.log(`📊 Performance: ${result.performance?.total}ms (Preprocessing: ${result.performance?.preprocessing}ms, Gemini: ${result.performance?.gemini}ms, Translation: ${result.performance?.translation}ms)`);
-      console.log(`🌐 Language: ${result.detectedLanguage}, Urgency: ${result.preprocessing?.urgency}`);
-      return result.response;
+      
+      console.log('✅ Personalized response generated:', {
+        personalized: result.personalized,
+        fallback: result.fallback,
+        length: result.response?.length
+      });
+      
+      // Return the response text
+      return result.response || 'I understand. How can I help you further?';
     } catch (error) {
       console.error('AI Response Error:', error);
       // Fallback with intent handling and varied templates
@@ -134,6 +181,24 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
     }
   };
 
+  const playResponseVoice = async (text) => {
+    // Don't auto-play voice - let VoiceEnabledMessage handle it
+    // This prevents duplicate voice playback
+    console.log('ℹ️ Voice playback handled by VoiceEnabledMessage component');
+    return;
+  };
+
+  const handleVoiceTranscription = (transcription) => {
+    setInputMessage(transcription);
+    // Auto-send after voice input
+    setTimeout(() => handleSendMessage(transcription), 500);
+  };
+
+  const handleEmotionDetected = (emotion) => {
+    setCurrentEmotion(emotion);
+    console.log('Real-time emotion:', emotion);
+  };
+
   const handleSendMessage = async (overrideText) => {
     const text = (overrideText ?? inputMessage).trim();
     if (!text) return;
@@ -143,11 +208,13 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
       id: Date.now(),
       type: 'user',
       content: text,
-      timestamp: new Date()
+      timestamp: new Date(),
+      emotion: currentEmotion
     };
 
     setMessages(prev => [...prev, userMsg]);
     setInputMessage('');
+    setCurrentEmotion(null);
     setIsTyping(true);
 
     // Generate AI response
@@ -163,6 +230,11 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
 
       setMessages(prev => [...prev, aiMsg]);
       setIsTyping(false);
+      
+      // Play voice response
+      if (autoPlayVoice) {
+        playResponseVoice(aiResponse);
+      }
     } catch (error) {
       console.error('Error generating AI response:', error);
       setIsTyping(false);
@@ -206,13 +278,35 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-calm-800">Meet Mira</h1>
-            <p className="text-blue-900">Your AI Wellness Coach</p>
+            <p className="text-blue-900">Your Personalized AI Wellness Coach</p>
           </div>
         </div>
+        
+        {/* User Context Indicator */}
+        {getCurrentUser() && (
+          <div className="mb-3 inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-200">
+            <span className="text-xs font-medium text-purple-700">
+              {getCurrentUser().isAnonymous ? '🔒 Anonymous Mode' : `👤 ${getCurrentUser().displayName?.split(' ')[0] || 'User'}`}
+            </span>
+            {userProgress?.streak > 0 && (
+              <>
+                <span className="text-purple-300">•</span>
+                <span className="text-xs text-purple-600">🔥 {userProgress.streak} day streak</span>
+              </>
+            )}
+            {userProgress?.completedExercises > 0 && (
+              <>
+                <span className="text-purple-300">•</span>
+                <span className="text-xs text-purple-600">✅ {userProgress.completedExercises} exercises</span>
+              </>
+            )}
+          </div>
+        )}
+        
         <div className="flex items-center justify-center space-x-4 text-sm text-blue-900">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span>Online and ready to help</span>
+            <span>Gemini 2.5 Flash • Personalized</span>
           </div>
           
           {/* Auto-play toggle */}
@@ -227,6 +321,16 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
           >
             <span>{autoPlayVoice ? '🔊' : '🔇'}</span>
             <span>Auto-speak</span>
+          </button>
+          
+          {/* Real-Time Voice Chat Button */}
+          <button
+            onClick={() => setShowRealTimeChat(true)}
+            className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg transition-all text-xs font-medium"
+            title="Start instant voice conversation"
+          >
+            <span>⚡</span>
+            <span>Real-Time Voice</span>
           </button>
         </div>
       </div>
@@ -246,7 +350,25 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
               {message.type === 'user' ? (
                 <div className="max-w-[80%] lg:max-w-[70%] flex items-start space-x-2">
                   <div className="flex-1 px-4 py-3 rounded-2xl bg-primary-500 text-white shadow-sm">
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                    <div className="text-sm leading-relaxed prose prose-sm prose-invert max-w-none">
+                      <ReactMarkdown 
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                          p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
+                          strong: ({node, ...props}) => <strong className="font-semibold" {...props} />,
+                          em: ({node, ...props}) => <em className="italic" {...props} />,
+                          ul: ({node, ...props}) => <ul className="list-disc list-inside mb-2 space-y-1" {...props} />,
+                          ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-2 space-y-1" {...props} />,
+                          li: ({node, ...props}) => <li className="ml-2" {...props} />,
+                          code: ({node, inline, ...props}) => 
+                            inline 
+                              ? <code className="bg-primary-600 px-1 py-0.5 rounded text-xs font-mono" {...props} />
+                              : <code className="block bg-primary-600 p-2 rounded text-xs font-mono overflow-x-auto" {...props} />,
+                        }}
+                      >
+                        {message.content}
+                      </ReactMarkdown>
+                    </div>
                     <div className="text-[10px] mt-1 text-primary-100 text-right">
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
@@ -325,12 +447,19 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
 
         {/* Input */}
         <div className="p-4 border-t border-calm-100 sticky bottom-0 bg-white">
-          <div className="flex space-x-3">
+          <div className="flex items-end space-x-3">
+            {/* Voice Button */}
+            <VoiceButton
+              onTranscription={handleVoiceTranscription}
+              onEmotionDetected={handleEmotionDetected}
+              disabled={isTyping}
+            />
+            
             <textarea
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Share what's on your mind..."
+              placeholder="Share what's on your mind... (or use voice 🎤)"
               className="flex-1 p-3 border border-calm-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none shadow-sm"
               rows="1"
               ref={textareaRef}
@@ -343,6 +472,16 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
               Send
             </button>
           </div>
+          
+          {/* Current emotion indicator */}
+          {currentEmotion && (
+            <div className="mt-2 flex items-center gap-2 text-sm text-navy/60">
+              <span>Detected emotion:</span>
+              <span className="px-2 py-1 bg-mint rounded-full capitalize font-medium">
+                {currentEmotion.primaryMood}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -366,6 +505,11 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
           <p className="text-sm text-purple-600">Helping you build resilience and coping skills</p>
         </div>
       </div>
+
+      {/* Real-Time Voice Chat Modal */}
+      {showRealTimeChat && (
+        <RealTimeVoiceChat onClose={() => setShowRealTimeChat(false)} />
+      )}
     </div>
   );
 };

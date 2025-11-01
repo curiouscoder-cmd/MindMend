@@ -12,7 +12,10 @@ const DATASET_ID = 'mindmend_analytics';
 /**
  * Export mood entry to BigQuery
  */
-export const exportMoodEntry = onDocumentCreated('users/{userId}/moodEntries/{entryId}', async (event) => {
+export const exportMoodEntry = onDocumentCreated({
+  document: 'users/{userId}/moodEntries/{entryId}',
+  region: 'us-central1' // Moved to bypass asia-south1 CPU quota
+}, async (event) => {
   try {
     const moodData = event.data.data();
     const userId = event.params.userId;
@@ -45,7 +48,10 @@ export const exportMoodEntry = onDocumentCreated('users/{userId}/moodEntries/{en
 /**
  * Export chat message to BigQuery
  */
-export const exportChatMessage = onDocumentCreated('chatSessions/{userId}/messages/{messageId}', async (event) => {
+export const exportChatMessage = onDocumentCreated({
+  document: 'chatSessions/{userId}/messages/{messageId}',
+  region: 'us-central1'
+}, async (event) => {
   try {
     const messageData = event.data.data();
     const userId = event.params.userId;
@@ -77,7 +83,10 @@ export const exportChatMessage = onDocumentCreated('chatSessions/{userId}/messag
 /**
  * Export exercise completion to BigQuery
  */
-export const exportExerciseCompletion = onDocumentCreated('exerciseCompletions/{userId}/sessions/{sessionId}', async (event) => {
+export const exportExerciseCompletion = onDocumentCreated({
+  document: 'exerciseCompletions/{userId}/sessions/{sessionId}',
+  region: 'us-central1'
+}, async (event) => {
   try {
     const sessionData = event.data.data();
     const userId = event.params.userId;
@@ -112,6 +121,7 @@ export const exportExerciseCompletion = onDocumentCreated('exerciseCompletions/{
 export const getAnalyticsDashboard = onRequest({ 
   cors: true,
   timeoutSeconds: 60,
+  region: 'us-central1',
 }, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
@@ -202,6 +212,7 @@ export const getAnalyticsDashboard = onRequest({
 export const getUserInsights = onRequest({ 
   cors: true,
   timeoutSeconds: 30,
+  region: 'us-central1',
 }, async (req, res) => {
   try {
     const { userId } = req.query;
@@ -258,6 +269,8 @@ export const getUserInsights = onRequest({
 export const initializeBigQuery = onRequest({ 
   cors: true,
   timeoutSeconds: 120,
+  region: 'us-central1',
+  memory: '256MiB',
 }, async (req, res) => {
   try {
     const dataset = bigquery.dataset(DATASET_ID);

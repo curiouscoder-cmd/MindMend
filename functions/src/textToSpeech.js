@@ -19,7 +19,8 @@ const VOICE_CONFIG = {
 export const textToSpeech = onRequest({ 
   cors: true,
   timeoutSeconds: 30,
-  memory: '512MiB',
+  memory: '256MiB',
+  region: 'us-central1', // Moved to bypass asia-south1 CPU quota
 }, async (req, res) => {
   try {
     const { text, languageCode = 'en', voiceGender = 'FEMALE', speakingRate = 1.0 } = req.body;

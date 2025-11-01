@@ -1,10 +1,11 @@
-// Multilingual Chat with Gemma 3 + Gemini 2.5 Pipeline
+// Multilingual Chat with Hybrid Streaming Translation
 import { onRequest } from 'firebase-functions/v2/https';
 import { VertexAI } from '@google-cloud/vertexai';
 import { 
-  processMultilingualInput, 
-  translateFromEnglish 
-} from './multilingualPipeline.js';
+  processStreaming,
+  translateStreaming,
+  detectLanguage,
+} from './streamingTranslation.js';
 
 const vertexAI = new VertexAI({
   project: process.env.GCP_PROJECT_ID || 'mindmend-25dca',
@@ -15,6 +16,7 @@ export const chatMultilingual = onRequest({
   cors: true,
   timeoutSeconds: 90,
   memory: '1GiB',
+  region: 'asia-south1',
 }, async (req, res) => {
   try {
     const { message, moodHistory = [], userProgress = {} } = req.body;
@@ -26,19 +28,22 @@ export const chatMultilingual = onRequest({
     console.log('=== Multilingual Chat Pipeline Started ===');
     const pipelineStart = Date.now();
     
-    // Step 1: Process input with Gemma 3 pipeline
-    const processed = await processMultilingualInput(message, { moodHistory, userProgress });
-    console.log(`Pipeline processing: ${processed.processingTime}ms`);
+    // Step 1: Streaming language detection and translation
+    const streamingCallback = (data) => {
+      console.log(`Streaming update: ${data.type}`, data);
+    };
     
-    // Step 2: Choose Gemini model based on urgency
-    const isUrgent = processed.preprocessing.urgency === 'critical' || processed.preprocessing.urgency === 'high';
-    const isComplex = processed.englishText.length > 500;
-    const modelName = isUrgent || isComplex ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
+    const processed = await processStreaming(message, 'en', streamingCallback);
+    console.log(`Streaming processing: ${processed.performance?.total || 0}ms`);
     
-    console.log(`Using ${modelName} for urgency: ${processed.preprocessing.urgency}`);
+    // Step 2: Choose Gemini model based on message complexity and detected urgency
+    const isComplex = message.length > 500;
+    const modelName = isComplex ? 'gemini-2.5-pro' : 'gemini-2.5-flash';
+    
+    console.log(`Using ${modelName} for message length: ${message.length}`);
     
     // Step 3: Generate response with Gemini 2.5
-    const model = vertexAI.preview.getGenerativeModel({
+    const model = vertexAI.getGenerativeModel({
       model: modelName,
       generationConfig: {
         temperature: 0.85,
@@ -56,56 +61,64 @@ export const chatMultilingual = onRequest({
     const systemPrompt = `You are Mira, an empathetic AI mental wellness coach for Indian youth.
 
 User Context:
-- Language: ${processed.detectedLanguage}
+- Language: ${processed.detectedLanguage || 'en'}
 - Recent moods: ${moodHistory.slice(-5).join(', ') || 'none'}
 - Completed exercises: ${userProgress.completedExercises || 0}
 - Current streak: ${userProgress.streak || 0} days
-- Detected emotion: ${processed.preprocessing.emotion}
-- Intent: ${processed.preprocessing.intent}
-- Urgency: ${processed.preprocessing.urgency}
+- Translation confidence: ${processed.confidence || 0.9}
+- Model used: ${processed.model || 'hybrid'}
 
 Guidelines:
 - Be warm, empathetic, culturally sensitive to Indian context
 - Use evidence-based CBT techniques
 - Keep responses concise (2-3 sentences)
 - Suggest specific exercises when appropriate
-- If urgency is high/critical, prioritize immediate coping strategies
 - Acknowledge academic/social pressures common in India
 
-${isUrgent ? '⚠️ HIGH URGENCY: Provide immediate support, grounding techniques, and crisis resources.' : ''}
-
-User message (translated to English): "${processed.englishText}"
+User message (translated to English): "${processed.translatedText || processed.originalText}"
 
 Your empathetic response in English:`;
     
     const geminiStart = Date.now();
     const result = await model.generateContent(systemPrompt);
-    const englishResponse = result.response.text;
+    const englishResponse = result.response?.text || result.response?.candidates?.[0]?.content?.parts?.[0]?.text || 'I understand you need support.';
     const geminiTime = Date.now() - geminiStart;
     
     console.log(`Gemini ${modelName} response: ${geminiTime}ms`);
     
-    // Step 4: Translate response back to user's language
+    // Step 4: Translate response back to user's language using streaming
     const translationStart = Date.now();
-    const localizedResponse = await translateFromEnglish(englishResponse, processed.detectedLanguage);
+    const responseTranslation = await translateStreaming(
+      englishResponse, 
+      'en', 
+      processed.detectedLanguage || 'en',
+      (data) => console.log('Response translation chunk:', data)
+    );
     const translationTime = Date.now() - translationStart;
     
-    console.log(`Translation: ${translationTime}ms`);
+    console.log(`Streaming translation: ${translationTime}ms`);
     
     const totalTime = Date.now() - pipelineStart;
     console.log(`=== Total pipeline time: ${totalTime}ms ===`);
     
     res.json({
-      response: localizedResponse,
+      response: responseTranslation.translation || englishResponse,
       responseEnglish: englishResponse,
-      detectedLanguage: processed.detectedLanguage,
-      preprocessing: processed.preprocessing,
+      detectedLanguage: processed.detectedLanguage || 'en',
+      confidence: processed.confidence || 0.9,
       model: modelName,
+      translationModel: responseTranslation.model || 'passthrough',
       performance: {
-        preprocessing: processed.processingTime,
+        languageDetection: processed.performance?.languageDetection || 0,
+        inputTranslation: processed.performance?.translation || 0,
         gemini: geminiTime,
-        translation: translationTime,
+        responseTranslation: translationTime,
         total: totalTime,
+      },
+      streaming: {
+        enabled: true,
+        cacheHit: responseTranslation.fromCache || false,
+        fallbackUsed: responseTranslation.model?.includes('fallback') || false,
       },
       timestamp: new Date().toISOString(),
     });
