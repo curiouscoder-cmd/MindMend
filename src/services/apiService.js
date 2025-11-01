@@ -1,9 +1,9 @@
 /**
  * API Service - Connects Frontend to Firebase Functions
- * Base URL: https://asia-south1-mindmend-25dca.cloudfunctions.net
+ * Base URL: us-central1 (most functions) + asia-south1 (chat only)
  */
 
-const FUNCTIONS_URL = "https://asia-south1-mindmend-25dca.cloudfunctions.net";
+const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || "https://us-central1-mindmend-25dca.cloudfunctions.net";
 
 /**
  * Generic function caller with error handling

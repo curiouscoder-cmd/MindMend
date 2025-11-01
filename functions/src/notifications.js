@@ -11,9 +11,8 @@ import { db } from './admin.js';
 export const sendNotification = onRequest({ 
   cors: true,
   timeoutSeconds: 30,
-  region: 'asia-south1',
+  region: 'us-central1',
   memory: '256MiB',
-  cpu: 1,
 }, async (req, res) => {
   try {
     const { userId, title, body, data = {}, imageUrl } = req.body;
@@ -86,7 +85,7 @@ export const sendNotification = onRequest({
 export const registerToken = onRequest({ 
   cors: true,
   timeoutSeconds: 10,
-  region: 'asia-south1',
+  region: 'us-central1', // Moved to bypass asia-south1 CPU quota
 }, async (req, res) => {
   try {
     const { userId, token } = req.body;

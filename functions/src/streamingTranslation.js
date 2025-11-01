@@ -347,8 +347,8 @@ initModels();
 export const streamingTranslation = onRequest({
   cors: true,
   timeoutSeconds: 60,
-  memory: '1GiB',
-  region: 'asia-south1',
+  memory: '512MiB',
+  region: 'us-central1',
 }, async (req, res) => {
   try {
     const { text, targetLanguage = 'en', streaming = true } = req.body;
@@ -429,7 +429,7 @@ export const streamingTranslationMetrics = onRequest({
  */
 export const clearTranslationCache = onRequest({
   cors: true,
-  region: 'asia-south1',
+  region: 'us-central1',
 }, async (req, res) => {
   try {
     cache.clear();

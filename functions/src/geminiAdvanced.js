@@ -21,9 +21,9 @@ const ai = new GoogleGenAI({
  */
 export const streamingChat = onRequest({
   cors: true,
-  region: 'asia-south1',
+  region: 'us-central1', // Moved to bypass asia-south1 CPU quota
   timeoutSeconds: 120,
-  memory: '512MiB'
+  memory: '256MiB'
 }, async (req, res) => {
   try {
     const { message, history = [] } = req.body;
@@ -332,9 +332,9 @@ Remember user context and build on previous conversations.`
  */
 export const multimodalAnalysis = onRequest({
   cors: true,
-  region: 'asia-south1',
+  region: 'us-central1',
   timeoutSeconds: 60,
-  memory: '1GiB'
+  memory: '256MiB'
 }, async (req, res) => {
   try {
     const { text, imageBase64, mimeType = 'image/jpeg' } = req.body;

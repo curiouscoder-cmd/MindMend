@@ -14,7 +14,7 @@ const DATASET_ID = 'mindmend_analytics';
  */
 export const exportMoodEntry = onDocumentCreated({
   document: 'users/{userId}/moodEntries/{entryId}',
-  region: 'asia-south1'
+  region: 'us-central1' // Moved to bypass asia-south1 CPU quota
 }, async (event) => {
   try {
     const moodData = event.data.data();
@@ -50,7 +50,7 @@ export const exportMoodEntry = onDocumentCreated({
  */
 export const exportChatMessage = onDocumentCreated({
   document: 'chatSessions/{userId}/messages/{messageId}',
-  region: 'asia-south1'
+  region: 'us-central1'
 }, async (event) => {
   try {
     const messageData = event.data.data();
@@ -85,7 +85,7 @@ export const exportChatMessage = onDocumentCreated({
  */
 export const exportExerciseCompletion = onDocumentCreated({
   document: 'exerciseCompletions/{userId}/sessions/{sessionId}',
-  region: 'asia-south1'
+  region: 'us-central1'
 }, async (event) => {
   try {
     const sessionData = event.data.data();
@@ -121,7 +121,7 @@ export const exportExerciseCompletion = onDocumentCreated({
 export const getAnalyticsDashboard = onRequest({ 
   cors: true,
   timeoutSeconds: 60,
-  region: 'asia-south1',
+  region: 'us-central1',
 }, async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
@@ -212,7 +212,7 @@ export const getAnalyticsDashboard = onRequest({
 export const getUserInsights = onRequest({ 
   cors: true,
   timeoutSeconds: 30,
-  region: 'asia-south1',
+  region: 'us-central1',
 }, async (req, res) => {
   try {
     const { userId } = req.query;
@@ -269,9 +269,8 @@ export const getUserInsights = onRequest({
 export const initializeBigQuery = onRequest({ 
   cors: true,
   timeoutSeconds: 120,
-  region: 'asia-south1',
+  region: 'us-central1',
   memory: '256MiB',
-  cpu: 1,
 }, async (req, res) => {
   try {
     const dataset = bigquery.dataset(DATASET_ID);

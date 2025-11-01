@@ -4,10 +4,9 @@
 ![Version](https://img.shields.io/badge/Version-3.0.0-green.svg)
 [![Primary Language](https://img.shields.io/badge/Language-JavaScript-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Google Cloud](https://img.shields.io/badge/Google%20Cloud-Firebase%20%2B%20Vertex%20AI-4285F4.svg)](https://cloud.google.com/)
-[![Gemma 3](https://img.shields.io/badge/Gemma%203-Ollama%20%2B%20Vertex%20AI-FF6B35.svg)](https://ollama.ai/)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Firebase-FF6F00.svg)](https://mindmend-25dca.web.app/)
 
-> **🏆 Google Gen AI Exchange Hackathon Project** - Advanced mental wellness platform powered by **Gemma 3 + Gemini 2.5** hybrid AI architecture, featuring multilingual support for 10 Indian languages, Firebase integration, and local Ollama deployment for enhanced privacy and performance.
+> **🏆 Google Gen AI Exchange Hackathon Project** - Advanced mental wellness platform powered by **Gemini 2.5 on Vertex AI**, featuring multilingual support for 10 Indian languages and deep Firebase integration.
 
 ## 🚀 Google Cloud Technology Stack
 
@@ -18,8 +17,6 @@
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
 ### AI Models & Services
-![Gemma 3](https://img.shields.io/badge/Gemma%203-1B%20%7C%204B%20%7C%2027B-FF6B35?style=for-the-badge&logo=google&logoColor=white)
-![Ollama](https://img.shields.io/badge/Ollama-Local%20Deployment-000000?style=for-the-badge&logo=ollama&logoColor=white)
 ![Vertex AI](https://img.shields.io/badge/Vertex%20AI-Gemini%202.5-4285F4?style=for-the-badge&logo=google&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-Functions%20Gen2-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)
 
@@ -33,33 +30,13 @@
 
 ## 📋 Project Overview
 
-**MindMend** is a comprehensive mental wellness platform built for the **Google Gen AI Exchange Hackathon**, showcasing the full power of Google Cloud's AI ecosystem enhanced with **Gemma 3 local deployment**. The platform provides evidence-based Cognitive Behavioral Therapy (CBT) exercises, multilingual AI support, and real-time analytics - all powered by a hybrid architecture combining local Ollama models with 15+ Google Cloud services running from the Mumbai region (asia-south1) for optimal performance in India.
+**MindMend** is a comprehensive mental wellness platform built for the **Google Gen AI Exchange Hackathon**, showcasing the full power of Google Cloud's AI ecosystem. The platform provides evidence-based Cognitive Behavioral Therapy (CBT) exercises, multilingual AI support, and real-time analytics - all powered by **Vertex AI (Gemini 2.5)** and 15+ Google Cloud services running from the Mumbai region (asia-south1) for optimal performance in India.
 
-## 🦙 **NEW: Gemma 3 + Ollama Integration**
+## 🤖 AI Architecture
 
-### **🚀 Hybrid AI Architecture**
-```
-Local Ollama (Privacy) ←→ Vertex AI (Scale)
-     ↓                           ↓
-Gemma 3:1B (Detection)    Gemini 2.5 (Fallback)
-Gemma 3:4B (Translation)  Gemini 2.5 Pro (Complex)
-Gemma 3:27B (Quality)     Cloud APIs (Multimodal)
-```
-
-### **✨ Key Innovations**
-- **🔒 Privacy-First**: Sensitive data processed locally with Ollama
-- **⚡ Performance**: Sub-second language detection with Gemma 3:1B
-- **🌍 Multilingual**: 140+ languages supported by Gemma 3 architecture
-- **🎯 Context-Aware**: 128K token context for mental health conversations
-- **🔄 Intelligent Fallback**: Automatic switching between local and cloud models
-
-### **📊 Performance Metrics**
-| Model | Task | Latency | Context | Languages |
-|-------|------|---------|---------|-----------|
-| **Gemma 3:1B** | Language Detection | ~300ms | 32K tokens | 140+ |
-| **Gemma 3:4B** | Translation | ~13s | 128K tokens | 140+ |
-| **Gemma 3:27B** | High-Quality | ~30s | 128K tokens | 140+ |
-| **Gemini 2.5** | Fallback | ~4s | 1M tokens | 100+ |
+- **Primary**: Vertex AI Gemini 2.5 (Flash/Pro) for reasoning, chat, and translation
+- **Multimodal**: Cloud Vision, Cloud Speech-to-Text, Cloud Text-to-Speech
+- **Data**: Firestore for realtime storage, BigQuery for analytics
 
 ## 🏆 Hackathon Implementation Status
 
@@ -198,6 +175,27 @@ Gemma 3:27B (Quality)     Cloud APIs (Multimodal)
 - **IndexedDB Storage**: Client-side database for offline data persistence
 - **Socket.io Integration**: Real-time messaging and notifications
 
+### 🤖 Advanced Gemini Features
+
+#### ✅ Implemented Features
+- **Streaming Chat**: Real-time token streaming with Server-Sent Events (SSE)
+- **Function Calling**: getMoodInsights, suggestExercise, scheduleReminder
+- **Multi-turn Chat Sessions**: Stateful conversations with context preservation
+- **Multimodal Analysis**: Image + text input with doodle analysis
+- **Context Caching**: Reduce API costs and get faster responses
+- **Structured Output**: JSON mode with typed responses
+
+#### 📁 Files Created
+- `functions/src/geminiAdvanced.js` - Backend implementations
+- `src/services/geminiAdvancedService.js` - Frontend client
+
+#### 🚀 Next Steps
+1. Restart emulators: `firebase emulators:start`
+2. Test new features
+3. Integrate into UI components
+
+All features use @google/genai v1.27.0 latest API!
+
 ## 🛠️ Installation & Setup Guide
 
 ### 📋 Prerequisites
@@ -206,17 +204,14 @@ Gemma 3:27B (Quality)     Cloud APIs (Multimodal)
 - **Node.js** (version 24 or higher)
 - **npm** or **yarn** package manager
 - **Git** for version control
-- **8GB+ RAM** (recommended for Gemma 3 models)
-- **10GB+ free disk space** (for Ollama models)
 
 #### **Cloud Services**
 - **Google Cloud Account** with billing enabled
 - **Firebase CLI** installed globally
 - **gcloud CLI** installed and authenticated
 
-#### **AI Models (Choose One)**
-- **Option A**: **Ollama** (Local, Privacy-First) - **RECOMMENDED**
-- **Option B**: **Vertex AI Only** (Cloud-based)
+#### **AI Models**
+- **Vertex AI (Gemini 2.5)** (Cloud-based)
 
 ---
 
@@ -236,45 +231,7 @@ npm install
 cd functions && npm install && cd ..
 ```
 
-### **Step 2: Choose Your AI Setup**
-
-#### **🦙 Option A: Ollama + Gemma 3 (RECOMMENDED)**
-
-**Install Ollama:**
-```bash
-# macOS/Linux
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# Windows (PowerShell)
-# Download from: https://ollama.ai/download/windows
-```
-
-**Pull Gemma 3 Models:**
-```bash
-# Essential models (Required)
-ollama pull gemma3:1b    # Fast language detection (~815MB)
-ollama pull gemma3:4b    # Primary translation (~3.3GB)
-
-# Optional high-quality model
-ollama pull gemma3:27b   # Premium quality (~17GB)
-```
-
-**Start Ollama Server:**
-```bash
-ollama serve
-# Server will run on http://localhost:11434
-```
-
-**Verify Installation:**
-```bash
-# Check available models
-ollama list
-
-# Test Gemma 3
-ollama run gemma3:1b "Hello, how are you?"
-```
-
-#### **☁️ Option B: Vertex AI Only**
+### **Step 2: Configure Google Cloud (Vertex AI)**
 
 ```bash
 # Login to Google Cloud
@@ -334,9 +291,6 @@ VITE_FIREBASE_APP_ID=your_app_id
 # Google Cloud Platform
 GCP_PROJECT_ID=your_project_id
 GCP_LOCATION=asia-south1
-
-# Ollama Configuration (Optional)
-OLLAMA_URL=http://localhost:11434
 ```
 
 **Get Firebase Config:**
@@ -347,77 +301,47 @@ OLLAMA_URL=http://localhost:11434
 
 ### **Step 6: Start Development Environment**
 
-**Terminal 1: Ollama (if using local models)**
-```bash
-ollama serve
-```
+#### **Starting All Emulators**
 
-**Terminal 2: Firebase Functions**
+Open a terminal and run this command to start all Firebase emulators:
 ```bash
 cd functions
 export GCP_PROJECT_ID=your_project_id
 export GCP_LOCATION=asia-south1
-firebase emulators:start --only functions,firestore
+firebase emulators:start --import=./emulator-data --export-on-exit --project=mindmend-emulator \
+  --only functions,firestore,auth,storage,hosting
 ```
 
-**Terminal 3: Frontend**
+The `--import` and `--export-on-exit` flags persist emulator data between runs.
+
+#### **Starting Frontend Dev Server**
+
+Open another terminal and run:
 ```bash
 npm run dev
 ```
+
+#### **Accessing Emulator UI**
+After starting the emulators, you can access the Firebase Emulator Suite UI at:
+http://localhost:4000
 
 ### **Step 7: Verify Installation**
 
 **Check Services:**
 - **Frontend**: http://localhost:3000
-- **Firebase Emulator**: http://localhost:4000
+- **Emulator UI**: http://localhost:4000
 - **Functions**: http://localhost:5001
-- **Ollama**: http://localhost:11434 (if using Ollama)
+- **Auth**: http://localhost:9099
+- **Firestore**: http://localhost:8080
+- **Storage**: http://localhost:9199
 
-**Test AI Integration:**
-```bash
-# Test Ollama connection
-curl http://localhost:11434/api/tags
-
-# Test Firebase Functions
-curl http://localhost:5001/your-project/asia-south1/healthCheck
-
-# Test translation with Gemma 3
-curl -X POST http://localhost:5001/your-project/asia-south1/streamingTranslation \
-  -H "Content-Type: application/json" \
-  -d '{"text":"Hello world","targetLanguage":"hi","streaming":false}'
-```
+Need help applying these changes in other docs or scripts?
 
 ---
 
 ## 🔧 **Troubleshooting Guide**
 
 ### **Common Issues & Solutions**
-
-#### **🦙 Ollama Issues**
-
-**Problem**: `ollama: command not found`
-```bash
-# Solution: Install Ollama
-curl -fsSL https://ollama.ai/install.sh | sh
-# Restart terminal after installation
-```
-
-**Problem**: `Error: remove /Users/.../models/blobs/...`
-```bash
-# Solution: Clean up partial downloads
-ollama rm gemma3:27b  # Remove problematic model
-ollama pull gemma3:27b  # Re-download
-```
-
-**Problem**: Ollama server not responding
-```bash
-# Check if Ollama is running
-ps aux | grep ollama
-
-# Restart Ollama
-pkill ollama
-ollama serve
-```
 
 #### **🔥 Firebase Issues**
 
@@ -464,16 +388,6 @@ gcloud services enable vision.googleapis.com
 
 ### **🚀 Performance Optimization**
 
-#### **Ollama Performance**
-```bash
-# Check system resources
-htop  # or Activity Monitor on macOS
-
-# Optimize Ollama for your system
-export OLLAMA_NUM_PARALLEL=1  # Reduce parallel requests
-export OLLAMA_MAX_LOADED_MODELS=2  # Limit loaded models
-```
-
 #### **Firebase Functions**
 ```bash
 # Increase memory allocation
@@ -488,54 +402,6 @@ export OLLAMA_MAX_LOADED_MODELS=2  # Limit loaded models
 ```
 
 ## 🧪 **Comprehensive Testing Guide**
-
-### **🦙 Ollama + Gemma 3 Testing**
-
-#### **1. Ollama Connection Test**
-```bash
-# Check Ollama server status
-curl http://localhost:11434/api/tags | jq '.models[].name'
-# Expected: ["gemma3:1b", "gemma3:4b", ...]
-
-# Test Gemma 3:1B language detection
-curl -X POST http://localhost:11434/api/generate \
-  -d '{"model":"gemma3:1b","prompt":"Detect language: Hello world","stream":false}' | jq '.response'
-# Expected: "en" or similar language code
-```
-
-#### **2. Streaming Translation Test**
-```bash
-# Test English to Hindi translation
-curl -X POST http://localhost:5001/your-project/asia-south1/streamingTranslation \
-  -H "Content-Type: application/json" \
-  -d '{"text":"I am feeling anxious about my studies","targetLanguage":"hi","streaming":false}' | jq '.'
-
-# Expected Response:
-{
-  "success": true,
-  "originalText": "I am feeling anxious about my studies",
-  "translatedText": "मैं अपनी पढ़ाई को लेकर चिंतित महसूस कर रहा हूं",
-  "detectedLanguage": "en",
-  "targetLanguage": "hi",
-  "confidence": 0.9,
-  "model": "gemma3:4b",
-  "performance": {
-    "languageDetection": 300,
-    "translation": 13000,
-    "total": 13300
-  }
-}
-```
-
-#### **3. Multilingual Pipeline Test**
-```bash
-# Test Hindi input with Gemma 3
-curl -X POST http://localhost:5001/your-project/asia-south1/chatMultilingual \
-  -H "Content-Type: application/json" \
-  -d '{"message": "मुझे मानसिक स्वास्थ्य सहायता चाहिए"}' | jq '.'
-
-# Expected: Automatic language detection + contextual response
-```
 
 ### **🔥 Firebase Functions Testing**
 
@@ -566,13 +432,13 @@ curl -X POST http://localhost:5001/your-project/asia-south1/analyzeDoodle \
 
 ### **📊 Performance Benchmarks**
 
-#### **Expected Performance (Gemma 3 + Ollama)**
-| Test Case | Gemma 3:1B | Gemma 3:4B | Gemini 2.5 Fallback |
-|-----------|------------|------------|---------------------|
-| **Language Detection** | ~300ms | N/A | ~1s |
-| **Simple Translation** | N/A | ~5-15s | ~3-4s |
-| **Complex Translation** | N/A | ~15-30s | ~4-6s |
-| **Mental Health Context** | N/A | ~20-35s | ~5-8s |
+#### **Expected Performance (Vertex AI)**
+| Test Case | Gemini 2.5 |
+|-----------|------------|
+| **Language Detection** | ~1s |
+| **Simple Translation** | ~3-4s |
+| **Complex Translation** | ~4-6s |
+| **Mental Health Context** | ~5-8s |
 
 #### **Performance Test Script**
 ```bash
@@ -583,13 +449,13 @@ echo "🧪 MindMend Performance Test"
 echo "=========================="
 
 # Test 1: Language Detection Speed
-echo "Test 1: Language Detection (Gemma 3:1B)"
+echo "Test 1: Language Detection (Gemini 2.5)"
 time curl -s -X POST http://localhost:5001/your-project/asia-south1/streamingTranslation \
   -H "Content-Type: application/json" \
   -d '{"text":"Hello","targetLanguage":"hi","streaming":false}' | jq '.performance.languageDetection'
 
 # Test 2: Translation Quality
-echo "Test 2: Translation Quality (Gemma 3:4B)"
+echo "Test 2: Translation Quality (Gemini 2.5)"
 curl -s -X POST http://localhost:5001/your-project/asia-south1/streamingTranslation \
   -H "Content-Type: application/json" \
   -d '{"text":"I need help with anxiety and depression","targetLanguage":"hi","streaming":false}' | jq '.confidence'
@@ -616,26 +482,25 @@ npm run dev
 
 # Open http://localhost:3000
 # ✅ Check: App loads without errors
-# ✅ Check: Gemma 3 status indicator shows "Connected"
 # ✅ Check: Language selection works
 # ✅ Check: Translation is fast and accurate
 ```
 
 #### **2. AI Integration Test**
 ```bash
-# Test AI chat with Gemma 3
+# Test AI chat
 # 1. Go to AI Coach section
 # 2. Type: "I am feeling stressed"
-# 3. ✅ Check: Response uses Gemma 3 model
+# 3. ✅ Check: Response uses Gemini 2.5 (Vertex AI)
 # 4. ✅ Check: Response is contextually appropriate
-# 5. ✅ Check: Latency is acceptable (<30s)
+# 5. ✅ Check: Latency is acceptable (<10s)
 ```
 
 ### **🔍 Integration Testing**
 
 #### **End-to-End User Flow**
 1. **🔐 Authentication**: Test Firebase Auth
-2. **🤖 AI Chat**: Send message to Gemma 3-powered coach
+2. **🤖 AI Chat**: Send message to Gemini-powered coach
 3. **🌍 Translation**: Test multilingual support
 4. **📊 Analytics**: Check performance metrics
 5. **🔔 Notifications**: Test FCM integration
@@ -731,8 +596,7 @@ MindMend/
 │   │   ├── 🔧 index.js                    # Functions entry point
 │   │   ├── 🔧 admin.js                    # Firebase Admin initialization
 │   │   ├── 🤖 chat.js                     # Gemini 2.5 Flash chat
-│   │   ├── 🌍 chatMultilingual.js         # Multilingual chat pipeline
-│   │   ├── 🦙 streamingTranslation.js     # Gemma 3 + Ollama translation
+│   │   ├── 🌐 streamingTranslation.js     # Translation via Vertex AI
 │   │   ├── 🎤 voiceChat.js                # Voice-to-text chat
 │   │   ├── 🎤 speechToText.js             # Cloud Speech API
 │   │   ├── 🔊 textToSpeech.js             # Cloud Text-to-Speech API
@@ -745,7 +609,7 @@ MindMend/
 │   └── 📋 firebase.json                   # Firebase configuration
 ├── 📁 scripts/                            # Testing & deployment scripts
 │   ├── 🧪 quick-test.sh                   # Quick functionality test
-│   ├── 🧪 test-streaming-translation.sh   # Gemma 3 translation tests
+│   ├── 🧪 test-streaming-translation.sh   # Translation tests
 │   ├── 🚀 deploy-functions.sh             # Deploy to production
 │   └── 🔧 setup-environment.sh            # Environment setup
 ├── 📁 public/
@@ -760,7 +624,7 @@ MindMend/
 │   │   ├── 📊 ProgressTracking.jsx        # Progress visualization
 │   │   ├── 🎮 Gamification.jsx            # Gamification features
 │   │   ├── 👥 Community.jsx               # Community support
-│   │   ├── 🤖 AICoach.jsx                 # AI coaching component (Gemma 3)
+│   │   ├── 🤖 AICoach.jsx                 # AI coaching component
 │   │   ├── 📈 AIInsights.jsx              # AI-powered insights
 │   │   ├── 🎭 EmotionalTwin.jsx           # AI emotional companion
 │   │   ├── 📊 MoodAnalytics.jsx           # Mood analytics dashboard
@@ -774,7 +638,6 @@ MindMend/
 │   │   ├── 🔐 authService.js              # Authentication service
 │   │   ├── 🗄️ firestoreService.js        # Firestore database
 │   │   ├── 🔔 fcmService.js               # Push notifications
-│   │   ├── 🦙 ollamaService.js            # Ollama integration service
 │   │   └── 💾 offlineService.js           # Offline data management
 │   ├── 📁 hooks/
 │   │   └── 🎨 useMoodTheme.js             # Mood-based theming
@@ -792,20 +655,9 @@ MindMend/
 └── 🌍 .env.example                        # Environment template
 ```
 
-### **🦙 Ollama Integration Files**
+### 🚀 Production Deployment
 
-| File | Purpose | Gemma 3 Models |
-|------|---------|----------------|
-| `streamingTranslation.js` | Hybrid translation service | 1B, 4B, 27B |
-| `ollamaService.js` | Ollama API integration | All models |
-| `chatMultilingual.js` | Multilingual chat pipeline | 4B primary |
-| `healthCheck.js` | System monitoring | Connection status |
-
----
-
-## 🚀 **Production Deployment**
-
-### **🌐 Frontend Deployment (Firebase Hosting)**
+### 🌐 Frontend Deployment (Firebase Hosting)
 
 ```bash
 # Build for production
@@ -818,7 +670,7 @@ firebase deploy --only hosting
 firebase hosting:channel:deploy production --expires 30d
 ```
 
-### **⚡ Functions Deployment (Firebase Functions)**
+### ⚡ Functions Deployment (Firebase Functions)
 
 ```bash
 # Deploy all functions to production
@@ -830,65 +682,11 @@ firebase deploy --only functions:streamingTranslation
 # Deploy with environment variables
 firebase functions:config:set \
   gcp.project_id="your-project-id" \
-  gcp.location="asia-south1" \
-  ollama.url="http://your-ollama-server:11434"
-
+  gcp.location="asia-south1"
 firebase deploy --only functions
 ```
 
-### **🦙 Ollama Production Setup**
-
-#### **Option 1: Cloud VM with Ollama**
-```bash
-# Create Google Cloud VM
-gcloud compute instances create ollama-server \
-  --zone=asia-south1-a \
-  --machine-type=n1-standard-4 \
-  --boot-disk-size=50GB \
-  --image-family=ubuntu-2004-lts \
-  --image-project=ubuntu-os-cloud
-
-# SSH and install Ollama
-gcloud compute ssh ollama-server --zone=asia-south1-a
-curl -fsSL https://ollama.ai/install.sh | sh
-ollama serve --host 0.0.0.0:11434
-
-# Pull models
-ollama pull gemma3:1b
-ollama pull gemma3:4b
-```
-
-#### **Option 2: Docker Deployment**
-```bash
-# Create Dockerfile for Ollama
-cat > Dockerfile.ollama << 'EOF'
-FROM ollama/ollama:latest
-
-# Copy models (if pre-downloaded)
-COPY models/ /root/.ollama/models/
-
-# Expose port
-EXPOSE 11434
-
-# Start Ollama server
-CMD ["ollama", "serve", "--host", "0.0.0.0:11434"]
-EOF
-
-# Build and deploy
-docker build -f Dockerfile.ollama -t mindmend-ollama .
-docker run -d -p 11434:11434 --name ollama-server mindmend-ollama
-```
-
-#### **Option 3: Vertex AI Model Garden (Alternative)**
-```bash
-# Deploy Gemma models via Vertex AI (if Ollama not available)
-gcloud ai models deploy \
-  --model=gemma-3-4b-it \
-  --endpoint=mindmend-gemma-endpoint \
-  --region=asia-south1
-```
-
-### **📊 Production Monitoring**
+### 📊 Production Monitoring
 
 ```bash
 # Set up monitoring
@@ -898,12 +696,9 @@ firebase functions:log --only streamingTranslation
 gcloud logging read "resource.type=cloud_function" \
   --format="table(timestamp,severity,textPayload)" \
   --limit=50
-
-# Ollama monitoring
-curl http://your-ollama-server:11434/api/tags
 ```
 
-### **🔒 Security Configuration**
+### 🔒 Security Configuration
 
 ```bash
 # Firebase security rules
@@ -921,15 +716,13 @@ service cloud.firestore {
 firebase deploy --only firestore:rules
 ```
 
-### **💰 Cost Optimization**
+### 💰 Cost Optimization
 
 | Service | Estimated Monthly Cost | Optimization |
 |---------|----------------------|--------------|
 | **Firebase Functions** | $10-50 | Use appropriate memory allocation |
 | **Firestore** | $5-25 | Optimize queries, use caching |
-| **Vertex AI** | $20-100 | Use Ollama for primary workload |
-| **Ollama VM** | $30-80 | Use preemptible instances |
-| **Total** | $65-255 | Hybrid approach saves 60-70% |
+| **Vertex AI** | $20-100 | Cache prompts/results, batch where possible, choose Flash vs Pro wisely |
 
 ## 🏆 Hackathon Scoring Breakdown
 
@@ -1018,52 +811,29 @@ If you're experiencing a mental health crisis, please reach out immediately:
 - [GreenHacker](https://github.com/GreenHacker420) - Technical Contributor
 - Built for Google Gen AI Exchange Hackathon 2025
 
-**🏆 Achievement**: 95/100 Hackathon Score - Advanced Google Cloud AI Integration
-Customize the color palette in `tailwind.config.js`:
+## 🤖 Advanced Gemini Features
 
-```javascript
-theme: {
-  extend: {
-    colors: {
-      primary: {
-        50: '#fff7ed',
-        // ... custom primary colors
-      },
-      calm: {
-        50: '#f9fafb',
-        // ... custom calm colors
-      },
-      accent: {
-        50: '#fdf6f0',
-        // ... custom accent colors
-      }
-    }
-  }
-}
-```
+#### ✅ Implemented Features
 
-### Custom Media Files
-- **Music**: Replace `public/music.mp3` with your own calming audio
-- **Video**: Replace `public/plant.mp4` with your own peaceful video
-- **Supported formats**: MP3 for audio, MP4 for video
+- **Streaming Chat**: Real-time token streaming with Server-Sent Events (SSE)
+- **Function Calling**: getMoodInsights, suggestExercise, scheduleReminder
+- **Multi-turn Chat Sessions**: Stateful conversations with context preservation
+- **Multimodal Analysis**: Image + text input with doodle analysis
+- **Context Caching**: Reduce API costs and get faster responses
+- **Structured Output**: JSON mode with typed responses
 
-### Adding New CBT Exercises
-Create new exercise components in `src/components/` and integrate them into the main `CBTExercise.jsx` component.
+#### 📁 Files Created
+- `functions/src/geminiAdvanced.js` - Backend implementations
+- `src/services/geminiAdvancedService.js` - Frontend client
 
-### Database Configuration
-The application uses Supabase for backend services. Database migrations are located in `supabase/migrations/`. To set up the database:
+#### 🚀 Next Steps
+1. Restart emulators: `firebase emulators:start`
+2. Test new features
+3. Integrate into UI components
 
-1. Create a Supabase project
-2. Run the migrations using the Supabase CLI
-3. Configure your environment variables
+All features use @google/genai v1.27.0 latest API!
 
-### Deployment Configuration
-The application is configured for Netlify deployment with:
-- `netlify.toml` - Deployment configuration
-- `netlify/functions/` - Serverless functions
-- Automatic builds from the main branch
-
-## 🌐 Browser Support
+### 🌐 Browser Support
 
 | Browser | Version |
 |---------|---------|
@@ -1122,3 +892,5 @@ If you're experiencing a mental health crisis, please reach out immediately:
 - [GreenHacker](https://github.com/GreenHacker420) (harsh@greenhacker.tech)
 - [curiouscoder-cmd](https://github.com/curiouscoder-cmd) (nitya@curiouscoder.live)
 
+
+```

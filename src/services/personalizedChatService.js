@@ -182,7 +182,7 @@ export async function generatePersonalizedResponse(
     
     // Call Gemini API via Firebase Functions
     const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 
-      'https://asia-south1-mindmend-25dca.cloudfunctions.net';
+      'https://us-central1-mindmend-25dca.cloudfunctions.net';
     
     const response = await fetch(`${FUNCTIONS_URL}/chatPersonalized`, {
       method: 'POST',

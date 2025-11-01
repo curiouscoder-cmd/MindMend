@@ -27,7 +27,7 @@ const RealTimeVoiceChat = ({ onClose }) => {
 
   const connectWebSocket = () => {
     // Connect to Firebase Function WebSocket endpoint
-    const wsUrl = 'wss://asia-south1-mindmend-25dca.cloudfunctions.net/realtimeVoiceChat';
+    const wsUrl = 'wss://us-central1-mindmend-25dca.cloudfunctions.net/realtimeVoiceChat';
     
     wsRef.current = new WebSocket(wsUrl);
 

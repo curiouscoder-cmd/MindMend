@@ -13,10 +13,10 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 export const chatPersonalized = onRequest({
   cors: true,
-  region: LOCATION,
+  region: 'us-central1',
   timeoutSeconds: 60,
-  memory: '512MiB',
-  maxInstances: 10
+  memory: '256MiB',
+  maxInstances: 5
 }, async (req, res) => {
   try {
     const { messages, userContext = {} } = req.body;

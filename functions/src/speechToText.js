@@ -5,8 +5,8 @@ import speech from '@google-cloud/speech';
 export const speechToText = onRequest({ 
   cors: true,
   timeoutSeconds: 60,
-  memory: '512MiB',
-  region: 'asia-south1',
+  memory: '256MiB',
+  region: 'us-central1',
 }, async (req, res) => {
   try {
     const { audioContent, languageCode = 'en-IN' } = req.body;

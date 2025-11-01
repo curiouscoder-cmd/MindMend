@@ -72,8 +72,8 @@ export async function synthesizeSpeech(text, voiceName = 'Aoede', stylePrompt = 
 export const geminiTTS = onRequest({
   cors: true,
   timeoutSeconds: 60,
-  memory: '512MiB',
-  region: 'asia-south1',
+  memory: '256MiB',
+  region: 'us-central1', // Moved to bypass asia-south1 CPU quota
 }, async (req, res) => {
   try {
     const { 
@@ -142,8 +142,8 @@ export const geminiTTS = onRequest({
 export const geminiTTSStream = onRequest({
   cors: true,
   timeoutSeconds: 120,
-  memory: '512MiB',
-  region: 'asia-south1',
+  memory: '256MiB',
+  region: 'us-central1', // Moved to bypass asia-south1 CPU quota
 }, async (req, res) => {
   try {
     const { 
