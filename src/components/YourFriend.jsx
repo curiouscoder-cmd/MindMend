@@ -232,7 +232,7 @@ const speakMessage = async (text) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4">
+    <div className="min-h-screen bg-mint/50 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
@@ -242,7 +242,7 @@ const speakMessage = async (text) => {
         >
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center text-3xl shadow-lg">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-ocean to-highlight flex items-center justify-center text-3xl shadow-lg">
                 👥
               </div>
               <div>
@@ -265,7 +265,7 @@ const speakMessage = async (text) => {
               <select
                 value={currentLanguage}
                 onChange={(e) => changeLanguage(e.target.value)}
-                className="px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-ocean"
                 disabled={isConnected}
               >
                 <option value="en">🇮🇳 English</option>
@@ -284,7 +284,7 @@ const speakMessage = async (text) => {
                 className={`px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 ${
                   isConnected
                     ? 'bg-red-500 hover:bg-red-600 text-white'
-                    : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white'
+                    : 'bg-gradient-to-r from-ocean to-highlight hover:from-primary-700 hover:to-ocean text-white'
                 }`}
               >
                 {isConnected ? '🛑 End Chat' : '🎤 Start Talking'}
@@ -345,25 +345,25 @@ const speakMessage = async (text) => {
                     {message.type === 'user' ? (
                       // User Message
                       <div className="max-w-[70%] flex items-start space-x-2">
-                        <div className="flex-1 px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md">
+                        <div className="flex-1 px-4 py-3 rounded-2xl bg-gradient-to-r from-ocean to-highlight text-white shadow-md">
                           <p className="text-sm leading-relaxed">{message.content}</p>
-                          <div className="text-[10px] mt-1 text-purple-100 text-right">
+                          <div className="text-[10px] mt-1 text-sky text-right">
                             {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </div>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center justify-center shadow-md flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-ocean to-highlight text-white flex items-center justify-center shadow-md flex-shrink-0">
                           <span className="text-sm">🧑</span>
                         </div>
                       </div>
                     ) : (
                       // Friend Message
                       <div className="max-w-[70%] flex items-start space-x-2">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center shadow-md flex-shrink-0">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-ocean to-highlight flex items-center justify-center shadow-md flex-shrink-0">
                           <span className="text-base">👥</span>
                         </div>
                         <div className="flex-1 bg-gray-50 rounded-2xl border border-gray-200 p-4 shadow-sm">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs font-medium text-purple-600">Your Friend</span>
+                            <span className="text-xs font-medium text-ocean">Your Friend</span>
                             <div className="text-[10px] text-gray-500">
                               {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </div>
@@ -386,13 +386,13 @@ const speakMessage = async (text) => {
                     className="flex justify-end"
                   >
                     <div className="max-w-[70%] flex items-start space-x-2">
-                      <div className="flex-1 px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-300 to-pink-300 text-white shadow-md opacity-70">
+                      <div className="flex-1 px-4 py-3 rounded-2xl bg-gradient-to-r from-primary-300 to-highlight text-white shadow-md opacity-70">
                         <p className="text-sm leading-relaxed italic">{interimTranscript}</p>
-                        <div className="text-[10px] mt-1 text-purple-100 text-right">
+                        <div className="text-[10px] mt-1 text-sky text-right">
                           Listening...
                         </div>
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-300 to-pink-300 text-white flex items-center justify-center shadow-md flex-shrink-0 animate-pulse">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary-300 to-highlight text-white flex items-center justify-center shadow-md flex-shrink-0 animate-pulse">
                         <span className="text-sm">🎤</span>
                       </div>
                     </div>
@@ -406,9 +406,9 @@ const speakMessage = async (text) => {
 
           {/* Instructions */}
           {!isConnected && messages.length === 0 && (
-            <div className="mt-4 p-4 bg-purple-50 rounded-xl border border-purple-200">
-              <h3 className="text-sm font-semibold text-purple-800 mb-2">💡 How to use:</h3>
-              <ul className="text-xs text-purple-700 space-y-1">
+            <div className="mt-4 p-4 bg-primary-50 rounded-xl border border-primary-200">
+              <h3 className="text-sm font-semibold text-navy mb-2">💡 How to use:</h3>
+              <ul className="text-xs text-primary-700 space-y-1">
                 <li>• Click "Start Talking" to begin</li>
                 <li>• Speak naturally in your chosen language</li>
                 <li>• Your friend will respond in real-time</li>
@@ -454,11 +454,11 @@ const speakMessage = async (text) => {
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #c084fc;
+          background: #62b6cb;
           border-radius: 10px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #a855f7;
+          background: #5fa8d3;
         }
       `}</style>
     </div>
