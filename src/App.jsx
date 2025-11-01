@@ -1,24 +1,21 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Navigation from './components/Navigation.jsx';
+import Home from './components/Home.jsx';
 import Onboarding from './components/Onboarding.jsx';
 import Login from './components/Login.jsx';
-import OfflineIndicator from './components/OfflineIndicator.jsx';
 
 // Lazy load heavy components
 const CBTExercise = lazy(() => import('./components/CBTExercise.jsx'));
 const ProgressTracking = lazy(() => import('./components/ProgressTracking.jsx'));
-const Community = lazy(() => import('./components/Community.jsx'));
 const AICoach = lazy(() => import('./components/AICoach.jsx'));
 const YourFriend = lazy(() => import('./components/YourFriend.jsx'));
 const AIInsights = lazy(() => import('./components/AIInsights.jsx'));
 const MoodAnalytics = lazy(() => import('./components/MoodAnalytics.jsx'));
 const CrisisMode = lazy(() => import('./components/CrisisMode.jsx'));
 const VoiceInput = lazy(() => import('./components/VoiceInput.jsx'));
-const DoodleMoodInput = lazy(() => import('./components/DoodleMoodInput.jsx'));
+const BDIAssessment = lazy(() => import('./components/Assessment/BDIAssessment.jsx'));
 import LoadingSpinner from './components/LoadingSpinner.jsx';
-import { useMoodTheme } from './hooks/useMoodTheme.js';
-import offlineService from './services/offlineService.js';
 import { onAuthChange } from './services/authService.js';
 import { createUserProfile, getUserProfile, updateUserProgress } from './services/firestoreService.js';
 import { initializeFCM, onForegroundMessage } from './services/fcmService.js';
@@ -30,7 +27,7 @@ function App() {
   const [showAuthLoader, setShowAuthLoader] = useState(false);
   
   // App state
-  const [currentView, setCurrentView] = useState('onboarding');
+  const [currentView, setCurrentView] = useState('home');
   const [selectedMood, setSelectedMood] = useState(null);
   const [userProgress, setUserProgress] = useState({
     completedExercises: 0,
@@ -117,13 +114,16 @@ function App() {
     return unsubscribe;
   }, [user]);
 
-  // Simple mood theme
-  const { backgroundGradient } = useMoodTheme(currentMood);
-
   const handleMoodSelection = (mood) => {
     setSelectedMood(mood);
     setCurrentMood(mood.id);
-    setMoodHistory(prev => [...prev, mood.id]);
+    // Store mood with timestamp for better tracking
+    const moodEntry = {
+      id: mood.id,
+      timestamp: new Date().toISOString(),
+      date: new Date().toLocaleDateString()
+    };
+    setMoodHistory(prev => [...prev, moodEntry]);
     setCurrentView('exercise');
   };
 
@@ -164,6 +164,15 @@ function App() {
       <Suspense fallback={null}> 
         {(() => {
           switch (currentView) {
+            case 'home':
+              return (
+                <Home
+                  user={user}
+                  onMoodSelect={handleMoodSelection}
+                  onNavigate={handleNavigate}
+                  moodHistory={moodHistory}
+                />
+              );
             case 'onboarding':
               return <Onboarding onMoodSelect={handleMoodSelection} />;
             case 'exercise':
@@ -171,20 +180,14 @@ function App() {
                 <CBTExercise
                   mood={selectedMood}
                   onComplete={handleExerciseComplete}
-                  onBack={() => setCurrentView('onboarding')}
+                  onBack={() => setCurrentView('home')}
                 />
               );
             case 'progress':
               return (
                 <ProgressTracking
                   progress={userProgress}
-                  onBack={() => setCurrentView('onboarding')}
-                />
-              );
-            case 'community':
-              return (
-                <Community
-                  userProgress={userProgress}
+                  onBack={() => setCurrentView('home')}
                 />
               );
             case 'coach':
@@ -227,20 +230,22 @@ function App() {
                   }}
                 />
               );
-            case 'doodle-mood':
+            case 'bdi-assessment':
               return (
-                <DoodleMoodInput
-                  onMoodDetected={(analysis) => {
-                    console.log('Mood analysis:', analysis);
-                    setCurrentMood(analysis.primaryMood);
-                  }}
-                  onDoodleComplete={(data) => {
-                    console.log('Doodle complete:', data);
-                  }}
+                <BDIAssessment
+                  user={user}
+                  onBack={() => setCurrentView('home')}
                 />
               );
             default:
-              return <Onboarding onMoodSelect={handleMoodSelection} />;
+              return (
+                <Home
+                  user={user}
+                  onMoodSelect={handleMoodSelection}
+                  onNavigate={handleNavigate}
+                  moodHistory={moodHistory}
+                />
+              );
           }
         })()}
       </Suspense>

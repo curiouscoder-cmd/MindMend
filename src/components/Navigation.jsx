@@ -3,14 +3,10 @@ import { logout } from '../services/authService.js';
 
 const Navigation = ({ currentView, onNavigate, calmPoints, user }) => {
   const navItems = [
-    { id: 'onboarding', label: 'Home', icon: '🏠' },
+    { id: 'home', label: 'Home', icon: '🏠' },
     { id: 'coach', label: 'AI Coach', icon: '🤖' },
     { id: 'your-friend', label: 'Your Friend', icon: '👥' },
-    { id: 'voice-input', label: 'Voice', icon: '🎤' },
-    { id: 'doodle-mood', label: 'Express', icon: '🎨' },
-    { id: 'analytics', label: 'Analytics', icon: '📊' },
-    { id: 'community', label: 'Community', icon: '🌐' },
-    { id: 'insights', label: 'Insights', icon: '💡' }
+    { id: 'analytics', label: 'Analytics', icon: '📊' }
   ];
 
   const menuRef = useRef(null);
@@ -57,14 +53,8 @@ const Navigation = ({ currentView, onNavigate, calmPoints, user }) => {
           
           </div>
 
-          {/* User Profile & Calm Points */}
+          {/* User Profile */}
           <div className="flex items-center space-x-3 shrink-0 ml-auto">
-            {/* Calm Points */}
-            <div className="flex items-center space-x-2 bg-mint px-3 py-2 rounded-2xl border border-ocean/10 shadow-soft">
-              <span className="text-navy font-medium">{calmPoints}</span>
-              <span className="text-navy/70 text-sm hidden sm:inline">points</span>
-            </div>
-            
             {/* User Menu */}
             {user && (
               <div className="relative" ref={menuRef}>

@@ -6,6 +6,32 @@ const CBTExercise = ({ mood, onComplete, onBack }) => {
   const [isCompleted, setIsCompleted] = useState(false);
 
   const exercises = {
+    'very-happy': {
+      title: "Amplify Joy & Share Positivity",
+      description: "Let's celebrate and spread your wonderful energy!",
+      steps: [
+        {
+          type: "reflection",
+          title: "Celebrate Your Joy",
+          content: "Acknowledge what's making you feel so wonderful.",
+          prompt: "What's bringing you so much joy right now?",
+          placeholder: "I'm feeling amazing because..."
+        },
+        {
+          type: "breathing",
+          title: "Energizing Breath",
+          content: "Amplify your positive energy with vibrant breathing.",
+          instruction: "Take deep, energizing breaths. Breathe in joy for 4 counts, hold for 4, breathe out gratitude for 4. Feel the energy radiating through you."
+        },
+        {
+          type: "activity",
+          title: "Share the Joy",
+          content: "Think of how you might share this positive energy with others.",
+          prompt: "How could you spread this joy to someone else today?",
+          placeholder: "I could share my joy by..."
+        }
+      ]
+    },
     happy: {
       title: "Gratitude & Positive Reinforcement",
       description: "Let's amplify your positive feelings and build lasting happiness habits.",
@@ -29,6 +55,58 @@ const CBTExercise = ({ mood, onComplete, onBack }) => {
           content: "Reinforce your positive mindset with a personal affirmation.",
           prompt: "Create a positive affirmation about yourself:",
           placeholder: "I am..."
+        }
+      ]
+    },
+    good: {
+      title: "Maintain Balance & Contentment",
+      description: "Let's appreciate this peaceful state and build on it.",
+      steps: [
+        {
+          type: "reflection",
+          title: "Appreciate the Moment",
+          content: "Recognize what's contributing to your sense of balance.",
+          prompt: "What's helping you feel content right now?",
+          placeholder: "I feel balanced because..."
+        },
+        {
+          type: "breathing",
+          title: "Centering Breath",
+          content: "Maintain your equilibrium with mindful breathing.",
+          instruction: "Breathe naturally and calmly. With each breath, notice the sense of peace and balance within you."
+        },
+        {
+          type: "affirmation",
+          title: "Affirm Your Stability",
+          content: "Acknowledge your inner strength and balance.",
+          prompt: "What positive quality helps you maintain this balance?",
+          placeholder: "I am capable of..."
+        }
+      ]
+    },
+    okay: {
+      title: "Gentle Uplift & Self-Care",
+      description: "Let's gently shift toward a more positive state.",
+      steps: [
+        {
+          type: "reflection",
+          title: "Check In With Yourself",
+          content: "Explore what might help you feel a bit better.",
+          prompt: "What's one small thing that could brighten your day?",
+          placeholder: "Something that might help is..."
+        },
+        {
+          type: "breathing",
+          title: "Refreshing Breath",
+          content: "Use your breath to create a gentle shift in energy.",
+          instruction: "Breathe in fresh energy for 4 counts, hold for 4, breathe out stagnation for 6. Feel yourself becoming more present."
+        },
+        {
+          type: "activity",
+          title: "Small Joy Action",
+          content: "Plan one small act of self-care.",
+          prompt: "What's one kind thing you can do for yourself today?",
+          placeholder: "I will..."
         }
       ]
     },
@@ -83,6 +161,58 @@ const CBTExercise = ({ mood, onComplete, onBack }) => {
         }
       ]
     },
+    'very-sad': {
+      title: "Deep Comfort & Gentle Support",
+      description: "I'm here with you. Let's take this one gentle step at a time.",
+      steps: [
+        {
+          type: "self-compassion",
+          title: "You're Not Alone",
+          content: "It's okay to feel this way. Your feelings are valid and you deserve kindness.",
+          prompt: "What do you need to hear right now? Write a message of comfort to yourself:",
+          placeholder: "It's okay that I'm feeling... I deserve..."
+        },
+        {
+          type: "breathing",
+          title: "Gentle Soothing Breath",
+          content: "Let's use breath to bring some comfort.",
+          instruction: "Breathe very gently and slowly. No pressure, just soft, caring breaths. Imagine someone who loves you is breathing with you, supporting you."
+        },
+        {
+          type: "activity",
+          title: "One Tiny Step",
+          content: "What's the smallest, gentlest thing you could do for yourself?",
+          prompt: "Even the tiniest act of self-care counts. What feels manageable?",
+          placeholder: "I could try..."
+        }
+      ]
+    },
+    angry: {
+      title: "Anger Release & Healthy Expression",
+      description: "Let's acknowledge your anger and channel it constructively.",
+      steps: [
+        {
+          type: "reflection",
+          title: "Understand Your Anger",
+          content: "Anger often protects other feelings. Let's explore what's underneath.",
+          prompt: "What triggered your anger? What might you really be feeling underneath (hurt, fear, frustration)?",
+          placeholder: "I'm angry because... Underneath, I might be feeling..."
+        },
+        {
+          type: "breathing",
+          title: "Cooling Breath",
+          content: "Release the heat of anger with powerful exhales.",
+          instruction: "Breathe in slowly for 4 counts, then exhale forcefully for 6 counts, releasing the anger. Imagine the anger leaving your body with each exhale."
+        },
+        {
+          type: "solution",
+          title: "Constructive Action",
+          content: "How can you address this situation in a healthy way?",
+          prompt: "What's one constructive action you could take to address what's making you angry?",
+          placeholder: "I could..."
+        }
+      ]
+    },
     stressed: {
       title: "Stress Relief & Perspective",
       description: "Let's work on reducing your stress and gaining perspective.",
@@ -106,6 +236,32 @@ const CBTExercise = ({ mood, onComplete, onBack }) => {
           content: "Shift from problem-focused to solution-focused thinking.",
           prompt: "What's one small step you can take today to address your stress?",
           placeholder: "One thing I can do is..."
+        }
+      ]
+    },
+    tired: {
+      title: "Energy Restoration & Rest Permission",
+      description: "Let's honor your need for rest and gentle renewal.",
+      steps: [
+        {
+          type: "reflection",
+          title: "Acknowledge Your Tiredness",
+          content: "Being tired is your body's way of asking for care.",
+          prompt: "What's been draining your energy? What do you need right now?",
+          placeholder: "I'm tired because... I need..."
+        },
+        {
+          type: "breathing",
+          title: "Restorative Breath",
+          content: "Use gentle breathing to restore some energy.",
+          instruction: "Breathe slowly and deeply. Imagine breathing in golden, restorative light. Breathe out exhaustion. No rush, just gentle renewal."
+        },
+        {
+          type: "activity",
+          title: "Rest Planning",
+          content: "Give yourself permission to rest.",
+          prompt: "What's one way you could give yourself rest or restoration today?",
+          placeholder: "I will allow myself to..."
         }
       ]
     }

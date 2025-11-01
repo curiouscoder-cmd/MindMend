@@ -1,6 +1,6 @@
 # MindMend - AI-Powered Mental Wellness Platform
 
-![Last Commit](https://img.shields.io/badge/Last%20Commit-2025--10--24-blue.svg)
+![Last Commit](https://img.shields.io/badge/Last%20Commit-2025--11--01-blue.svg)
 ![Version](https://img.shields.io/badge/Version-3.0.0-green.svg)
 [![Primary Language](https://img.shields.io/badge/Language-JavaScript-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Google Cloud](https://img.shields.io/badge/Google%20Cloud-Firebase%20%2B%20Vertex%20AI-4285F4.svg)](https://cloud.google.com/)
@@ -25,7 +25,6 @@
 ![Cloud Vision](https://img.shields.io/badge/Cloud%20Vision-API-4285F4?style=for-the-badge&logo=google&logoColor=white)
 ![Cloud NLP](https://img.shields.io/badge/Cloud%20NLP-API-4285F4?style=for-the-badge&logo=google&logoColor=white)
 ![Cloud Speech](https://img.shields.io/badge/Cloud%20Speech-API-4285F4?style=for-the-badge&logo=google&logoColor=white)
-![BigQuery](https://img.shields.io/badge/BigQuery-Analytics-4285F4?style=for-the-badge&logo=google&logoColor=white)
 ![FCM](https://img.shields.io/badge/FCM-Push%20Notifications-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)
 
 ## 📋 Project Overview
@@ -36,7 +35,7 @@
 
 - **Primary**: Vertex AI Gemini 2.5 (Flash/Pro) for reasoning, chat, and translation
 - **Multimodal**: Cloud Vision, Cloud Speech-to-Text, Cloud Text-to-Speech
-- **Data**: Firestore for realtime storage, BigQuery for analytics
+- **Data**: Firestore for realtime storage and user data
 
 ## 🏆 Hackathon Implementation Status
 
@@ -62,11 +61,9 @@
 - **Language Detection**: Automatic language identification
 - **Cultural Context**: India-specific mental health responses
 
-#### 📊 **Analytics & Monitoring (90%)**
-- **BigQuery Integration**: Data export and analytics
-- **Real-time Metrics**: Performance monitoring
-- **User Insights**: 30-day trend analysis
+#### 📊 **Monitoring**
 - **Crisis Intervention Tracking**: Safety monitoring
+- **System Health**: Function monitoring
 
 #### 🎯 **Core Features (95%)**
 - **CBT Exercises**: Evidence-based therapy modules
@@ -78,7 +75,6 @@
 ### 🚧 **IN PROGRESS**
 - **Cloud Vision API**: Doodle mood analysis (80%)
 - **Cloud Speech APIs**: Voice emotion detection (70%)
-- **Advanced Analytics**: BigQuery dashboards (60%)
 
 ### 🎯 Key Features
 
@@ -103,28 +99,13 @@
 
 #### 📊 Progress Tracking & Analytics
 - Visual progress bars showing completion percentage
-- Calm points reward system
 - Daily streak tracking
 - Weekly activity visualization
-- Achievement badges and milestones
 - Motivational messages and encouragement
-
-#### 🎮 Gamification Features
-- **Calm Points System**: Earn points for completing exercises
-- **Achievement Badges**: Unlock badges for consistency and milestones
-- **Level Progression**: Advance through wellness levels
-- **Streak Tracking**: Maintain daily practice streaks
-- **Community Leaderboard**: Compare progress with others (optional)
 
 #### 👥 Community Support
 - **Anonymous Support Groups**: Join topic-based discussion groups
-- **Peer Encouragement**: Give and receive support from others
-- **Success Stories**: Share and read inspiring recovery journeys
-- **Expert Q&A**: Weekly sessions with mental health professionals
 - **Crisis Support Network**: 24/7 peer support for urgent situations
-- **Community Forums**: Advanced forum system with real-time messaging
-- **Micro Communities**: Small, focused support groups for specific needs
-- **Voice-Enabled Messaging**: Communicate through voice in community spaces
 
 #### 🤖 AI-Powered Features
 - **Personal AI Coach**: Personalized guidance and check-ins with Google AI integration
@@ -151,14 +132,6 @@
 - Accessible and intuitive interface with comprehensive accessibility settings
 - Clean, minimalistic aesthetic
 - Healthcare-appropriate theme
-- **Floating Particles**: Beautiful visual effects for enhanced user experience
-- **Mood-Based Theming**: Dynamic color schemes that adapt to user's emotional state
-- **Offline Support**: Full functionality even without internet connection
-
-#### 🎵 Multimedia Experience
-- **Calming Music**: Enjoy royalty-free music tracks directly from the homepage
-- **Peaceful Videos**: Watch relaxing videos to help soothe your mind
-- **Custom Media**: Upload your own music (`public/music.mp3`) and video (`public/plant.mp4`) files
 
 #### 🗄️ Database & Backend Integration
 - **Supabase Integration**: Real-time database with user authentication
@@ -168,12 +141,8 @@
 - **Real-time Updates**: Live data updates across all connected devices
 
 #### 🔧 Advanced Technical Features
-- **Progressive Web App (PWA)**: Install as a native app on any device
-- **Service Workers**: Background sync and caching for offline functionality
-- **WebRTC Integration**: Real-time communication for group therapy sessions
-- **Canvas Confetti**: Celebration animations for achievements
-- **IndexedDB Storage**: Client-side database for offline data persistence
-- **Socket.io Integration**: Real-time messaging and notifications
+- **Real-time Communication**: WebRTC for voice chat functionality
+- **Push Notifications**: Firebase Cloud Messaging for engagement
 
 ### 🤖 Advanced Gemini Features
 
@@ -271,7 +240,6 @@ gcloud services enable \
   language.googleapis.com \
   speech.googleapis.com \
   texttospeech.googleapis.com \
-  bigquery.googleapis.com \
   firebase.googleapis.com \
   firestore.googleapis.com
 ```
@@ -603,7 +571,6 @@ MindMend/
 │   │   ├── 🎨 analyzeDoodle.js            # Cloud Vision doodle analysis
 │   │   ├── 📊 analyzeMood.js              # Cloud NLP sentiment analysis
 │   │   ├── 🔔 notifications.js            # Firebase Cloud Messaging
-│   │   ├── 📈 analytics.js                # BigQuery analytics
 │   │   └── 🩺 healthCheck.js              # System health monitoring
 │   ├── 📦 package.json                    # Node.js 24 dependencies
 │   └── 📋 firebase.json                   # Firebase configuration
@@ -613,8 +580,6 @@ MindMend/
 │   ├── 🚀 deploy-functions.sh             # Deploy to production
 │   └── 🔧 setup-environment.sh            # Environment setup
 ├── 📁 public/
-│   ├── 🎵 music.mp3                       # Background music file
-│   ├── 🎬 plant.mp4                       # Calming video file
 │   └── 🔥 favicon.svg                     # App icon
 ├── 📁 src/
 │   ├── 📁 components/

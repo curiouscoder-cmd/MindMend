@@ -4,40 +4,6 @@ const ProgressTracking = ({ progress, onBack }) => {
   const { completedExercises, totalExercises, calmPoints, streak } = progress;
   const progressPercentage = (completedExercises / totalExercises) * 100;
 
-  const achievements = [
-    {
-      id: 'first-step',
-      title: 'First Step',
-      description: 'Complete your first exercise',
-      icon: '🌱',
-      unlocked: completedExercises >= 1,
-      requirement: 1
-    },
-    {
-      id: 'consistent',
-      title: 'Consistent Practice',
-      description: 'Complete 3 exercises',
-      icon: '🔥',
-      unlocked: completedExercises >= 3,
-      requirement: 3
-    },
-    {
-      id: 'dedicated',
-      title: 'Dedicated Learner',
-      description: 'Complete 5 exercises',
-      icon: '⭐',
-      unlocked: completedExercises >= 5,
-      requirement: 5
-    },
-    {
-      id: 'mindful-master',
-      title: 'Mindful Master',
-      description: 'Complete 10 exercises',
-      icon: '🏆',
-      unlocked: completedExercises >= 10,
-      requirement: 10
-    }
-  ];
 
   const weeklyData = [
     { day: 'Mon', exercises: 1, mood: 'happy' },
@@ -72,7 +38,7 @@ const ProgressTracking = ({ progress, onBack }) => {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="card text-center">
           <div className="text-3xl mb-2">📚</div>
           <div className="text-2xl font-bold text-primary-600 mb-1">
@@ -81,13 +47,6 @@ const ProgressTracking = ({ progress, onBack }) => {
           <div className="text-blue-900 text-sm">Exercises Completed</div>
         </div>
         
-        <div className="card text-center">
-          <div className="text-3xl mb-2">✨</div>
-          <div className="text-2xl font-bold text-primary-600 mb-1">
-            {calmPoints}
-          </div>
-          <div className="text-blue-900 text-sm">Calm Points</div>
-        </div>
         
         <div className="card text-center">
           <div className="text-3xl mb-2">🔥</div>
@@ -179,46 +138,6 @@ const ProgressTracking = ({ progress, onBack }) => {
         </div>
       </div>
 
-      {/* Achievements */}
-      <div className="card mt-8">
-        <h2 className="text-2xl font-semibold text-calm-800 mb-6">
-          Achievements
-        </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {achievements.map((achievement) => (
-            <div 
-              key={achievement.id}
-              className={`p-4 rounded-lg border-2 text-center transition-all duration-200 ${
-                achievement.unlocked
-                  ? 'border-primary-200 bg-primary-50'
-                  : 'border-calm-200 bg-calm-50'
-              }`}
-            >
-              <div className={`text-4xl mb-2 ${
-                achievement.unlocked ? '' : 'grayscale opacity-50'
-              }`}>
-                {achievement.icon}
-              </div>
-              <h3 className={`font-semibold mb-1 ${
-                achievement.unlocked ? 'text-primary-800' : 'text-blue-900'
-              }`}>
-                {achievement.title}
-              </h3>
-              <p className={`text-sm ${
-                achievement.unlocked ? 'text-primary-700' : 'text-blue-500'
-              }`}>
-                {achievement.description}
-              </p>
-              {!achievement.unlocked && (
-                <div className="mt-2 text-xs text-blue-500">
-                  {completedExercises}/{achievement.requirement} exercises
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
 
       {/* Motivational Message */}
       <div className="card mt-8 bg-gradient-to-r from-primary-50 to-calm-50 border-primary-200">
@@ -240,12 +159,9 @@ const ProgressTracking = ({ progress, onBack }) => {
               : "Every exercise brings you closer to better mental wellness. Keep going!"
             }
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <button onClick={onBack} className="btn-primary">
               Continue Your Journey
-            </button>
-            <button className="btn-secondary">
-              Share Progress
             </button>
           </div>
         </div>

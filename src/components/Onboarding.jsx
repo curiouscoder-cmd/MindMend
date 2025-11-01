@@ -129,48 +129,7 @@ const Onboarding = ({ onMoodSelect }) => {
         </div>
       </div>
 
-      {/* Calming Music and Video Feature */}
-      <div className="flex flex-col md:flex-row items-center justify-center mt-12 gap-8">
-        {/* Music Card */}
-        <div className="group relative w-72 h-56 md:w-80 mx-auto bg-white text-navy/80 rounded-xl overflow-hidden shadow-soft flex flex-col items-center justify-center mb-4 md:mb-0 hover:-translate-y-2 duration-500">
-          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="absolute blur z-10 fill-ocean/25 duration-500 group-hover:blur-none group-hover:scale-105">
-            <path transform="translate(100 100)" d="M39.5,-49.6C54.8,-43.2,73.2,-36.5,78.2,-24.6C83.2,-12.7,74.8,4.4,69,22.5C63.3,40.6,60.2,59.6,49.1,64.8C38.1,70,19,61.5,0.6,60.7C-17.9,59.9,-35.9,67,-47.2,61.9C-58.6,56.7,-63.4,39.5,-70,22.1C-76.6,4.7,-84.9,-12.8,-81.9,-28.1C-79,-43.3,-64.6,-56.3,-49.1,-62.5C-33.6,-68.8,-16.8,-68.3,-2.3,-65.1C12.1,-61.9,24.2,-55.9,39.5,-49.6Z"></path>
-          </svg>
-          <div className="z-20 flex flex-col justify-center items-center text-center px-6">
-            <div className="text-4xl mb-2">🎵</div>
-            <h3 className="font-semibold text-navy mb-2">Listen to Calming Music</h3>
-            <audio id="calm-audio" src="/music.mp3" preload="auto"></audio>
-            <button
-              onClick={() => {
-                const audio = document.getElementById('calm-audio');
-                if (audio.paused) {
-                  audio.play();
-                } else {
-                  audio.pause();
-                }
-              }}
-              className="mt-2 btn-primary rounded-full"
-            >
-              Play / Pause
-            </button>
-            <p className="text-navy/70 text-xs mt-2">Gentle background music to help you relax</p>
-          </div>
-        </div>
-      </div>
-      {/* Large Video Card */}
-      <div className="flex flex-col items-center justify-center w-full mt-8">
-        <div className="flex flex-col items-center justify-center text-center bg-white rounded-3xl shadow-soft border border-ocean/10 w-full max-w-3xl mx-auto p-6">
-          <div className="text-5xl mb-3">🌱</div>
-          <h3 className="font-semibold text-navy mb-2">Watch Calming Video</h3>
-          <video
-            src="/plant.mp4"
-            controls
-            className="w-full max-w-2xl h-72 rounded-2xl object-cover bg-white shadow mx-auto"
-            style={{ minHeight: '18rem' }}
-          />
-          <p className="text-navy/70 text-xs mt-2">A peaceful plant video to soothe your mind</p>
-        </div>
-      </div>
+      
     </div>
   );
 };

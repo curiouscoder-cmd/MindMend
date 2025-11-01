@@ -7,30 +7,27 @@ const Community = ({ userProgress }) => {
   const communityPosts = [
     {
       id: 1,
-      user: { name: 'Sarah M.', avatar: '👩‍💼', level: 8 },
+      user: { name: 'Sarah M.', avatar: '👩‍💼' },
       content: 'Just completed my 30-day streak! The breathing exercises have been life-changing. 🌟',
       timestamp: '2 hours ago',
-      likes: 24,
       comments: 5,
       mood: 'happy',
       anonymous: false
     },
     {
       id: 2,
-      user: { name: 'Anonymous', avatar: '🌸', level: 3 },
+      user: { name: 'Anonymous', avatar: '🌸' },
       content: 'Having a tough day but the grounding exercise really helped me center myself. Thank you MindMend community! 💙',
       timestamp: '4 hours ago',
-      likes: 18,
       comments: 8,
       mood: 'anxious',
       anonymous: true
     },
     {
       id: 3,
-      user: { name: 'Mike R.', avatar: '👨‍💻', level: 12 },
+      user: { name: 'Mike R.', avatar: '👨‍💻' },
       content: 'Pro tip: I do my morning CBT exercise right after my coffee. It sets such a positive tone for the day! ☕️✨',
       timestamp: '1 day ago',
-      likes: 31,
       comments: 12,
       mood: 'happy',
       anonymous: false
@@ -198,9 +195,6 @@ const Community = ({ userProgress }) => {
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
                       <h4 className="font-semibold text-blue-900">{post.user.name}</h4>
-                      <span className="px-2 py-1 bg-primary-100 text-primary-700 text-xs rounded-full">
-                        Level {post.user.level}
-                      </span>
                       <span className={`px-2 py-1 text-xs rounded-full ${getMoodColor(post.mood)}`}>
                         {post.mood}
                       </span>
@@ -209,16 +203,8 @@ const Community = ({ userProgress }) => {
                     <p className="text-blue-700 mb-4">{post.content}</p>
                     <div className="flex items-center space-x-6">
                       <button className="flex items-center space-x-2 text-blue-900 hover:text-primary-600">
-                        <span>❤️</span>
-                        <span className="text-sm">{post.likes}</span>
-                      </button>
-                      <button className="flex items-center space-x-2 text-blue-900 hover:text-primary-600">
                         <span>💬</span>
-                        <span className="text-sm">{post.comments}</span>
-                      </button>
-                      <button className="flex items-center space-x-2 text-blue-900 hover:text-primary-600">
-                        <span>🔗</span>
-                        <span className="text-sm">Share</span>
+                        <span className="text-sm">{post.comments} comments</span>
                       </button>
                     </div>
                   </div>
