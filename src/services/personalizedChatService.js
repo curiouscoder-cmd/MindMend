@@ -7,6 +7,9 @@
 import { getCurrentUser } from './authService.js';
 import { db } from './firebaseConfig.js';
 import { collection, addDoc, query, where, orderBy, limit, getDocs } from 'firebase/firestore';
+import { formatContextForPrompt } from './userContextService.js';
+import { logChatMessage } from './activityTrackingService.js';
+import { searchKnowledgeBase, createTherapistSystemPrompt } from './knowledgeBaseService.js';
 
 // Conversation memory (in-memory cache)
 const conversationCache = new Map();
@@ -91,9 +94,9 @@ async function saveMessage(userId, role, content, metadata = {}) {
 }
 
 /**
- * Build personalized system prompt
+ * Build personalized system prompt with unified context and professional training
  */
-function buildPersonalizedPrompt(userProfile, moodHistory, userProgress) {
+function buildPersonalizedPrompt(userProfile, moodHistory, userProgress, unifiedContext = null, knowledgePassages = []) {
   const userName = userProfile?.displayName?.split(' ')[0] || 'friend';
   const recentMoods = moodHistory?.slice(-3) || [];
   const streak = userProgress?.streak || 0;
@@ -104,18 +107,43 @@ function buildPersonalizedPrompt(userProfile, moodHistory, userProgress) {
     ? `Recent moods: ${recentMoods.join(' → ')}`
     : 'No recent mood data';
   
+  // Include unified context if available
+  let contextSection = '';
+  if (unifiedContext && unifiedContext.summary) {
+    const { summary, cbtEntries, assessments } = unifiedContext;
+    contextSection = `
+**Full User Context:**
+- ${summary.moodTrend}
+- ${summary.cbtSummary}
+- ${summary.assessmentSummary}
+- Engagement: ${summary.engagement.coachMessages} coach conversations, ${summary.engagement.friendMessages} friend chats`;
+  }
+
+  // Include professional knowledge if available
+  let knowledgeSection = '';
+  if (knowledgePassages && knowledgePassages.length > 0) {
+    const knowledgeText = knowledgePassages
+      .map(p => `**${p.title}**: ${p.content.substring(0, 200)}...`)
+      .join('\n\n');
+    knowledgeSection = `
+
+**Professional Reference (from "Feeling Good" & CBT Techniques):**
+${knowledgeText}`;
+  }
+  
   // Build context-aware prompt - OPTIMIZED FOR SPEED
-  return `You are Mira, an empathetic AI mental wellness coach. KEEP RESPONSES SHORT (1-2 sentences max).
+  return `You are Mira, a professional AI mental wellness coach trained in Cognitive Behavioral Therapy (CBT) and therapeutic techniques from "Feeling Good" by David D. Burns. KEEP RESPONSES SHORT (1-2 sentences max).
 
 **User Context:**
 - Name: ${userName}
 - ${moodSummary}
-- Progress: ${completedExercises} exercises, ${streak}-day streak
+- Progress: ${completedExercises} exercises, ${streak}-day streak${contextSection}${knowledgeSection}
 
 **Your Personality:**
 - Warm, supportive, non-judgmental
 - Use CBT and mindfulness techniques
 - Culturally sensitive to Indian context
+- Aware of user's full wellness journey
 
 **Guidelines:**
 1. **BREVITY FIRST**: 1-2 sentences max - NO LONG RESPONSES
@@ -124,11 +152,13 @@ function buildPersonalizedPrompt(userProfile, moodHistory, userProgress) {
    - AASRA: 91-22-27546669
    - Vandrevala Foundation: 1860-2662-345
 4. **Cultural**: Use language relevant to Indian youth
+5. **Continuity**: Reference past CBT work or mood patterns when relevant
 
 **Response Style:**
 - Empathy + ONE action
 - Be conversational, avoid jargon
-- Use "you" to make it personal`;
+- Use "you" to make it personal
+- Build on user's existing wellness practices`;
 }
 
 /**
@@ -150,8 +180,50 @@ export async function generatePersonalizedResponse(
     // Get conversation history
     const history = currentUser ? await getConversationHistory(userId) : conversationContext.slice(-3);
     
-    // Build personalized system prompt
-    const systemPrompt = buildPersonalizedPrompt(userProfile, moodHistory, userProgress);
+    // Fetch unified user context from backend for comprehensive awareness
+    let unifiedContext = null;
+    let knowledgePassages = [];
+    
+    if (currentUser) {
+      try {
+        const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 
+          'http://localhost:5001/mindmend-25dca/us-central1';
+        
+        const contextResponse = await fetch(`${FUNCTIONS_URL}/getUserContext`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId })
+        });
+
+        if (contextResponse.ok) {
+          unifiedContext = await contextResponse.json();
+          console.log('📊 Unified context loaded:', {
+            moods: unifiedContext.moods?.length || 0,
+            cbtEntries: unifiedContext.cbtEntries?.length || 0,
+            coachMessages: unifiedContext.coachHistory?.length || 0,
+            friendMessages: unifiedContext.friendHistory?.length || 0,
+            assessments: unifiedContext.assessments?.length || 0
+          });
+        } else {
+          console.warn('⚠️ Could not fetch unified context from backend');
+        }
+      } catch (error) {
+        console.warn('⚠️ Error fetching unified context:', error);
+      }
+
+      // Fetch relevant knowledge passages for professional response
+      try {
+        knowledgePassages = await searchKnowledgeBase(userMessage, 2);
+        if (knowledgePassages.length > 0) {
+          console.log('📚 Knowledge passages loaded:', knowledgePassages.length);
+        }
+      } catch (error) {
+        console.warn('⚠️ Error fetching knowledge passages:', error);
+      }
+    }
+    
+    // Build personalized system prompt with unified context and professional knowledge
+    const systemPrompt = buildPersonalizedPrompt(userProfile, moodHistory, userProgress, unifiedContext, knowledgePassages);
     
     // Build conversation messages
     const messages = [
@@ -198,11 +270,13 @@ export async function generatePersonalizedResponse(
     const data = await response.json();
     const aiResponse = data.response;
     
-    // Save to conversation history
+    // Save to conversation history and log activity
     if (currentUser) {
       const currentMood = moodHistory && moodHistory.length > 0 ? moodHistory[moodHistory.length - 1] : 'neutral';
       await saveMessage(userId, 'user', userMessage, { mood: currentMood });
       await saveMessage(userId, 'coach', aiResponse, { mood: 'supportive' });
+      // Log chat activity
+      await logChatMessage('coach', userMessage.length);
     }
     
     return {

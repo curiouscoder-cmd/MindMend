@@ -204,29 +204,6 @@ class GeminiAdvancedService {
   }
 
   /**
-   * Analyze doodle with multimodal
-   * @param {string} imageDataUrl - Data URL of doodle
-   * @returns {Promise<Object>} Mood analysis
-   */
-  async analyzeDoodle(imageDataUrl) {
-    try {
-      // Extract base64 from data URL
-      const base64 = imageDataUrl.split(',')[1];
-      const mimeType = imageDataUrl.match(/data:([^;]+);/)?.[1] || 'image/png';
-
-      return await this.multimodalAnalysis(
-        base64,
-        'Analyze this doodle and describe the mood, emotions, and mental state it conveys. Be empathetic and insightful.',
-        mimeType
-      );
-
-    } catch (error) {
-      console.error('Doodle analysis error:', error);
-      throw error;
-    }
-  }
-
-  /**
    * Get structured mood insights
    * @param {string} journalEntry - User's journal entry
    * @returns {Promise<Object>} Structured mood data

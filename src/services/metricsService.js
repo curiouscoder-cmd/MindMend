@@ -131,7 +131,7 @@ class MetricsService {
       mood: moodData.mood,
       intensity: moodData.intensity,
       triggers: moodData.triggers,
-      method: moodData.method // 'manual', 'voice', 'doodle'
+      method: moodData.method // 'manual', 'voice'
     });
   }
 

@@ -1,5 +1,9 @@
 import { detectDistortionsLocally } from '../utils/cognitiveDistortions';
 import { GoogleGenAI } from '@google/genai';
+import { db } from './firebaseConfig';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { getCurrentUser } from './authService';
+import { logCBTEntry } from './activityTrackingService';
 
 // Initialize Gemini AI
 let genAI = null;
@@ -155,8 +159,8 @@ Provide your analysis in valid JSON format only. No markdown, no code blocks, ju
   }
 };
 
-// Save thought record to localStorage (can be upgraded to Firestore later)
-export const saveThoughtRecord = (thoughtRecord) => {
+// Save thought record to localStorage and Firestore
+export const saveThoughtRecord = async (thoughtRecord) => {
   try {
     const records = JSON.parse(localStorage.getItem('thoughtRecords') || '[]');
     
@@ -175,6 +179,26 @@ export const saveThoughtRecord = (thoughtRecord) => {
     }
     
     localStorage.setItem('thoughtRecords', JSON.stringify(records));
+
+    // Save to Firestore for AI context awareness
+    const currentUser = getCurrentUser();
+    if (currentUser?.uid && db) {
+      try {
+        await addDoc(collection(db, 'users', currentUser.uid, 'cbtEntries'), {
+          automaticThought: thoughtRecord.automaticThought,
+          distortions: thoughtRecord.distortions || [],
+          rationalResponse: thoughtRecord.rationalResponse,
+          aiSuggestion: thoughtRecord.aiSuggestion || '',
+          timestamp: serverTimestamp(),
+          completedAt: new Date().toISOString()
+        });
+        console.log('✅ CBT entry saved to Firestore for AI context');
+        // Log activity
+        await logCBTEntry('automatic_thought', thoughtRecord.distortions || []);
+      } catch (error) {
+        console.error('❌ Error saving CBT entry to Firestore:', error);
+      }
+    }
     
     return newRecord;
   } catch (error) {

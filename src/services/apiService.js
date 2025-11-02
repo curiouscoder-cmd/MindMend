@@ -61,14 +61,6 @@ export const api = {
     return response;
   },
 
-  // Doodle Analysis (Cloud Vision)
-  analyzeDoodle: async (imageData) => {
-    const response = await callFunction('analyzeDoodle', { 
-      imageData 
-    });
-    return response;
-  },
-
   // Voice Features
   speechToText: async (audioData, language = 'en') => {
     const response = await callFunction('speechToText', { 

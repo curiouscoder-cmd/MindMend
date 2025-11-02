@@ -8,23 +8,36 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { GoogleGenAI } from '@google/genai';
 
 const PROJECT_ID = process.env.GCP_PROJECT_ID || 'mindmend-ai';
-const LOCATION = 'asia-south1';
+const LOCATION = 'us-central1';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
+// Configure CORS with all origins allowed
 export const chatPersonalized = onRequest({
-  cors: true,
+  cors: [
+    {
+      origin: '*',
+      methods: ['GET', 'POST', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+      credentials: true
+    }
+  ],
   region: 'us-central1',
   timeoutSeconds: 60,
   memory: '256MiB',
   maxInstances: 5
 }, async (req, res) => {
-  res.set('Access-Control-Allow-Origin', '*');
-  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.set('Access-Control-Allow-Credentials', 'true');
     return res.status(204).send('');
   }
+  
+  // Set CORS headers for regular requests
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Credentials', 'true');
 
   try {
     const { messages, userContext = {} } = req.body;

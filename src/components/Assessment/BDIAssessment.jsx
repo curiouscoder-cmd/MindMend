@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BDIResults from './BDIResults';
 import { processAssessment } from '../../utils/bdiScoring';
+import { db } from '../../services/firebaseConfig';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { logAssessmentCompletion } from '../../services/activityTrackingService';
 
 const BDIAssessment = ({ onBack, onNavigate, user }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -76,7 +79,7 @@ const BDIAssessment = ({ onBack, onNavigate, user }) => {
     }
   };
 
-  const completeAssessment = (finalAnswers) => {
+  const completeAssessment = async (finalAnswers) => {
     // Process assessment with proper scoring logic
     const results = processAssessment(finalAnswers);
     setAssessmentResults(results);
@@ -86,12 +89,33 @@ const BDIAssessment = ({ onBack, onNavigate, user }) => {
     const assessment = {
       userId: user?.uid,
       ...results,
-      answers: finalAnswers
+      answers: finalAnswers,
+      timestamp: new Date().toISOString()
     };
     
     const history = JSON.parse(localStorage.getItem('bdiHistory') || '[]');
     history.push(assessment);
     localStorage.setItem('bdiHistory', JSON.stringify(history));
+
+    // Save to Firestore for AI context awareness
+    if (user?.uid && db) {
+      try {
+        await addDoc(collection(db, 'users', user.uid, 'assessments'), {
+          type: 'BDI',
+          score: results.score,
+          severity: results.severity,
+          category: results.category,
+          answers: finalAnswers,
+          timestamp: serverTimestamp(),
+          completedAt: new Date().toISOString()
+        });
+        console.log('✅ Assessment saved to Firestore for AI context');
+        // Log activity
+        await logAssessmentCompletion('BDI', results.score, results.severity);
+      } catch (error) {
+        console.error('❌ Error saving assessment to Firestore:', error);
+      }
+    }
   };
 
   const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;

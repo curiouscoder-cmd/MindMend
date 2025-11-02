@@ -1,5 +1,4 @@
 /**
- * Modern TTS Service - Functional ES6+ Approach
  * Uses Web Speech API for high-quality text-to-speech
  * 
  * Note: Gemini TTS is not yet supported in @google/genai SDK

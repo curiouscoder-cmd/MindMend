@@ -6,7 +6,6 @@ import api from '../services/apiService.js';
 import { generatePersonalizedResponse } from '../services/personalizedChatService.js';
 import { getCurrentUser } from '../services/authService.js';
 import VoiceButton from './VoiceButton.jsx';
-import RealTimeVoiceChat from './RealTimeVoiceChat.jsx';
 import VoiceEnabledMessage from './VoiceEnabledMessage';
 import { mockData } from '../data/mockData';
 import * as elevenLabsService from '../services/elevenLabsService';
@@ -323,15 +322,6 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
             <span>Auto-speak</span>
           </button>
           
-          {/* Real-Time Voice Chat Button */}
-          <button
-            onClick={() => setShowRealTimeChat(true)}
-            className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:shadow-lg transition-all text-xs font-medium"
-            title="Start instant voice conversation"
-          >
-            <span>⚡</span>
-            <span>Real-Time Voice</span>
-          </button>
         </div>
       </div>
 
@@ -506,10 +496,6 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
         </div>
       </div>
 
-      {/* Real-Time Voice Chat Modal */}
-      {showRealTimeChat && (
-        <RealTimeVoiceChat onClose={() => setShowRealTimeChat(false)} />
-      )}
     </div>
   );
 };
