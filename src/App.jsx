@@ -246,6 +246,7 @@ function App() {
                 <TripleColumnWorksheet
                   onBack={() => setCurrentView('home')}
                   onNavigate={handleNavigate}
+                  user={user}
                 />
               );
             case 'distortion-library':

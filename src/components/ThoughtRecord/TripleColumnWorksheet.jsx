@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DistortionBadge from './DistortionBadge';
+import DistortionExplainer from './DistortionExplainer';
+import SocraticQuestions from './SocraticQuestions';
 import ThoughtRecordHistory from './ThoughtRecordHistory';
-import { detectDistortions, saveThoughtRecord } from '../../services/distortionDetection';
+import { detectDistortions, saveThoughtRecord, validateRationalResponse, improveRationalResponse, generateResponseFromUserAnswers } from '../../services/distortionDetection';
+import { saveThoughtRecordToFirestore } from '../../services/thoughtRecordService';
 
-const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavigate = null }) => {
+const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavigate = null, user = null }) => {
+  console.log('🎨 TripleColumnWorksheet rendering...');
+  
   const [automaticThought, setAutomaticThought] = useState(prefilledThought || '');
   const [distortions, setDistortions] = useState([]);
   const [rationalResponse, setRationalResponse] = useState('');
@@ -12,9 +17,16 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
   
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isValidating, setIsValidating] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [validationFeedback, setValidationFeedback] = useState(null);
   const [currentStep, setCurrentStep] = useState(1); // 1, 2, 3
   const [showHistory, setShowHistory] = useState(false);
+  const [selectedDistortion, setSelectedDistortion] = useState(null);
+  const [showDistortionExplainer, setShowDistortionExplainer] = useState(false);
+  const [questionQuality, setQuestionQuality] = useState(0);
+  const [questionAnswers, setQuestionAnswers] = useState({ q1: '', q2: '', q3: '' });
+  const [isImprovingResponse, setIsImprovingResponse] = useState(false);
 
   // Auto-analyze when thought is provided
   useEffect(() => {
@@ -31,20 +43,33 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
 
     setIsAnalyzing(true);
     setDistortions([]);
-    setAiSuggestion('');
+    setRationalResponse('');
 
     try {
+      console.log('🔍 Analyzing thought:', automaticThought);
       const result = await detectDistortions(automaticThought);
-      setDistortions(result.distortions || []);
-      setAiSuggestion(result.suggestions || '');
-      setCurrentStep(2);
+      console.log('✅ Distortions detected:', result);
+      
+      if (result && result.distortions && result.distortions.length > 0) {
+        setDistortions(result.distortions);
+        setCurrentStep(2);
+        setRationalResponse('');
+      } else {
+        alert('No distortions detected. Please try another thought.');
+      }
     } catch (error) {
-      console.error('Error analyzing thought:', error);
-      alert('Failed to analyze thought. Please try again.');
+      console.error('❌ Error analyzing thought:', error);
+      alert('Failed to analyze thought. Please check your API key and try again.');
     } finally {
       setIsAnalyzing(false);
     }
   };
+
+  const handleShowDistortionExplainer = (distortion) => {
+    setSelectedDistortion(distortion);
+    setShowDistortionExplainer(true);
+  };
+
 
   const handleSaveRecord = async () => {
     if (!automaticThought.trim()) {
@@ -57,9 +82,26 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
       return;
     }
 
-    setIsSaving(true);
+    setIsValidating(true);
+    setValidationFeedback(null);
 
     try {
+      // Validate the rational response
+      const validation = await validateRationalResponse(automaticThought, rationalResponse, distortions);
+      
+      if (!validation.isRational) {
+        setValidationFeedback({
+          type: 'warning',
+          message: validation.feedback || 'This response may not be fully rational. Please revise it.',
+          suggestion: validation.suggestion
+        });
+        setIsValidating(false);
+        return;
+      }
+
+      // If validation passes, save the record
+      setIsSaving(true);
+
       const record = {
         automaticThought: automaticThought.trim(),
         distortions,
@@ -67,11 +109,30 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
         aiSuggestion
       };
 
+      // Save to localStorage (for offline access)
       saveThoughtRecord(record);
+      
+      // Save to Firestore (if user is logged in)
+      if (user && user.uid) {
+        try {
+          await saveThoughtRecordToFirestore(user.uid, record);
+          console.log('✅ Saved to both localStorage and Firestore');
+        } catch (firestoreError) {
+          console.error('Failed to save to Firestore, but saved locally:', firestoreError);
+        }
+      }
       
       // Show success message
       setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
+      setValidationFeedback({
+        type: 'success',
+        message: 'Great work! Your rational response is balanced and helpful.'
+      });
+      
+      setTimeout(() => {
+        setShowSuccess(false);
+        setValidationFeedback(null);
+      }, 3000);
 
       // Reset form
       setAutomaticThought('');
@@ -87,6 +148,7 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
       alert('Failed to save thought record. Please try again.');
     } finally {
       setIsSaving(false);
+      setIsValidating(false);
     }
   };
 
@@ -97,8 +159,11 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
       setRationalResponse('');
       setAiSuggestion('');
       setCurrentStep(1);
+      setValidationFeedback(null);
     }
   };
+
+  console.log('📊 Rendering with state:', { currentStep, distortions: distortions.length });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-navy/5 via-ocean/5 to-sky/10 p-6">
@@ -170,11 +235,9 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
               <textarea
                 value={automaticThought}
                 onChange={(e) => setAutomaticThought(e.target.value)}
-                placeholder="What negative thought went through your mind?&#10;&#10;Example: 'I'm going to fail this presentation and everyone will think I'm incompetent.'"
-                className="w-full h-40 p-4 bg-white/80 border border-navy/20 text-navy placeholder:text-navy/40 font-light text-sm focus:outline-none focus:border-navy transition-all resize-none"
-                disabled={isAnalyzing || isSaving}
+                placeholder="What's the negative thought on your mind?"
+                className="w-full h-24 p-4 bg-white/80 border border-navy/20 text-navy placeholder:text-navy/40 font-light text-sm focus:outline-none focus:border-navy transition-all resize-none rounded"
               />
-              
               {currentStep === 1 && (
                 <button
                   onClick={handleAnalyzeThought}
@@ -214,21 +277,15 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
                         <DistortionBadge 
                           key={index} 
                           distortion={distortion}
-                          showConfidence={true}
+                          showConfidence={false}
+                          onClick={() => handleShowDistortionExplainer(distortion)}
                         />
                       ))}
                     </div>
+                    <p className="text-xs text-navy/50 font-light">
+                      💡 Click on any distortion to learn how to challenge it
+                    </p>
                     
-                    {aiSuggestion && (
-                      <div className="pt-4 border-t border-navy/10">
-                        <p className="text-xs text-navy/60 mb-2 font-normal tracking-wider uppercase">
-                          AI Suggestion
-                        </p>
-                        <p className="text-navy/80 text-sm font-light leading-relaxed">
-                          {aiSuggestion}
-                        </p>
-                      </div>
-                    )}
                   </div>
                   
                   {currentStep === 2 && (
@@ -261,36 +318,93 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
                   Rational Response
                 </h3>
               </div>
-              
-              <textarea
-                value={rationalResponse}
-                onChange={(e) => setRationalResponse(e.target.value)}
-                placeholder="Write a more balanced, realistic thought...&#10;&#10;Example: 'While I'm nervous, I've prepared well. Even if I make mistakes, it doesn't define my competence.'"
-                className="w-full h-40 p-4 bg-white/80 border border-navy/20 text-navy placeholder:text-navy/40 font-light text-sm focus:outline-none focus:border-navy transition-all resize-none"
-                disabled={currentStep < 3 || isSaving}
-              />
-              
-              {currentStep === 3 && (
-                <div className="mt-4 space-y-2">
-                  <button
-                    onClick={handleSaveRecord}
-                    disabled={!rationalResponse.trim() || isSaving}
-                    className="w-full bg-ocean text-white py-3 px-6 font-normal text-sm hover:bg-ocean/90 disabled:bg-ocean/30 disabled:cursor-not-allowed transition-all"
-                  >
-                    {isSaving ? 'Saving...' : 'Save Entry'}
-                  </button>
-                  <button
-                    onClick={handleReset}
-                    disabled={isSaving}
-                    className="w-full bg-white/60 text-navy/60 py-2 px-6 font-normal text-sm hover:bg-white border border-navy/20 transition-all"
-                  >
-                    Clear & Start New
-                  </button>
-                </div>
+
+              {currentStep >= 3 && (
+                <>
+                  <div className="bg-white/80 border border-navy/20 p-4 rounded mb-3">
+                    <p className="text-xs text-navy/60 font-normal uppercase tracking-wider mb-2">
+                      ✍️ Your Balanced Response
+                    </p>
+                    <textarea
+                      value={rationalResponse}
+                      onChange={(e) => {
+                        setRationalResponse(e.target.value);
+                        setValidationFeedback(null);
+                      }}
+                      placeholder={questionQuality === 0 ? 'Answer the questions below first...' : 'Your response will appear here...'}
+                      disabled={questionQuality === 0}
+                      className={`w-full h-32 p-4 bg-navy/5 border border-navy/20 text-navy placeholder:text-navy/40 font-light text-sm focus:outline-none focus:border-navy transition-all resize-none rounded ${
+                        questionQuality === 0 ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
+                    />
+                    
+                    {questionQuality === 0 && (
+                      <p className="text-xs text-navy/50 font-light mt-2 italic">
+                        💡 Answer the questions below to unlock this field
+                      </p>
+                    )}
+                    
+                  </div>
+                </>
               )}
             </div>
           </div>
         </div>
+
+        {/* Socratic Questions Section (Below Table) */}
+        {currentStep >= 3 && (
+          <div className="mb-8">
+            <SocraticQuestions 
+              automaticThought={automaticThought}
+              distortions={distortions}
+              onQualityChange={setQuestionQuality}
+              onAnswersChange={(answers) => {
+                setQuestionAnswers(answers);
+              }}
+            />
+          </div>
+        )}
+
+        {/* Validation Feedback */}
+        {currentStep >= 3 && validationFeedback && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`mb-6 p-4 text-sm font-light ${
+              validationFeedback.type === 'success' 
+                ? 'bg-green-50 text-green-800 border-l-4 border-green-500' 
+                : 'bg-yellow-50 text-yellow-800 border-l-4 border-yellow-500'
+            }`}
+          >
+            <p className="mb-2">{validationFeedback.message}</p>
+            {validationFeedback.suggestion && (
+              <p className="text-xs italic opacity-80">
+                💡 Tip: {validationFeedback.suggestion}
+              </p>
+            )}
+          </motion.div>
+        )}
+
+        {/* Action Buttons */}
+        {currentStep >= 3 && (
+          <div className="flex gap-3 mb-8">
+            <button
+              onClick={handleSaveRecord}
+              disabled={!rationalResponse.trim() || isSaving || isValidating || questionQuality === 0}
+              className="flex-1 bg-ocean text-white py-3 px-6 font-normal text-sm hover:bg-ocean/90 disabled:bg-ocean/30 disabled:cursor-not-allowed transition-all"
+            >
+              {isValidating ? '⏳ Validating...' : isSaving ? '💾 Saving...' : '💾 Save Entry'}
+            </button>
+            
+            <button
+              onClick={handleReset}
+              disabled={isSaving || isValidating}
+              className="flex-1 bg-white/60 text-navy/60 py-3 px-6 font-normal text-sm hover:bg-white border border-navy/20 transition-all"
+            >
+              🔄 Start Over
+            </button>
+          </div>
+        )}
 
         {/* History Section */}
         <div className="mb-8">
@@ -305,6 +419,13 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
           {showHistory && <ThoughtRecordHistory />}
         </div>
       </div>
+
+      {/* Distortion Explainer Modal */}
+      <DistortionExplainer 
+        distortion={selectedDistortion}
+        isOpen={showDistortionExplainer}
+        onClose={() => setShowDistortionExplainer(false)}
+      />
     </div>
   );
 };
