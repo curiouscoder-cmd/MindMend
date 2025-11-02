@@ -5,6 +5,9 @@
  */
 
 import * as elevenLabsService from './elevenLabsService.js';
+import { detectLanguageMix, chooseReplyLanguage, summarizeMix } from './languageService.js';
+import { getCurrentUser } from './authService.js';
+import { logChatMessage } from './activityTrackingService.js';
 
 // Module state
 const audioCache = new Map();
@@ -253,62 +256,98 @@ export const generateFriendResponse = async (userInput, context = {}) => {
     const mood = detectMood(userInput);
     const topics = detectTopics(userInput);
     
-    // Detect if user is speaking Hindi/Hinglish
-    const hindiWords = ['mera', 'tera', 'hai', 'nahi', 'nahin', 'kya', 'kaise', 'bahut', 'kharab', 'achha', 'acche', 'theek', 'yaar', 'dost', 'bhai', 'aaj', 'kal', 'gaya', 'karun', 'samajh', 'dimag', 'kam', 'kiya', 'apne', 'aap', 'jabardasti', 'nautanki', 'karti', 'rahti', 'roj', 'kuchh'];
-    const lowerInput = userInput.toLowerCase();
-    const hindiWordCount = hindiWords.filter(word => lowerInput.includes(word)).length;
-    const isHindi = hindiWordCount >= 2; // Reduced threshold to 2 words for better detection
+    // Multilingual detection and mix analysis
+    const mix = detectLanguageMix(userInput);
+    const prevLang = conversationContext.language || 'en';
+    const replyLanguage = chooseReplyLanguage(mix, prevLang);
+    const isHindi = replyLanguage === 'hi';
+
+    // Fetch unified user context from backend for better awareness
+    let unifiedContext = null;
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      try {
+        const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 
+          'http://localhost:5001/mindmend-25dca/us-central1';
+        
+        const contextResponse = await fetch(`${FUNCTIONS_URL}/getUserContext`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: currentUser.uid })
+        });
+
+        if (contextResponse.ok) {
+          const fullContext = await contextResponse.json();
+          unifiedContext = fullContext.summary;
+          console.log('📊 Friend service - Unified context loaded:', {
+            assessments: fullContext.assessments?.length || 0,
+            moods: fullContext.moods?.length || 0
+          });
+        }
+      } catch (error) {
+        console.warn('⚠️ Could not fetch unified context in friend service:', error);
+      }
+    }
 
     // Update context
     updateContext({ 
       mood, 
       topics: [...new Set([...conversationContext.topics, ...topics])],
-      language: isHindi ? 'hi' : 'en'
+      language: replyLanguage === 'mixed' ? prevLang : replyLanguage,
+      userMessage: userInput,
+      languageMix: summarizeMix(mix),
+      unifiedContext: unifiedContext?.summary
     });
 
     // Create context-aware prompt with language instruction
     // For better pronunciation, use PURE language (no mixing)
-    const languageInstruction = isHindi 
+    const languageInstruction = replyLanguage === 'hi'
       ? `CRITICAL LANGUAGE RULE - MUST FOLLOW:
          - Respond ONLY in PURE HINDI using Devanagari script (हिंदी)
          - ABSOLUTELY NO English words or Roman script
-         - Use ONLY: "दोस्त", "यार", "मुझे", "तुम्हें", "क्या", "कैसे", "बहुत", "अच्छा"
-         - NEVER use: "dost", "yaar", "friend", "buddy" or ANY English
-         - Example CORRECT: "अरे यार, मुझे बहुत दुख हुआ।"
-         - Example WRONG: "Oh no, dost!" or "Haan yaar" (NO ROMAN SCRIPT)`
-      : `LANGUAGE RULE - REDUCE HINDI WORD FREQUENCY:
-         - Respond PRIMARILY in ENGLISH
-         - Use "friend", "buddy", "mate" as main words
-         - Use "yaar" or "dost" SPARINGLY (max once per 3-4 responses)
-         - Vary your vocabulary - don't repeat same words
-         - Example GOOD: "Hey friend, I'm sorry to hear that."
-         - Example ACCEPTABLE: "I understand, yaar. Tell me more."
-         - Example BAD: "Hey yaar, I hear you, dost" (TOO MANY)`;
+         - Keep sentences SHORT (1-2 lines)
+         - Avoid repetitive openings; vary wording`
+      : replyLanguage === 'en'
+      ? `LANGUAGE RULE:
+         - Respond in NATURAL ENGLISH
+         - Use "friend", "buddy" sparingly; vary openings
+         - Avoid repeating the same phrases across turns
+         - Keep it SHORT (1-2 sentences) and ask ONE follow-up question`
+      : `LANGUAGE RULE (MIXED CONTEXT):
+         - Respond in the user's dominant language based on context; avoid heavy code-mixing
+         - If user used Devanagari, reply in Hindi; else default to English
+         - Keep 1-2 sentences and ONE follow-up question
+         - Vary vocabulary; avoid repeating recent openings`;
 
     const systemPrompt = `You are a supportive, empathetic friend having a real-time voice conversation.
 
 Current Context:
 - User mood: ${mood}
 - Topics: ${topics.join(', ') || 'general chat'}
-- Language: ${isHindi ? 'Hindi/Hinglish' : 'English'}
+- Language: ${replyLanguage}
+- Mix: ${summarizeMix(mix)}
 - Conversation history: ${conversationContext.history.slice(-3).join('; ')}
+${unifiedContext ? `
+User's Wellness Journey:
+- Mood trend: ${unifiedContext.moodTrend}
+- Recent thoughts: ${unifiedContext.cbtSummary}
+- Assessment: ${unifiedContext.assessmentSummary}
+- Engagement: ${unifiedContext.engagement.coachMessages} coach chats, ${unifiedContext.engagement.friendMessages} friend chats` : ''}
 
 ${languageInstruction}
 
 Guidelines:
 1. Keep responses VERY SHORT (1-2 sentences max) for real-time feel
 2. Be warm, casual, and supportive like a close friend
-3. VARY your vocabulary - use different words each time
-4. Use "friend", "buddy", "mate" as primary words
-5. Use "yaar" or "dost" OCCASIONALLY (not every response)
-6. Ask ONE follow-up question to keep conversation flowing
-7. Acknowledge emotions naturally
-8. NO markdown, NO formatting - just plain friendly text
+3. VARY your vocabulary - do not repeat the same opening lines
+4. Ask ONE follow-up question to keep conversation flowing
+5. Acknowledge emotions naturally
+6. NO markdown, NO formatting - just plain friendly text
 
-${isHindi ? 
-  'HINDI EXAMPLES:\n✅ "अरे यार, मुझे बहुत दुख हुआ। क्या हुआ था?"\n✅ "दोस्त, मैं समझ सकता हूँ। तुम्हें कैसा लग रहा है?"\n❌ "Oh no, dost! Kya hua?" (WRONG - mixed)' 
+${replyLanguage === 'hi' ? 
+  'HINDI EXAMPLES:\n✅ "मुझे अफसोस है। क्या हुआ था?"\n✅ "मैं समझ रहा हूँ। तुम्हें कैसा लग रहा है?"\n❌ "Oh no, dost! Kya hua?" (WRONG - mixed)'
   : 
-  'ENGLISH EXAMPLES:\n✅ "Hey friend, I\'m sorry to hear that. What happened?"\n✅ "I understand. How are you feeling?"\n✅ "That sounds tough, yaar. Tell me more." (occasional Hindi OK)\n❌ "Hey yaar, I hear you, dost!" (TOO MANY Hindi words)'}
+  'ENGLISH EXAMPLES:\n✅ "I\'m sorry to hear that. What happened?"\n✅ "I hear you. How are you feeling now?"\n❌ "Hey yaar, I hear you, dost!" (repetitive/mixed)'}
 
 Respond as a caring friend would in a natural conversation.`;
 
@@ -341,8 +380,27 @@ Respond as a caring friend would in a natural conversation.`;
     const data = await response.json();
     let friendResponse = data.response || data.message || getFallbackResponse(mood);
 
+    // Post-processing: reduce repeated openings and overused terms
+    const recent = conversationContext.history.slice(-6).join(' ').toLowerCase();
+    const openingPatterns = [
+      /^hey\b/i, /^hi\b/i, /^hello\b/i, /^ar[e|é]?\b/i, /^दोस्त[, ]/i, /^मुझे\b/i
+    ];
+    const overusedEnglish = [/\bhey friend\b/i, /\bi hear you\b/i];
+    if (overusedEnglish.some(r => r.test(recent))) {
+      friendResponse = friendResponse
+        .replace(/\bHey friend\b/i, 'I get that')
+        .replace(/\bI hear you\b/i, 'I understand');
+    }
+    // Ensure only one question; keep first '?'
+    const qIndex = friendResponse.indexOf('?');
+    if (qIndex !== -1) {
+      const first = friendResponse.slice(0, qIndex + 1);
+      const rest = friendResponse.slice(qIndex + 1).replace(/\?/g, '.');
+      friendResponse = first + rest;
+    }
+
     // POST-PROCESSING: Track usage to reduce frequency
-    if (!isHindi) {
+    if (replyLanguage !== 'hi') {
       // Count occurrences of Hindi words in recent history
       const recentHistory = conversationContext.history.slice(-6).join(' ').toLowerCase();
       const yaarCount = (recentHistory.match(/yaar/g) || []).length;
@@ -356,10 +414,15 @@ Respond as a caring friend would in a natural conversation.`;
       }
     }
 
-    // Add to history
+    // Add to history and log activity
     conversationContext.history.push(`User: ${userInput}`, `Friend: ${friendResponse}`);
     if (conversationContext.history.length > 10) {
       conversationContext.history = conversationContext.history.slice(-10);
+    }
+
+    // Log chat activity (currentUser already fetched above)
+    if (currentUser) {
+      await logChatMessage('friend', userInput.length);
     }
 
     return friendResponse;

@@ -70,28 +70,6 @@ export const analyzeMoodText = async (text, language = 'en') => {
   }
 };
 
-/**
- * Analyze doodle with Cloud Vision
- */
-export const analyzeDoodleImage = async (imageBase64) => {
-  try {
-    const response = await fetch(`${FUNCTIONS_URL}/analyzeDoodle`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageBase64 }),
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Doodle analysis error:', error);
-    throw error;
-  }
-};
 
 /**
  * Speech-to-Text
@@ -166,7 +144,6 @@ export default {
   callChatFunction,
   callMultilingualChat,
   analyzeMoodText,
-  analyzeDoodleImage,
   speechToText,
   textToSpeech,
   voiceChat,

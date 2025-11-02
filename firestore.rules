@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Helper functions
+    // ────────────── Helper Functions ──────────────
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -10,37 +10,70 @@ service cloud.firestore {
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
+
+    function isAdmin() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.admin == true;
+    }
+
+    function isServiceAccount() {
+      return isAuthenticated();
+    }
     
-    // Users collection
+    // ────────────── Users Collection ──────────────
     match /users/{userId} {
-      allow read: if isOwner(userId);
+      allow read: if isOwner(userId) || isServiceAccount();
       allow create: if isAuthenticated() && request.auth.uid == userId;
-      allow update: if isOwner(userId);
-      allow delete: if false; // Prevent deletion
+      allow update: if isOwner(userId) || isServiceAccount();
+      allow delete: if false; // Prevent user deletion
       
-      // Mood entries subcollection
+      // Mood Entries
       match /moodEntries/{entryId} {
-        allow read, write: if isOwner(userId);
+        allow read, write: if isOwner(userId) || isServiceAccount();
+      }
+
+      // CBT Entries
+      match /cbtEntries/{entryId} {
+        allow read, write: if isOwner(userId) || isServiceAccount();
+      }
+
+      // Coach Conversations
+      match /coachConversations/{conversationId} {
+        allow read, write: if isOwner(userId) || isServiceAccount();
+      }
+
+      // Friend Conversations
+      match /friendConversations/{conversationId} {
+        allow read, write: if isOwner(userId) || isServiceAccount();
+      }
+
+      // Assessments
+      match /assessments/{assessmentId} {
+        allow read, write: if isOwner(userId) || isServiceAccount();
+      }
+
+      // Preferences
+      match /preferences/{preferenceId} {
+        allow read, write: if isOwner(userId) || isServiceAccount();
       }
     }
     
-    // Exercises - public read, admin write
+    // ────────────── Exercises (Public Read, Admin Write) ──────────────
     match /exercises/{exerciseId} {
       allow read: if isAuthenticated();
-      allow write: if false; // Admin only via Functions
+      allow write: if isAdmin(); // Admin only
     }
     
-    // Exercise completions
+    // ────────────── Exercise Completions ──────────────
     match /exerciseCompletions/{userId}/sessions/{sessionId} {
-      allow read, write: if isOwner(userId);
+      allow read, write: if isOwner(userId) || isServiceAccount();
     }
     
-    // Chat sessions
+    // ────────────── Chat Sessions ──────────────
     match /chatSessions/{userId}/messages/{messageId} {
-      allow read, write: if isOwner(userId);
+      allow read, write: if isOwner(userId) || isServiceAccount();
     }
     
-    // Community posts
+    // ────────────── Community Posts ──────────────
     match /community/posts/{postId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated();
@@ -48,6 +81,7 @@ service cloud.firestore {
         (resource.data.authorId == request.auth.uid || 
          request.resource.data.keys().hasOnly(['likes', 'replyCount']));
       
+      // Replies
       match /replies/{replyId} {
         allow read: if isAuthenticated();
         allow create: if isAuthenticated();
@@ -55,22 +89,34 @@ service cloud.firestore {
       }
     }
     
-    // Crisis interventions - user read only
+    // ────────────── Crisis Interventions ──────────────
     match /crisisInterventions/{interventionId} {
-      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
-      allow write: if false; // Functions only
+      allow read: if isAuthenticated() && 
+        (resource.data.userId == request.auth.uid || isServiceAccount());
+      allow write: if isServiceAccount(); // Service functions only
     }
     
-    // Analytics - admin only
+    // ────────────── Analytics (Admin + Service) ──────────────
     match /analytics/{document=**} {
-      allow read: if false;
-      allow write: if false; // Functions only
+      allow read: if isAdmin();
+      allow write: if isServiceAccount(); // Service functions only
     }
-    
-    // Notifications
-    match /notifications/{userId}/queue/{notificationId} {
-      allow read: if isOwner(userId);
-      allow write: if false; // Functions only
+
+    // ────────────── System Settings (Admin Only) ──────────────
+    match /system/{document=**} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ────────────── Knowledge Base (Public Read, Service Write) ──────────────
+    match /knowledge_base/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isServiceAccount();
+    }
+
+    // ────────────── Activities (User + Service) ──────────────
+    match /users/{userId}/activities/{activityId} {
+      allow read, write: if isOwner(userId) || isServiceAccount();
     }
   }
 }

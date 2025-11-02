@@ -154,8 +154,8 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
         aiSuggestion
       };
 
-      // Save to localStorage (for offline access)
-      saveThoughtRecord(record);
+      // Save to localStorage and Firestore
+      await saveThoughtRecord(record);
       
       // Save to Firestore (if user is logged in)
       if (user && user.uid) {

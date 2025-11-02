@@ -284,7 +284,18 @@ const analyzeEmotionFromContext = (context) => {
 const detectLanguageFromContext = (context) => {
   if (!context || !context.userMessage) return 'en';
 
+  // Honor explicit language in context when available
+  if (context.language === 'hi' || context.language === 'en') {
+    return context.language;
+  }
+
   const message = context.userMessage.toLowerCase();
+
+  // If mixed was selected upstream, choose based on script presence
+  if (context.language === 'mixed') {
+    const devanagariRegex = /[\u0900-\u097F]/;
+    return devanagariRegex.test(message) ? 'hi' : 'en';
+  }
 
   // Detect Devanagari script (Hindi, Marathi, Sanskrit)
   const devanagariRegex = /[\u0900-\u097F]/;

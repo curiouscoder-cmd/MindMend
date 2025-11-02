@@ -231,7 +231,7 @@ const VoiceEnabledMessage = ({
               <div className="flex items-center space-x-1">
                 <div className="w-2 h-2 rounded-full bg-green-400"></div>
                 <span className="text-xs text-calm-500">
-                  ElevenLabs Rachel • Premium Voice
+                  Rachel
                 </span>
               </div>
             </div>
