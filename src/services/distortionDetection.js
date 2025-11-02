@@ -351,6 +351,88 @@ Write ONLY the starter response, no explanations.`;
   }
 };
 
+// Analyze user's answers to Socratic questions
+export const analyzeQuestionAnswers = async (automaticThought, answers, distortions = []) => {
+  try {
+    const ai = initializeAI();
+    
+    if (!ai || !import.meta.env.VITE_GEMINI_API_KEY) {
+      return {
+        approved: true,
+        message: 'Analysis unavailable, proceeding with answers.'
+      };
+    }
+
+    console.log('🤖 Analyzing question answers...');
+
+    const distortionList = distortions && distortions.length > 0 
+      ? distortions.map(d => d.name || d.type).join(', ')
+      : 'Unknown';
+
+    const prompt = `You are a CBT therapist evaluating if a user's answers to reflection questions show genuine engagement and understanding.
+
+Automatic Negative Thought: "${automaticThought}"
+Identified Distortions: ${distortionList}
+
+User's Answers:
+Question 1: "${answers.q1}"
+Question 2: "${answers.q2}"
+Question 3: "${answers.q3}"
+
+Evaluate if the answers:
+1. Show genuine reflection (not just one-word or superficial responses)
+2. Demonstrate understanding of the thought pattern
+3. Provide some evidence, reasoning, or perspective
+4. Are honest and thoughtful (not just saying what sounds good)
+
+Be ENCOURAGING and SUPPORTIVE - if answers show ANY genuine effort and reflection, approve them.
+Only reject if answers are clearly superficial (like "idk", "maybe", single words, or copy-paste of the question).
+
+Respond in JSON format:
+{
+  "approved": true/false,
+  "message": "Encouraging feedback about their reflection",
+  "suggestion": "If not approved, gentle suggestion for improvement"
+}
+
+Provide ONLY the JSON, no markdown or code blocks.`;
+
+    const result = await ai.models.generateContent({
+      model: 'gemini-2.0-flash-exp',
+      systemInstruction: CBT_SYSTEM_INSTRUCTION,
+      contents: prompt,
+      generationConfig: {
+        temperature: 0.5,
+        topP: 0.95,
+        topK: 40,
+        maxOutputTokens: 256,
+      }
+    });
+
+    let text = result.text.trim();
+    text = text.replace(/```json\n?/g, '');
+    text = text.replace(/```\n?/g, '');
+    text = text.trim();
+
+    const analysis = JSON.parse(text);
+
+    console.log('✅ Answer analysis complete:', analysis);
+
+    return {
+      approved: analysis.approved === true,
+      message: analysis.message || '',
+      suggestion: analysis.suggestion || ''
+    };
+
+  } catch (error) {
+    console.error('❌ Error analyzing answers:', error);
+    return {
+      approved: true,
+      message: 'Analysis unavailable, proceeding with your answers.'
+    };
+  }
+};
+
 // Validate if user's response actually fights the negative thought
 export const validateRationalResponse = async (automaticThought, rationalResponse, distortions = []) => {
   try {

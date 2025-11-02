@@ -18,7 +18,7 @@ const DistortionBadge = ({ distortion, showConfidence = false, onClick = null })
       'labeling': 'bg-red-100 text-red-800 border-red-300',
       'personalization': 'bg-teal-100 text-teal-800 border-teal-300'
     };
-    return colors[type] || 'bg-gray-100 text-gray-800 border-gray-300';
+    return colors[type] || 'bg-navy text-white border-navy';
   };
 
   const colorClass = getColor(distortion.type);
