@@ -8,6 +8,7 @@ import Login from './components/Login.jsx';
 // Lazy load heavy components
 const CBTExercise = lazy(() => import('./components/CBTExercise.jsx'));
 const ProgressTracking = lazy(() => import('./components/ProgressTracking.jsx'));
+const ProgressDashboard = lazy(() => import('./components/ProgressDashboard.jsx'));
 const AICoach = lazy(() => import('./components/AICoach.jsx'));
 const YourFriend = lazy(() => import('./components/YourFriend.jsx'));
 const AIInsights = lazy(() => import('./components/AIInsights.jsx'));
@@ -15,6 +16,7 @@ const MoodAnalytics = lazy(() => import('./components/MoodAnalytics.jsx'));
 const CrisisMode = lazy(() => import('./components/CrisisMode.jsx'));
 const VoiceInput = lazy(() => import('./components/VoiceInput.jsx'));
 const BDIAssessment = lazy(() => import('./components/Assessment/BDIAssessment.jsx'));
+const BDIAssessmentNew = lazy(() => import('./components/BDIAssessment.jsx'));
 const TripleColumnWorksheet = lazy(() => import('./components/ThoughtRecord/TripleColumnWorksheet.jsx'));
 const DistortionLibrary = lazy(() => import('./components/DistortionLibrary/DistortionLibrary.jsx'));
 const TherapistFinder = lazy(() => import('./components/TherapistFinder.jsx'));
@@ -41,6 +43,7 @@ function App() {
   const [currentMood, setCurrentMood] = useState(null);
   const [moodHistory, setMoodHistory] = useState([]);
   const [showCrisisMode, setShowCrisisMode] = useState(false);
+  const [showBDIModal, setShowBDIModal] = useState(false);
 
   // Listen to authentication state changes
   useEffect(() => {
@@ -215,9 +218,8 @@ function App() {
               );
             case 'analytics':
               return (
-                <MoodAnalytics
-                  moodHistory={moodHistory}
-                  userProgress={userProgress}
+                <ProgressDashboard
+                  user={user}
                 />
               );
             case 'voice-input':
@@ -345,6 +347,20 @@ function App() {
                 calmPoints: prev.calmPoints + 20 // Extra points for crisis exercises
               }));
             }}
+          />
+        </Suspense>
+      )}
+
+      {/* BDI Assessment Modal */}
+      {showBDIModal && (
+        <Suspense fallback={null}>
+          <BDIAssessmentNew
+            onComplete={(score) => {
+              console.log('BDI Score:', score);
+              setShowBDIModal(false);
+              setCurrentView('analytics');
+            }}
+            onClose={() => setShowBDIModal(false)}
           />
         </Suspense>
       )}
