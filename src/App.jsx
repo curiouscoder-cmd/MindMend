@@ -18,6 +18,7 @@ const BDIAssessment = lazy(() => import('./components/Assessment/BDIAssessment.j
 const TripleColumnWorksheet = lazy(() => import('./components/ThoughtRecord/TripleColumnWorksheet.jsx'));
 const DistortionLibrary = lazy(() => import('./components/DistortionLibrary/DistortionLibrary.jsx'));
 const TherapistFinder = lazy(() => import('./components/TherapistFinder.jsx'));
+const DynamicThoughtChallenger = lazy(() => import('./components/ThoughtRecord/DynamicThoughtChallenger.jsx'));
 import LoadingSpinner from './components/LoadingSpinner.jsx';
 import { onAuthChange } from './services/authService.js';
 import { createUserProfile, getUserProfile, updateUserProgress } from './services/firestoreService.js';
@@ -258,6 +259,12 @@ function App() {
             case 'therapist-finder':
               return (
                 <TherapistFinder
+                  onBack={() => setCurrentView('home')}
+                />
+              );
+            case 'dynamic-thought-challenger':
+              return (
+                <DynamicThoughtChallenger
                   onBack={() => setCurrentView('home')}
                 />
               );

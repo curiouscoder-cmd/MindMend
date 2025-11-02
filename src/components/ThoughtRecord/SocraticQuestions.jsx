@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { generateDynamicSocraticQuestions } from '../../services/distortionDetection';
 
 // Helper: normalize incoming distortion type/name to our canonical keys
 const normalizeType = (raw) => {
@@ -209,7 +210,7 @@ const questionsByDistortion = {
   }
 };
 
-const SocraticQuestions = ({ automaticThought, distortions, onQualityChange, onAnswersChange, onSubmitAnswers }) => {
+const SocraticQuestions = ({ automaticThought, distortions, onQualityChange, onAnswersChange, onSubmitAnswers, onQuestionsLoaded }) => {
   const [answers, setAnswers] = useState({
     q1: '',
     q2: '',
@@ -218,9 +219,41 @@ const SocraticQuestions = ({ automaticThought, distortions, onQualityChange, onA
   const [expandedQuestion, setExpandedQuestion] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisFeedback, setAnalysisFeedback] = useState(null);
+  const [dynamicQuestions, setDynamicQuestions] = useState(null);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
 
-  // Get questions based on primary distortion
+  // Load dynamic questions when thought or distortions change
+  useEffect(() => {
+    if (automaticThought && distortions && distortions.length > 0) {
+      loadDynamicQuestions();
+    }
+  }, [automaticThought, distortions]);
+
+  const loadDynamicQuestions = async () => {
+    setIsLoadingQuestions(true);
+    try {
+      const result = await generateDynamicSocraticQuestions(automaticThought, distortions);
+      setDynamicQuestions(result.questions);
+      console.log('✅ Dynamic questions loaded:', result.questions);
+      
+      // Notify parent of loaded questions
+      if (onQuestionsLoaded) {
+        onQuestionsLoaded(result.questions);
+      }
+    } catch (error) {
+      console.error('Error loading dynamic questions:', error);
+      setDynamicQuestions(null);
+    } finally {
+      setIsLoadingQuestions(false);
+    }
+  };
+
+  // Get questions - prefer dynamic, fallback to static
   const getQuestions = () => {
+    if (dynamicQuestions && dynamicQuestions.length > 0) {
+      return dynamicQuestions;
+    }
+
     if (!distortions || distortions.length === 0) {
       return [];
     }
@@ -317,6 +350,14 @@ const SocraticQuestions = ({ automaticThought, distortions, onQualityChange, onA
         <p className="text-navy/70 text-sm font-light mb-6 leading-relaxed">
           Use these questions to examine your thought from different angles. There's no right answer - just be honest with yourself.
         </p>
+
+        {/* Loading State */}
+        {isLoadingQuestions && (
+          <div className="flex items-center gap-2 text-navy/60 mb-6">
+            <div className="animate-spin w-4 h-4 border-2 border-navy border-t-transparent rounded-full"></div>
+            <span className="text-sm font-light">Generating personalized questions...</span>
+          </div>
+        )}
 
         {/* Questions */}
         <div className="space-y-4">

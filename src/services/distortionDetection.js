@@ -271,6 +271,212 @@ export const deleteThoughtRecord = (recordId) => {
   }
 };
 
+// Generate dynamic personalized distortion explanations with parallel processing
+export const generatePersonalizedDistortionExplanation = async (automaticThought, distortionType) => {
+  try {
+    const ai = initializeAI();
+    
+    if (!ai) {
+      return {
+        explanation: 'This distortion affects how you interpret situations.',
+        isLocal: true
+      };
+    }
+
+    console.log('🤖 Generating personalized distortion explanation...');
+
+    const prompt = `You are a CBT therapist explaining a cognitive distortion to someone who just experienced it.
+
+User's Thought: "${automaticThought}"
+Distortion Type: ${distortionType}
+
+Create a SHORT, PERSONALIZED explanation (2-3 sentences) that:
+1. Explains how THIS SPECIFIC distortion appears in THEIR thought
+2. Is compassionate and non-judgmental
+3. Helps them understand the pattern
+4. Suggests one way to challenge it
+
+Example:
+- Thought: "I failed the exam, I'm a failure"
+- Distortion: Labeling
+- Explanation: "You're defining your entire self based on one exam result. This is labeling - taking one action and using it to define your whole identity. Instead, try separating the action from your identity: 'I struggled with this exam' rather than 'I am a failure.'"
+
+Write ONLY the explanation, no labels or formatting.`;
+
+    const result = await ai.models.generateContent({
+      model: 'gemini-2.0-flash-exp',
+      systemInstruction: CBT_SYSTEM_INSTRUCTION,
+      contents: prompt,
+      generationConfig: {
+        temperature: 0.7,
+        topP: 0.95,
+        topK: 40,
+        maxOutputTokens: 200,
+      }
+    });
+
+    const text = result.text.trim();
+    console.log('✅ Personalized explanation generated:', text);
+
+    return {
+      explanation: text,
+      isLocal: false
+    };
+
+  } catch (error) {
+    console.error('❌ Error generating explanation:', error);
+    return {
+      explanation: 'This distortion affects how you interpret situations.',
+      isLocal: true
+    };
+  }
+};
+
+// Generate dynamic personalized Socratic questions for challenging thoughts
+export const generateDynamicSocraticQuestions = async (automaticThought, distortions = []) => {
+  try {
+    const ai = initializeAI();
+    
+    if (!ai) {
+      return {
+        questions: [],
+        isLocal: true
+      };
+    }
+
+    console.log('🤖 Generating dynamic Socratic questions...');
+
+    const distortionList = distortions && distortions.length > 0
+      ? distortions.map(d => d.name || d.type).join(', ')
+      : 'General negative thinking';
+
+    const prompt = `You are a compassionate CBT therapist creating powerful Socratic questions to help someone challenge their automatic negative thought.
+
+User's Thought: "${automaticThought}"
+Identified Distortions: ${distortionList}
+
+Generate 3 powerful, SPECIFIC Socratic questions that:
+1. Are tailored to THIS exact thought (not generic)
+2. Help examine the thought from different angles
+3. Are open-ended and thought-provoking
+4. Guide the user to discover insights themselves
+5. Are compassionate and non-judgmental
+6. Focus on evidence, alternatives, and perspective
+
+Format as JSON:
+{
+  "questions": [
+    {
+      "question": "The specific question",
+      "hint": "A brief hint to guide their thinking"
+    }
+  ]
+}
+
+Provide ONLY valid JSON, no markdown.`;
+
+    const result = await ai.models.generateContent({
+      model: 'gemini-2.0-flash-exp',
+      systemInstruction: CBT_SYSTEM_INSTRUCTION,
+      contents: prompt,
+      generationConfig: {
+        temperature: 0.8,
+        topP: 0.95,
+        topK: 40,
+        maxOutputTokens: 512,
+      }
+    });
+
+    let text = result.text.trim();
+    text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+    const data = JSON.parse(text);
+    console.log('✅ Dynamic Socratic questions generated:', data);
+
+    return {
+      questions: data.questions || [],
+      isLocal: false
+    };
+
+  } catch (error) {
+    console.error('❌ Error generating questions:', error);
+    return {
+      questions: [],
+      isLocal: true
+    };
+  }
+};
+
+// Generate dynamic personalized questions for specific distortion (for modal)
+export const generateDynamicDistortionQuestions = async (automaticThought, distortionType) => {
+  try {
+    const ai = initializeAI();
+    
+    if (!ai) {
+      return {
+        questions: [],
+        isLocal: true
+      };
+    }
+
+    console.log('🤖 Generating dynamic distortion questions...');
+
+    const prompt = `You are a CBT therapist creating personalized Socratic questions to challenge a specific cognitive distortion.
+
+User's Thought: "${automaticThought}"
+Distortion Type: ${distortionType}
+
+Generate 3 powerful, SPECIFIC Socratic questions that:
+1. Are tailored to THIS exact thought (not generic)
+2. Help challenge THIS specific distortion type
+3. Are open-ended and thought-provoking
+4. Guide the user to discover insights themselves
+5. Are compassionate and non-judgmental
+
+Format as JSON:
+{
+  "questions": [
+    {
+      "question": "The specific question",
+      "hint": "A brief hint to guide their thinking"
+    }
+  ]
+}
+
+Provide ONLY valid JSON, no markdown.`;
+
+    const result = await ai.models.generateContent({
+      model: 'gemini-2.0-flash-exp',
+      systemInstruction: CBT_SYSTEM_INSTRUCTION,
+      contents: prompt,
+      generationConfig: {
+        temperature: 0.8,
+        topP: 0.95,
+        topK: 40,
+        maxOutputTokens: 512,
+      }
+    });
+
+    let text = result.text.trim();
+    text = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
+    const data = JSON.parse(text);
+    console.log('✅ Dynamic questions generated:', data);
+
+    return {
+      questions: data.questions || [],
+      isLocal: false
+    };
+
+  } catch (error) {
+    console.error('❌ Error generating questions:', error);
+    return {
+      questions: [],
+      isLocal: true
+    };
+  }
+};
+
 // Generate rational response starter with AI (user completes it)
 export const generateRationalResponse = async (automaticThought, distortions) => {
   try {

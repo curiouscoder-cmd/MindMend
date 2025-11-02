@@ -1,837 +1,605 @@
-# MindMend - AI-Powered Mental Wellness Platform
+# 🧠 MindMend
 
-![Last Commit](https://img.shields.io/badge/Last%20Commit-2025--11--01-blue.svg)
-![Version](https://img.shields.io/badge/Version-3.0.0-green.svg)
-[![Primary Language](https://img.shields.io/badge/Language-JavaScript-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
-[![Google Cloud](https://img.shields.io/badge/Google%20Cloud-Firebase%20%2B%20Vertex%20AI-4285F4.svg)](https://cloud.google.com/)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Firebase-FF6F00.svg)](https://mindmend-25dca.web.app/)
+> **AI-Powered Mental Wellness Platform for Young Adults**
 
-> **🏆 Google Gen AI Exchange Hackathon Project** - Advanced mental wellness platform powered by **Gemini 2.5 on Vertex AI**, featuring multilingual support for 10 Indian languages and deep Firebase integration.
+MindMend is a comprehensive mental health support application that combines evidence-based Cognitive Behavioral Therapy (CBT) techniques with advanced AI technology to provide personalized mental wellness support. Designed specifically for young adults in India dealing with academic and social pressures.
 
-## 🚀 Google Cloud Technology Stack
-
-### Frontend
-![React](https://img.shields.io/badge/React-19.1.0-61DAFB?style=for-the-badge&logo=react&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-6.3.5-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.4.17-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-
-### AI Models & Services
-![Vertex AI](https://img.shields.io/badge/Vertex%20AI-Gemini%202.5-4285F4?style=for-the-badge&logo=google&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-Functions%20Gen2-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)
-
-### Google Cloud Services (15 Services)
-![Firestore](https://img.shields.io/badge/Firestore-NoSQL-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)
-![Cloud Vision](https://img.shields.io/badge/Cloud%20Vision-API-4285F4?style=for-the-badge&logo=google&logoColor=white)
-![Cloud NLP](https://img.shields.io/badge/Cloud%20NLP-API-4285F4?style=for-the-badge&logo=google&logoColor=white)
-![Cloud Speech](https://img.shields.io/badge/Cloud%20Speech-API-4285F4?style=for-the-badge&logo=google&logoColor=white)
-![FCM](https://img.shields.io/badge/FCM-Push%20Notifications-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)
-
-## 📋 Project Overview
-
-**MindMend** is a comprehensive mental wellness platform built for the **Google Gen AI Exchange Hackathon**, showcasing the full power of Google Cloud's AI ecosystem. The platform provides evidence-based Cognitive Behavioral Therapy (CBT) exercises, multilingual AI support, and real-time analytics - all powered by **Vertex AI (Gemini 2.5)** and 15+ Google Cloud services running from the Mumbai region (asia-south1) for optimal performance in India.
-
-## 🤖 AI Architecture
-
-- **Primary**: Vertex AI Gemini 2.5 (Flash/Pro) for reasoning, chat, and translation
-- **Multimodal**: Cloud Vision, Cloud Speech-to-Text, Cloud Text-to-Speech
-- **Data**: Firestore for realtime storage and user data
-
-## 🏆 Hackathon Implementation Status
-
-### ✅ **COMPLETED FEATURES**
-
-#### 🔥 **Firebase Integration (100%)**
-- **Firebase Functions Gen 2**: 19 serverless functions deployed
-- **Firebase Authentication**: Google Sign-In + Anonymous auth
-- **Firestore Database**: Real-time NoSQL database with offline support
-- **Firebase Cloud Messaging**: Push notifications system
-- **Firebase Storage**: File storage for user content
-
-#### 🤖 **Vertex AI Integration (100%)**
-- **Gemini 2.5 Flash**: Fast chat responses (~4s)
-- **Gemini 2.5 Pro**: High-quality translations
-- **Mumbai Region**: All AI models running from asia-south1
-- **Multilingual Pipeline**: Support for 10 Indian languages
-- **Crisis Detection**: AI-powered mental health crisis detection
-
-#### 🌍 **Multilingual Support (100%)**
-- **Languages**: English, Hindi, Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi
-- **Pipeline Performance**: 7.2s total response time
-- **Language Detection**: Automatic language identification
-- **Cultural Context**: India-specific mental health responses
-
-#### 📊 **Monitoring**
-- **Crisis Intervention Tracking**: Safety monitoring
-- **System Health**: Function monitoring
-
-#### 🎯 **Core Features (95%)**
-- **CBT Exercises**: Evidence-based therapy modules
-- **Mood Tracking**: Text, voice, and doodle input
-- **AI Coach**: Personalized mental health guidance
-- **Community Support**: Anonymous peer support
-- **Progress Tracking**: Gamified wellness journey
-
-### 🚧 **IN PROGRESS**
-- **Cloud Vision API**: Doodle mood analysis (80%)
-- **Cloud Speech APIs**: Voice emotion detection (70%)
-
-### 🎯 Key Features
-
-#### 🏠 Personalized Onboarding
-- Welcoming homepage with mood assessment
-- Four mood options: Happy, Anxious, Sad, Stressed
-- Intuitive mood selection with visual feedback
-- Clean, calming design with soft color palette
-
-#### 🧠 Tailored CBT Experience
-- Personalized cognitive behavioral therapy exercises based on selected mood
-- Multi-step guided exercises including:
-  - Breathing exercises with timer
-  - Reflection and journaling prompts
-  - Grounding techniques (5-4-3-2-1 method)
-  - Thought challenging and reframing
-  - Self-compassion practices
-  - Solution-focused activities
-- **Voice Input Integration**: Express emotions through voice with AI-powered emotion detection
-- **Doodle Mood Input**: Draw your feelings and get AI-powered mood analysis
-- **Emotional Twin**: AI companion that learns and mirrors your emotional patterns
-
-#### 📊 Progress Tracking & Analytics
-- Visual progress bars showing completion percentage
-- Daily streak tracking
-- Weekly activity visualization
-- Motivational messages and encouragement
-
-#### 👥 Community Support
-- **Anonymous Support Groups**: Join topic-based discussion groups
-- **Crisis Support Network**: 24/7 peer support for urgent situations
-
-#### 🤖 AI-Powered Features
-- **Personal AI Coach**: Personalized guidance and check-ins with Google AI integration
-- **Smart Insights**: AI-driven analysis of mood patterns and triggers
-- **Adaptive Recommendations**: Customized exercise suggestions based on progress
-- **Crisis Detection**: AI monitoring for signs of mental health crises
-- **Intelligent Reminders**: Smart notifications for optimal engagement times
-- **AI Group Therapy**: Participate in AI-facilitated group therapy sessions
-- **Enhanced AI Insights**: Deep learning analysis of emotional patterns
-- **Voice Emotion Recognition**: Real-time emotion detection from voice input
-- **Doodle Analysis**: AI interpretation of mood through artistic expression
-
-#### 🆘 Crisis Support Mode
-- **Immediate Help Resources**: Quick access to crisis hotlines and emergency contacts
-- **Breathing Exercises**: Instant access to calming techniques
-- **Grounding Techniques**: 5-4-3-2-1 sensory grounding and other methods
-- **Emergency Contacts**: Pre-configured list of trusted contacts
-- **Professional Resources**: Direct links to mental health professionals
-
-#### 🎨 Design Features
-- Responsive design that works on all devices
-- Calming color palette (soft blues, whites, grays)
-- Smooth animations and transitions with Framer Motion
-- Accessible and intuitive interface with comprehensive accessibility settings
-- Clean, minimalistic aesthetic
-- Healthcare-appropriate theme
-
-#### 🗄️ Database & Backend Integration
-- **Supabase Integration**: Real-time database with user authentication
-- **Offline-First Architecture**: Full functionality without internet connection
-- **Data Synchronization**: Seamless sync between offline and online data
-- **Database Migrations**: Structured database schema management
-- **Real-time Updates**: Live data updates across all connected devices
-
-#### 🔧 Advanced Technical Features
-- **Real-time Communication**: WebRTC for voice chat functionality
-- **Push Notifications**: Firebase Cloud Messaging for engagement
-
-### 🤖 Advanced Gemini Features
-
-#### ✅ Implemented Features
-- **Streaming Chat**: Real-time token streaming with Server-Sent Events (SSE)
-- **Function Calling**: getMoodInsights, suggestExercise, scheduleReminder
-- **Multi-turn Chat Sessions**: Stateful conversations with context preservation
-- **Multimodal Analysis**: Image + text input with doodle analysis
-- **Context Caching**: Reduce API costs and get faster responses
-- **Structured Output**: JSON mode with typed responses
-
-#### 📁 Files Created
-- `functions/src/geminiAdvanced.js` - Backend implementations
-- `src/services/geminiAdvancedService.js` - Frontend client
-
-#### 🚀 Next Steps
-1. Restart emulators: `firebase emulators:start`
-2. Test new features
-3. Integrate into UI components
-
-All features use @google/genai v1.27.0 latest API!
-
-## 🛠️ Installation & Setup Guide
-
-### 📋 Prerequisites
-
-#### **System Requirements**
-- **Node.js** (version 24 or higher)
-- **npm** or **yarn** package manager
-- **Git** for version control
-
-#### **Cloud Services**
-- **Google Cloud Account** with billing enabled
-- **Firebase CLI** installed globally
-- **gcloud CLI** installed and authenticated
-
-#### **AI Models**
-- **Vertex AI (Gemini 2.5)** (Cloud-based)
+[![Firebase](https://img.shields.io/badge/Firebase-12.4.0-orange?logo=firebase)](https://firebase.google.com/)
+[![React](https://img.shields.io/badge/React-19.1.0-blue?logo=react)](https://react.dev/)
+[![Gemini AI](https://img.shields.io/badge/Gemini-2.5-purple?logo=google)](https://ai.google.dev/)
+[![License](https://img.shields.io/badge/License-ISC-green)](LICENSE)
 
 ---
 
-## 🚀 **Quick Start Guide**
+## 📋 Table of Contents
 
-### **Step 1: Clone & Install**
+- [Features](#-features)
+- [Technical Stack](#-technical-stack)
+- [Architecture](#-architecture)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [Development](#-development)
+- [Testing](#-testing)
+- [Deployment](#-deployment)
+- [Project Structure](#-project-structure)
+
+---
+
+## ✨ Features
+
+### Frontend Features
+
+#### 🏠 **Home Dashboard**
+- **Mood Tracking**: Select from 10 different mood states with emoji-based interface
+- **Weekly Statistics**: Visual mood trends and consistency tracking
+- **Personalized Greeting**: User-specific welcome messages
+- **Quick Actions**: Fast access to all features from the home screen
+
+#### 🤖 **AI Coach (Mira)**
+- **Conversational AI**: Powered by Google Gemini 2.0 Flash
+- **Context-Aware**: Remembers user history, mood patterns, and progress
+- **CBT-Based Guidance**: Evidence-based therapeutic techniques
+- **Culturally Sensitive**: Tailored for Indian youth with appropriate language
+- **Real-time Responses**: Streaming text generation for natural conversations
+- **Multilingual Support**: Translation capabilities for regional languages
+
+#### 🧘 **CBT Tools Suite**
+
+##### 📝 Triple-Column Worksheet
+- **Step-by-Step Guidance**: Structured thought recording process
+- **AI Distortion Detection**: Automatically identifies cognitive distortions using Gemini AI
+- **10 Distortion Types**: Based on David Burns' "Feeling Good" methodology
+  - All-or-Nothing Thinking
+  - Overgeneralization
+  - Mental Filter
+  - Disqualifying the Positive
+  - Jumping to Conclusions
+  - Magnification/Minimization
+  - Emotional Reasoning
+  - Should Statements
+  - Labeling
+  - Personalization
+- **Rational Response Builder**: Guided reframing of negative thoughts
+- **History Tracking**: Save and review past thought records
+- **Statistics Dashboard**: Track distortion patterns over time
+- **Auto-save**: Never lose your progress
+
+##### 📚 Distortion Library
+- **Educational Resource**: Complete guide to all 10 cognitive distortions
+- **Search Functionality**: Quick lookup of specific distortions
+- **Real Examples**: Practical examples for each distortion type
+- **Expandable Cards**: Detailed explanations with visual design
+- **Color-Coded System**: Easy identification of distortion types
+
+##### 🎯 Dynamic Thought Challenger
+- **Socratic Questioning**: AI-powered guided self-inquiry
+- **Adaptive Questions**: Questions tailored to specific thought patterns
+- **Evidence Examination**: Structured analysis of thought validity
+- **Alternative Perspectives**: Generate balanced viewpoints
+- **Progress Tracking**: Monitor thought challenging journey
+
+##### 🔍 Burns Depression Inventory (BDI) Assessment
+- **Clinical Assessment**: Standardized depression screening tool
+- **21-Question Format**: Comprehensive mood evaluation
+- **Instant Scoring**: Immediate results with interpretation
+- **Severity Levels**: Clear categorization (Minimal, Mild, Moderate, Severe)
+- **CBT Recommendations**: Personalized suggestions based on score
+- **History Tracking**: Monitor assessment scores over time
+
+#### 🆘 **Crisis Mode**
+- **Immediate Access**: Floating SOS button always available
+- **Emergency Exercises**:
+  - **5-4-3-2-1 Grounding**: Sensory awareness technique
+  - **Box Breathing**: 4-4-4-4 breathing pattern with visual guide
+  - **Self-Soothing Statements**: Positive affirmations
+- **Emergency Contacts**: Quick access to crisis hotlines
+- **Guided Support**: Step-by-step crisis management
+- **No Login Required**: Accessible even without authentication
+
+#### 🎤 **Voice Features**
+
+##### Voice Input
+- **Speech-to-Text**: Real-time transcription using Web Speech API
+- **Emotion Detection**: AI analysis of voice patterns for emotional state
+- **Multilingual Support**: Multiple language recognition
+- **Hands-Free Operation**: Accessibility-focused design
+
+##### Voice Output (Text-to-Speech)
+- **Natural Voices**: ElevenLabs integration for high-quality TTS
+- **Multiple Voice Options**: Choose from various voice profiles
+- **Adjustable Speed**: Control playback rate
+- **Streaming Audio**: Real-time audio generation
+- **Fallback Support**: Browser TTS when API unavailable
+
+#### 📊 **Analytics & Insights**
+
+##### Mood Analytics
+- **Visual Charts**: Chart.js powered mood visualization
+- **Trend Analysis**: Weekly, monthly, and yearly patterns
+- **Mood Distribution**: Pie charts showing mood frequency
+- **Streak Tracking**: Consecutive days of mood logging
+- **Export Data**: Download mood history as CSV
+
+##### AI Insights
+- **Pattern Recognition**: AI-powered mood pattern analysis
+- **Personalized Recommendations**: Tailored exercise suggestions
+- **Progress Reports**: Weekly and monthly summaries
+- **Trigger Identification**: Common mood trigger detection
+- **Goal Tracking**: Monitor wellness objectives
+
+#### 🎮 **Gamification**
+- **Calm Points System**: Earn points for completing exercises
+- **Streak Counter**: Track consecutive days of engagement
+- **Level Progression**: Unlock new features and content
+- **Achievement Badges**: Visual rewards for milestones
+
+#### 🔍 **Therapist Finder**
+- **Location-Based Search**: Find therapists near you
+- **Filter Options**: Specialization, insurance, language
+- **Therapist Profiles**: Detailed information and credentials
+- **Booking Integration**: Direct appointment scheduling
+
+#### 🌐 **Accessibility Features**
+- **High Contrast Mode**: Enhanced visibility
+- **Font Size Adjustment**: Customizable text size
+- **Screen Reader Support**: ARIA labels and semantic HTML
+- **Keyboard Navigation**: Full keyboard accessibility
+- **Reduced Motion**: Respect user preferences
+- **Color Blind Friendly**: Accessible color schemes
+
+---
+
+### Backend Functions
+
+All Firebase Cloud Functions are deployed in the `asia-south1` (Mumbai) region.
+
+#### 💬 **Chat Functions**
+
+##### `chat`
+- **Purpose**: Basic AI chat functionality
+- **Model**: Google Gemini 2.0 Flash
+- **Endpoint**: `POST /chat`
+- **Input**: `{ message: string, moodHistory?: array, userProgress?: object }`
+- **Output**: `{ response: string, timestamp: string }`
+
+##### `chatPersonalized`
+- **Purpose**: Personalized chat with user context
+- **Features**: User profile integration, historical memory, adaptive responses
+- **Endpoint**: `POST /chatPersonalized`
+- **Input**: `{ userId: string, message: string }`
+
+##### `chatMultilingual`
+- **Purpose**: Multi-language chat support
+- **Features**: Auto language detection, regional language support
+- **Endpoint**: `POST /chatMultilingual`
+
+#### 🎙️ **Speech Functions**
+
+##### `speechToText`
+- **Purpose**: Convert audio to text
+- **Endpoint**: `POST /speechToText`
+- **Input**: `{ audioData: base64, format: string }`
+
+##### `textToSpeech`
+- **Purpose**: Generate natural speech from text
+- **Features**: ElevenLabs integration, multiple voices
+- **Endpoint**: `POST /textToSpeech`
+
+#### 🌍 **Translation Functions**
+
+##### `streamingTranslation`
+- **Purpose**: Real-time streaming translation
+- **Features**: Server-Sent Events (SSE), chunk-by-chunk translation
+- **Endpoint**: `GET /streamingTranslation`
+
+##### `streamingTranslationMetrics`
+- **Purpose**: Translation performance metrics
+- **Endpoint**: `GET /streamingTranslationMetrics`
+
+#### 📊 **Analytics Functions**
+
+##### `analyzeMood`
+- **Purpose**: AI-powered mood pattern analysis
+- **Endpoint**: `POST /analyzeMood`
+
+##### `getAnalyticsDashboard`
+- **Purpose**: Retrieve aggregated analytics
+- **Endpoint**: `GET /getAnalyticsDashboard`
+
+##### `getUserInsights`
+- **Purpose**: Generate personalized user insights
+- **Endpoint**: `GET /getUserInsights`
+
+##### `getUserContext`
+- **Purpose**: Retrieve comprehensive user context for AI
+- **Endpoint**: `GET /getUserContext`
+
+---
+
+## 🛠 Technical Stack
+
+### Frontend
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **React** | 19.1.0 | UI framework |
+| **Vite** | 6.3.5 | Build tool & dev server |
+| **TailwindCSS** | 3.4.17 | Utility-first CSS |
+| **Framer Motion** | 11.11.17 | Animations |
+| **Chart.js** | 4.4.6 | Data visualization |
+| **React Markdown** | 10.1.0 | Markdown rendering |
+
+### Backend & Services
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **Firebase** | 12.4.0 | Backend platform |
+| **Firebase Admin** | 13.5.0 | Server-side SDK |
+| **Google Gemini AI** | 0.3.0 | AI/ML model |
+| **ElevenLabs** | 1.59.0 | Text-to-speech |
+| **Supabase** | 2.39.0 | Database & storage |
+| **Socket.io** | 4.8.1 | Real-time communication |
+
+### Development & Testing
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| **Vitest** | 2.1.9 | Unit testing |
+| **Testing Library** | 16.3.0 | Component testing |
+| **JSDOM** | 25.0.1 | DOM simulation |
+
+---
+
+## 🏗 Architecture
+
+### System Architecture
+
+```
+┌─────────────────────────────────────────────┐
+│            Client Layer (React)             │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │    UI    │  │ IndexedDB│  │  Service │   │
+│  │Components│  │  (Cache) │  │  Worker  │   │
+│  └──────────┘  └──────────┘  └──────────┘   │
+└─────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────┐
+│         Firebase Services Layer             │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │   Auth   │  │Firestore │  │ Storage  │   │
+│  └──────────┘  └──────────┘  └──────────┘   │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │ Hosting  │  │Functions │  │   FCM    │   │
+│  └──────────┘  └──────────┘  └──────────┘   │
+└─────────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────┐
+│          External Services Layer            │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐   │
+│  │ Gemini AI│  │ElevenLabs│  │ Supabase │   │
+│  └──────────┘  └──────────┘  └──────────┘   │
+└─────────────────────────────────────────────┘
+```
+
+---
+
+## 📦 Installation
+
+### Prerequisites
+
+- **Node.js**: v18.0.0 or higher
+- **npm**: v9.0.0 or higher
+- **Firebase CLI**: v13.0.0 or higher
+
+### Step 1: Clone Repository
 
 ```bash
-# Clone the repository
-git clone https://github.com/curiouscoder-cmd/MindMend.git
-cd MindMend
+git clone https://github.com/yourusername/mindmend.git
+cd mindmend
+```
 
+### Step 2: Install Dependencies
+
+```bash
 # Install frontend dependencies
 npm install
 
 # Install Firebase Functions dependencies
-cd functions && npm install && cd ..
+cd functions
+npm install
+cd ..
 ```
 
-### **Step 2: Configure Google Cloud (Vertex AI)**
+### Step 3: Firebase Setup
 
 ```bash
-# Login to Google Cloud
-gcloud auth login
-gcloud auth application-default login
+# Install Firebase CLI globally
+npm install -g firebase-tools
 
-# Set your project
-gcloud config set project your-project-id
-
-# Enable Vertex AI
-gcloud services enable aiplatform.googleapis.com
-```
-
-### **Step 3: Firebase Project Setup**
-
-```bash
 # Login to Firebase
 firebase login
 
-# Create new project (or use existing)
-firebase projects:create mindmend-your-name
-
-# Set active project
-firebase use mindmend-your-name
-
-# Initialize Firebase in project
-firebase init functions
+# Initialize Firebase project
+firebase init
 ```
 
-### **Step 4: Google Cloud APIs**
+### Step 4: Environment Configuration
+
+Create `.env.local` file:
 
 ```bash
-# Enable all required APIs
-gcloud services enable \
-  aiplatform.googleapis.com \
-  vision.googleapis.com \
-  language.googleapis.com \
-  speech.googleapis.com \
-  texttospeech.googleapis.com \
-  firebase.googleapis.com \
-  firestore.googleapis.com
+cp .env.example .env.local
 ```
 
-### **Step 5: Environment Configuration**
+Edit `.env.local` with your credentials:
 
-**Create `.env.local` file:**
-```bash
-# Firebase Configuration (Get from Firebase Console)
-VITE_FIREBASE_API_KEY=your_api_key
+```env
+# Firebase Configuration
+VITE_FIREBASE_API_KEY=your_firebase_api_key
 VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=your_project_id
 VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
 VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 VITE_FIREBASE_APP_ID=your_app_id
 
-# Google Cloud Platform
-GCP_PROJECT_ID=your_project_id
-GCP_LOCATION=asia-south1
+# AI Services
+VITE_GEMINI_API_KEY=your_gemini_api_key
+
+# Voice Services
+VITE_ELEVENLABS_API_KEY=your_elevenlabs_api_key
+
+# Database
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_key
+
+# Development
+VITE_USE_EMULATORS=false
 ```
-
-**Get Firebase Config:**
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Select your project → Project Settings → General
-3. Scroll to "Your apps" → Web app → Config
-4. Copy the config values to `.env.local`
-
-### **Step 6: Start Development Environment**
-
-#### **Starting All Emulators**
-
-Open a terminal and run this command to start all Firebase emulators:
-```bash
-cd functions
-export GCP_PROJECT_ID=your_project_id
-export GCP_LOCATION=asia-south1
-firebase emulators:start --import=./emulator-data --export-on-exit --project=mindmend-emulator \
-  --only functions,firestore,auth,storage,hosting
-```
-
-The `--import` and `--export-on-exit` flags persist emulator data between runs.
-
-#### **Starting Frontend Dev Server**
-
-Open another terminal and run:
-```bash
-npm run dev
-```
-
-#### **Accessing Emulator UI**
-After starting the emulators, you can access the Firebase Emulator Suite UI at:
-http://localhost:4000
-
-### **Step 7: Verify Installation**
-
-**Check Services:**
-- **Frontend**: http://localhost:3000
-- **Emulator UI**: http://localhost:4000
-- **Functions**: http://localhost:5001
-- **Auth**: http://localhost:9099
-- **Firestore**: http://localhost:8080
-- **Storage**: http://localhost:9199
-
-Need help applying these changes in other docs or scripts?
 
 ---
 
-## 🔧 **Troubleshooting Guide**
+## ⚙️ Configuration
 
-### **Common Issues & Solutions**
+### Firestore Collections Structure
 
-#### **🔥 Firebase Issues**
-
-**Problem**: `Firebase CLI not found`
-```bash
-# Install Firebase CLI globally
-npm install -g firebase-tools
-firebase login
+```
+users/
+├── {userId}/
+│   ├── profile: { displayName, email, photoURL }
+│   ├── progress: { completedExercises, calmPoints, streak }
+│   ├── moods/
+│   │   └── {moodId}: { mood, timestamp, notes }
+│   ├── thoughtRecords/
+│   │   └── {recordId}: { thought, distortions, response }
+│   └── chats/
+│       └── {chatId}: { messages[], timestamp }
 ```
 
-**Problem**: `Permission denied` errors
+### API Keys Setup
+
+#### Google Gemini AI
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Create new API key
+3. Add to `.env.local`
+
+#### ElevenLabs
+1. Sign up at [ElevenLabs](https://elevenlabs.io/)
+2. Get API key from dashboard
+3. Add to `.env.local`
+
+---
+
+## 🚀 Development
+
+### Start Development Server
+
 ```bash
-# Re-authenticate
-firebase logout
-firebase login
-gcloud auth application-default login
-```
-
-**Problem**: Functions deployment fails
-```bash
-# Check Node.js version (must be 18+)
-node --version
-
-# Update Firebase CLI
-npm install -g firebase-tools@latest
-```
-
-#### **☁️ Google Cloud Issues**
-
-**Problem**: `API not enabled` errors
-```bash
-# Enable all required APIs
-gcloud services enable aiplatform.googleapis.com
-gcloud services enable vision.googleapis.com
-# ... (see Step 4 above)
-```
-
-**Problem**: `Quota exceeded` errors
-```bash
-# Check quotas in Google Cloud Console
-# Go to: IAM & Admin → Quotas
-# Request quota increases if needed
-```
-
-### **🚀 Performance Optimization**
-
-#### **Firebase Functions**
-```bash
-# Increase memory allocation
-# Edit functions/package.json:
-"engines": {
-  "node": "24"
-},
-"functions": {
-  "memory": "2GB",
-  "timeout": "540s"
-}
-```
-
-## 🧪 **Comprehensive Testing Guide**
-
-### **🔥 Firebase Functions Testing**
-
-#### **1. Health Check**
-```bash
-curl http://localhost:5001/your-project/asia-south1/healthCheck | jq '.'
-# Expected: {"status": "healthy", "functions": 19, "region": "asia-south1"}
-```
-
-#### **2. Translation Metrics**
-```bash
-curl http://localhost:5001/your-project/asia-south1/streamingTranslationMetrics | jq '.'
-# Expected: Performance metrics and cache statistics
-```
-
-#### **3. Voice & Multimodal Testing**
-```bash
-# Test speech-to-text
-curl -X POST http://localhost:5001/your-project/asia-south1/speechToText \
-  -H "Content-Type: application/json" \
-  -d '{"audioData": "base64_audio_data", "language": "hi"}' | jq '.'
-
-# Test doodle analysis
-curl -X POST http://localhost:5001/your-project/asia-south1/analyzeDoodle \
-  -H "Content-Type: application/json" \
-  -d '{"imageData": "base64_image_data"}' | jq '.'
-```
-
-### **📊 Performance Benchmarks**
-
-#### **Expected Performance (Vertex AI)**
-| Test Case | Gemini 2.5 |
-|-----------|------------|
-| **Language Detection** | ~1s |
-| **Simple Translation** | ~3-4s |
-| **Complex Translation** | ~4-6s |
-| **Mental Health Context** | ~5-8s |
-
-#### **Performance Test Script**
-```bash
-# Create performance test
-cat > test-performance.sh << 'EOF'
-#!/bin/bash
-echo "🧪 MindMend Performance Test"
-echo "=========================="
-
-# Test 1: Language Detection Speed
-echo "Test 1: Language Detection (Gemini 2.5)"
-time curl -s -X POST http://localhost:5001/your-project/asia-south1/streamingTranslation \
-  -H "Content-Type: application/json" \
-  -d '{"text":"Hello","targetLanguage":"hi","streaming":false}' | jq '.performance.languageDetection'
-
-# Test 2: Translation Quality
-echo "Test 2: Translation Quality (Gemini 2.5)"
-curl -s -X POST http://localhost:5001/your-project/asia-south1/streamingTranslation \
-  -H "Content-Type: application/json" \
-  -d '{"text":"I need help with anxiety and depression","targetLanguage":"hi","streaming":false}' | jq '.confidence'
-
-# Test 3: Multilingual Chat
-echo "Test 3: Multilingual Chat Pipeline"
-time curl -s -X POST http://localhost:5001/your-project/asia-south1/chatMultilingual \
-  -H "Content-Type: application/json" \
-  -d '{"message":"मुझे चिंता की समस्या है"}' | jq '.performance.total'
-
-echo "✅ Performance test completed!"
-EOF
-
-chmod +x test-performance.sh
-./test-performance.sh
-```
-
-### **🌐 Frontend Testing**
-
-#### **1. Basic Functionality**
-```bash
-# Start frontend
+# Start Vite dev server
 npm run dev
 
-# Open http://localhost:3000
-# ✅ Check: App loads without errors
-# ✅ Check: Language selection works
-# ✅ Check: Translation is fast and accurate
+# App available at http://localhost:5173
 ```
 
-#### **2. AI Integration Test**
+### Start Firebase Emulators
+
 ```bash
-# Test AI chat
-# 1. Go to AI Coach section
-# 2. Type: "I am feeling stressed"
-# 3. ✅ Check: Response uses Gemini 2.5 (Vertex AI)
-# 4. ✅ Check: Response is contextually appropriate
-# 5. ✅ Check: Latency is acceptable (<10s)
+# Start all emulators
+firebase emulators:start
+
+# Emulator UI: http://localhost:4000
 ```
 
-### **🔍 Integration Testing**
+### Development with Emulators
 
-#### **End-to-End User Flow**
-1. **🔐 Authentication**: Test Firebase Auth
-2. **🤖 AI Chat**: Send message to Gemini-powered coach
-3. **🌍 Translation**: Test multilingual support
-4. **📊 Analytics**: Check performance metrics
-5. **🔔 Notifications**: Test FCM integration
-6. **💾 Offline**: Test offline functionality
+Set in `.env.local`:
 
-#### **Automated Test Suite**
+```env
+VITE_USE_EMULATORS=true
+```
+
+---
+
+## 🧪 Testing
+
+### Run Tests
+
 ```bash
-# Run comprehensive test suite
-npm run test:integration
+# Run all tests
+npm test
 
-# Or create custom test script
-cat > test-suite.sh << 'EOF'
-#!/bin/bash
-echo "🚀 MindMend Integration Test Suite"
-echo "================================="
+# Run tests with UI
+npm run test:ui
 
-# Test all endpoints
-endpoints=(
-  "healthCheck"
-  "streamingTranslation" 
-  "chatMultilingual"
-  "speechToText"
-  "analyzeDoodle"
-  "getAnalyticsDashboard"
-)
-
-for endpoint in "${endpoints[@]}"; do
-  echo "Testing $endpoint..."
-  curl -s "http://localhost:5001/your-project/asia-south1/$endpoint" > /dev/null
-  if [ $? -eq 0 ]; then
-    echo "✅ $endpoint: PASS"
-  else
-    echo "❌ $endpoint: FAIL"
-  fi
-done
-
-echo "🏁 Test suite completed!"
-EOF
-
-chmod +x test-suite.sh
-./test-suite.sh
+# Generate coverage report
+npm run test:coverage
 ```
 
-### **Integration Testing**
+---
 
-#### **Firebase Emulator UI**
-1. Visit: http://localhost:4000
-2. **Authentication tab**: Check for test users
-3. **Functions tab**: View function invocations
-4. **Logs**: Monitor for errors
+## 🌐 Deployment
 
-#### **End-to-End User Flow**
-1. **Login**: Test authentication flow
-2. **AI Chat**: Send message to AI coach
-3. **Mood Tracking**: Log mood entry
-4. **Exercises**: Complete CBT exercise
-5. **Progress**: Check points and streak
+### Build for Production
 
-### **Available Scripts**
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Frontend development server |
-| `npm run build` | Build for production |
-| `npm run preview` | Preview production build |
-| `firebase emulators:start` | Start Firebase emulators |
-| `firebase deploy --only functions` | Deploy functions to production |
-
-### **Production Deployment**
-
-#### **Frontend (Firebase Hosting)**
 ```bash
 npm run build
-firebase deploy --only hosting
 ```
 
-#### **Functions (Firebase Functions)**
+### Deploy to Firebase
+
 ```bash
+# Deploy everything
+firebase deploy
+
+# Deploy only hosting
+firebase deploy --only hosting
+
+# Deploy only functions
 firebase deploy --only functions
 ```
 
-#### **Complete Deployment**
-```bash
-firebase deploy
-```
+---
 
-## 📁 **Project Structure**
+## 📁 Project Structure
 
 ```
 MindMend/
-├── 📁 functions/                           # Firebase Functions (19 functions)
-│   ├── 📁 src/
-│   │   ├── 🔧 index.js                    # Functions entry point
-│   │   ├── 🔧 admin.js                    # Firebase Admin initialization
-│   │   ├── 🤖 chat.js                     # Gemini 2.5 Flash chat
-│   │   ├── 🌐 streamingTranslation.js     # Translation via Vertex AI
-│   │   ├── 🎤 voiceChat.js                # Voice-to-text chat
-│   │   ├── 🎤 speechToText.js             # Cloud Speech API
-│   │   ├── 🔊 textToSpeech.js             # Cloud Text-to-Speech API
-│   │   ├── 🎨 analyzeDoodle.js            # Cloud Vision doodle analysis
-│   │   ├── 📊 analyzeMood.js              # Cloud NLP sentiment analysis
-│   │   ├── 🔔 notifications.js            # Firebase Cloud Messaging
-│   │   └── 🩺 healthCheck.js              # System health monitoring
-│   ├── 📦 package.json                    # Node.js 24 dependencies
-│   └── 📋 firebase.json                   # Firebase configuration
-├── 📁 scripts/                            # Testing & deployment scripts
-│   ├── 🧪 quick-test.sh                   # Quick functionality test
-│   ├── 🧪 test-streaming-translation.sh   # Translation tests
-│   ├── 🚀 deploy-functions.sh             # Deploy to production
-│   └── 🔧 setup-environment.sh            # Environment setup
-├── 📁 public/
-│   └── 🔥 favicon.svg                     # App icon
-├── 📁 src/
-│   ├── 📁 components/
-│   │   ├── 🧭 Navigation.jsx              # Navigation bar
-│   │   ├── 🏠 Onboarding.jsx              # Mood selection homepage
-│   │   ├── 🧠 CBTExercise.jsx             # CBT exercise components
-│   │   ├── 📊 ProgressTracking.jsx        # Progress visualization
-│   │   ├── 🎮 Gamification.jsx            # Gamification features
-│   │   ├── 👥 Community.jsx               # Community support
-│   │   ├── 🤖 AICoach.jsx                 # AI coaching component
-│   │   ├── 📈 AIInsights.jsx              # AI-powered insights
-│   │   ├── 🎭 EmotionalTwin.jsx           # AI emotional companion
-│   │   ├── 📊 MoodAnalytics.jsx           # Mood analytics dashboard
-│   │   ├── 🆘 CrisisMode.jsx              # Crisis support mode
-│   │   ├── 🎤 VoiceInput.jsx              # Voice emotion detection
-│   │   ├── 🎨 DoodleMoodInput.jsx         # Mood through drawing
-│   │   ├── 🏥 AIGroupTherapy.jsx          # AI group therapy
-│   │   └── 🔧 Login.jsx                   # Firebase Authentication
-│   ├── 📁 services/
-│   │   ├── 🔥 firebaseConfig.js           # Firebase initialization
-│   │   ├── 🔐 authService.js              # Authentication service
-│   │   ├── 🗄️ firestoreService.js        # Firestore database
-│   │   ├── 🔔 fcmService.js               # Push notifications
-│   │   └── 💾 offlineService.js           # Offline data management
-│   ├── 📁 hooks/
-│   │   └── 🎨 useMoodTheme.js             # Mood-based theming
-│   ├── 📱 App.jsx                         # Main application
-│   ├── 🚀 index.jsx                       # React entry point
-│   └── 🎨 index.css                       # Tailwind CSS styles
-├── 📋 README.md                           # This comprehensive guide
-├── 📋 TECH_STACK.md                       # Technical documentation
-├── 📋 DEPLOYMENT_GUIDE.md                 # Deployment instructions
-├── ⚙️ firebase.json                       # Firebase project config
-├── ⚙️ storage.rules                       # Firebase Storage rules
-├── 📦 package.json                        # Frontend dependencies
-├── ⚙️ vite.config.js                      # Vite build configuration
-├── 🌍 .env.local                          # Environment variables (gitignored)
-└── 🌍 .env.example                        # Environment template
+├── public/                      # Static assets
+├── src/
+│   ├── components/              # React components
+│   │   ├── Assessment/          # BDI assessment
+│   │   ├── DistortionLibrary/   # CBT library
+│   │   ├── ThoughtRecord/       # Thought records
+│   │   ├── AICoach.jsx          # AI chat
+│   │   ├── CrisisMode.jsx       # Crisis support
+│   │   ├── Home.jsx             # Dashboard
+│   │   ├── MoodAnalytics.jsx    # Analytics
+│   │   └── ...
+│   ├── services/                # Service layer
+│   │   ├── authService.js       # Authentication
+│   │   ├── geminiService.js     # AI service
+│   │   ├── firebaseConfig.js    # Firebase setup
+│   │   └── ...
+│   ├── utils/                   # Utilities
+│   ├── App.jsx                  # Root component
+│   └── index.jsx                # Entry point
+├── functions/                   # Firebase Functions
+│   ├── src/
+│   │   ├── chat.js              # Chat functions
+│   │   ├── analytics.js         # Analytics
+│   │   └── ...
+│   └── package.json
+├── .env.example                 # Environment template
+├── firebase.json                # Firebase config
+├── package.json                 # Dependencies
+└── vite.config.js               # Vite config
 ```
-
-### 🚀 Production Deployment
-
-### 🌐 Frontend Deployment (Firebase Hosting)
-
-```bash
-# Build for production
-npm run build
-
-# Deploy to Firebase Hosting
-firebase deploy --only hosting
-
-# Custom domain (optional)
-firebase hosting:channel:deploy production --expires 30d
-```
-
-### ⚡ Functions Deployment (Firebase Functions)
-
-```bash
-# Deploy all functions to production
-firebase deploy --only functions
-
-# Deploy specific function
-firebase deploy --only functions:streamingTranslation
-
-# Deploy with environment variables
-firebase functions:config:set \
-  gcp.project_id="your-project-id" \
-  gcp.location="asia-south1"
-firebase deploy --only functions
-```
-
-### 📊 Production Monitoring
-
-```bash
-# Set up monitoring
-firebase functions:log --only streamingTranslation
-
-# Performance monitoring
-gcloud logging read "resource.type=cloud_function" \
-  --format="table(timestamp,severity,textPayload)" \
-  --limit=50
-```
-
-### 🔒 Security Configuration
-
-```bash
-# Firebase security rules
-# Edit firestore.rules:
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
-
-# Deploy security rules
-firebase deploy --only firestore:rules
-```
-
-### 💰 Cost Optimization
-
-| Service | Estimated Monthly Cost | Optimization |
-|---------|----------------------|--------------|
-| **Firebase Functions** | $10-50 | Use appropriate memory allocation |
-| **Firestore** | $5-25 | Optimize queries, use caching |
-| **Vertex AI** | $20-100 | Cache prompts/results, batch where possible, choose Flash vs Pro wisely |
-
-## 🏆 Hackathon Scoring Breakdown
-
-### **Current Implementation Score: 95/100**
-
-| Category | Points | Status | Details |
-|----------|--------|--------|---------|
-| **Google Cloud Integration** | 25/25 | ✅ Complete | 15+ GCP services, Firebase stack, Vertex AI |
-| **Technical Innovation** | 20/20 | ✅ Complete | Multilingual AI, Mumbai region, real-time |
-| **User Experience** | 18/20 | ✅ Excellent | React 19, responsive, accessibility |
-| **Social Impact** | 15/15 | ✅ Complete | Mental health, 10 Indian languages, crisis support |
-| **Code Quality** | 12/15 | ✅ Good | ES6 modules, functional approach, documentation |
-| **Demo Readiness** | 5/5 | ✅ Ready | Live deployment, comprehensive testing |
-
-### **Key Differentiators**
-- **🌍 Mumbai Region**: All AI models running from asia-south1
-- **🗣️ 10 Languages**: Full multilingual support for Indian users  
-- **⚡ Performance**: 7.2s multilingual pipeline response time
-- **🔥 Firebase Stack**: 19 serverless functions, real-time database
-- **🤖 Advanced AI**: Gemini 2.5 Flash/Pro, crisis detection, sentiment analysis
-
-## 🤝 Contributing
-
-We welcome contributions to MindMend! Please follow these steps:
-
-1. **Fork the repository**
-2. **Create a feature branch:**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Commit your changes:**
-   ```bash
-   git commit -m 'Add some amazing feature'
-   ```
-4. **Push to the branch:**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-5. **Open a Pull Request**
-
-### Development Guidelines
-- Follow React best practices and functional patterns
-- Use Firebase for all backend services
-- Ensure Mumbai region (asia-south1) for all Google Cloud services
-- Test multilingual functionality thoroughly
-- Write meaningful commit messages
-- Document all new Google Cloud integrations
-
-## 🆘 Mental Health Resources
-
-If you're experiencing a mental health crisis, please reach out immediately:
-
-**India:**
-- **AASRA**: 9820466726
-- **iCall**: 9152987821
-- **Sneha**: 044-24640050
-
-**International:**
-- **National Suicide Prevention Lifeline**: 988
-- **Crisis Text Line**: Text HOME to 741741
-- **International Association for Suicide Prevention**: https://www.iasp.info/resources/Crisis_Centres/
-
-## 🏆 Hackathon Achievement
-
-**Google Gen AI Exchange Hackathon 2025**
-- **Score**: 95/100 🏆
-- **Category**: Mental Health & Social Impact
-- **Innovation**: Multilingual AI Mental Health Platform
-- **Region**: Asia-South1 (Mumbai) Optimized
-- **Services**: 15+ Google Cloud Services Integrated
-
-## 🙏 Acknowledgments
-
-- Built with ❤️ for mental health awareness and the Google Gen AI Exchange Hackathon
-- Powered by Google Cloud's comprehensive AI ecosystem
-- Optimized for Indian users with multilingual support
-- Inspired by evidence-based CBT practices and cultural sensitivity
-- Special thanks to the Google Cloud team for the amazing AI tools
 
 ---
 
-**⚠️ Disclaimer**: This application is not a substitute for professional mental health treatment. Please consult with a qualified mental health professional for serious mental health concerns.
+## 📚 Key Services Explained
 
-**👨‍💻 Maintainers**: 
-- [curiouscoder](https://github.com/curiouscoder-cmd) - Lead Developer  
-- [GreenHacker](https://github.com/GreenHacker420) - Technical Contributor
-- Built for Google Gen AI Exchange Hackathon 2025
+### Distortion Detection Service
+Located in `src/services/distortionDetection.js`
 
-## 🤖 Advanced Gemini Features
+**Purpose**: AI-powered cognitive distortion identification
 
-#### ✅ Implemented Features
+**Features**:
+- Analyzes user thoughts using Gemini 2.0
+- Identifies top 2-3 distortions with confidence scores
+- Provides compassionate reframe suggestions
+- Fallback to keyword-based detection
+- localStorage CRUD operations
 
-- **Streaming Chat**: Real-time token streaming with Server-Sent Events (SSE)
-- **Function Calling**: getMoodInsights, suggestExercise, scheduleReminder
-- **Multi-turn Chat Sessions**: Stateful conversations with context preservation
-- **Multimodal Analysis**: Image + text input with doodle analysis
-- **Context Caching**: Reduce API costs and get faster responses
-- **Structured Output**: JSON mode with typed responses
+**Usage**:
+```javascript
+import { analyzeThought } from './services/distortionDetection';
 
-#### 📁 Files Created
-- `functions/src/geminiAdvanced.js` - Backend implementations
-- `src/services/geminiAdvancedService.js` - Frontend client
+const result = await analyzeThought(userThought);
+// Returns: { distortions: [], aiSuggestion: string }
+```
 
-#### 🚀 Next Steps
-1. Restart emulators: `firebase emulators:start`
-2. Test new features
-3. Integrate into UI components
+### Gemini Service
+Located in `src/services/geminiService.js`
 
-All features use @google/genai v1.27.0 latest API!
+**Purpose**: Interface with Google Gemini AI
 
-### 🌐 Browser Support
+**Features**:
+- Chat response generation
+- Mood pattern analysis
+- Personalized exercise suggestions
+- Mental health context integration
+- Fallback responses
 
-| Browser | Version |
-|---------|---------|
-| Chrome | Latest ✅ |
-| Firefox | Latest ✅ |
-| Safari | Latest ✅ |
-| Edge | Latest ✅ |
+**Usage**:
+```javascript
+import { GeminiService } from './services/geminiService';
+
+const response = await GeminiService.generateChatResponse(
+  message,
+  moodHistory,
+  userProgress
+);
+```
+
+### ElevenLabs TTS Service
+Located in `src/services/elevenLabsService.js`
+
+**Purpose**: High-quality text-to-speech
+
+**Features**:
+- Multiple voice profiles
+- Streaming audio
+- Emotion-aware synthesis
+- Caching for performance
+
+**Usage**:
+```javascript
+import { generateSpeech } from './services/elevenLabsService';
+
+const audioUrl = await generateSpeech(text, voiceId);
+```
+
+---
+
+## 🔒 Security & Privacy
+
+- **Authentication**: Firebase Authentication with Google Sign-In
+- **Data Encryption**: All data encrypted in transit and at rest
+- **HIPAA Compliance**: Designed with healthcare privacy in mind
+- **No PHI Storage**: Personal health information stored securely
+- **User Control**: Users can delete their data anytime
+
+---
 
 ## 🤝 Contributing
 
-We welcome contributions to MindMend! Please follow these steps:
+We welcome contributions! Please see our contributing guidelines.
 
-1. **Fork the repository**
-2. **Create a feature branch:**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Commit your changes:**
-   ```bash
-   git commit -m 'Add some amazing feature'
-   ```
-4. **Push to the branch:**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-5. **Open a Pull Request**
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Open Pull Request
 
-### Development Guidelines
-- Follow React best practices and hooks patterns
-- Use Tailwind CSS for styling
-- Ensure responsive design across all devices
-- Write meaningful commit messages
-- Test your changes thoroughly
+---
+
+## 📄 License
+
+This project is licensed under the ISC License.
+
+---
+
+## 🙏 Acknowledgments
+
+- **David Burns, M.D.** - "Feeling Good: The New Mood Therapy"
+- **Google Gemini AI** - Advanced AI capabilities
+- **Firebase** - Backend infrastructure
+- **ElevenLabs** - Natural voice synthesis
+- **React Community** - Excellent ecosystem
+
+---
 
 
 ## 🆘 Mental Health Resources
@@ -842,12 +610,6 @@ If you're experiencing a mental health crisis, please reach out immediately:
 - **Crisis Text Line**: Text HOME to 741741
 - **International Association for Suicide Prevention**: https://www.iasp.info/resources/Crisis_Centres/
 
-## 🙏 Acknowledgments
-
-- Built with ❤️ for mental health awareness
-- Inspired by evidence-based CBT practices
-- Designed with accessibility and user experience in mind
-- Special thanks to the mental health community for guidance and feedback
 
 ---
 
@@ -856,6 +618,3 @@ If you're experiencing a mental health crisis, please reach out immediately:
 **👨‍💻 Maintainers**: 
 - [GreenHacker](https://github.com/GreenHacker420) (harsh@greenhacker.tech)
 - [curiouscoder-cmd](https://github.com/curiouscoder-cmd) (nitya@curiouscoder.live)
-
-
-```

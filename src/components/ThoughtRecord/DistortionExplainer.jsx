@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { generatePersonalizedDistortionExplanation, generateDynamicDistortionQuestions } from '../../services/distortionDetection';
 
 // Normalize incoming types/names to canonical keys used below
 const normalizeType = (raw) => {
@@ -34,7 +35,34 @@ const normalizeType = (raw) => {
   return aliases[compact] || aliases[s.replace(/\s+/g, '-')] || compact;
 };
 
-const DistortionExplainer = ({ distortion, isOpen, onClose }) => {
+const DistortionExplainer = ({ distortion, isOpen, onClose, automaticThought = null }) => {
+  const [personalizedExplanation, setPersonalizedExplanation] = React.useState(null);
+  const [dynamicQuestions, setDynamicQuestions] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isOpen && automaticThought && distortion) {
+      loadPersonalizedContent();
+    }
+  }, [isOpen, automaticThought, distortion]);
+
+  const loadPersonalizedContent = async () => {
+    setIsLoading(true);
+    try {
+      const [explanationResult, questionsResult] = await Promise.all([
+        generatePersonalizedDistortionExplanation(automaticThought, distortion.name || distortion.type),
+        generateDynamicDistortionQuestions(automaticThought, distortion.name || distortion.type)
+      ]);
+      
+      setPersonalizedExplanation(explanationResult.explanation);
+      setDynamicQuestions(questionsResult.questions);
+    } catch (error) {
+      console.error('Error loading personalized content:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (!distortion) return null;
 
   const explanations = {
@@ -237,12 +265,46 @@ const DistortionExplainer = ({ distortion, isOpen, onClose }) => {
 
               {/* Content */}
               <div className="p-6 space-y-6">
+                {/* Personalized Explanation */}
+                {isLoading ? (
+                  <div className="flex items-center gap-2 text-navy/60">
+                    <div className="animate-spin w-4 h-4 border-2 border-navy border-t-transparent rounded-full"></div>
+                    <span className="text-sm font-light">Generating personalized insights...</span>
+                  </div>
+                ) : personalizedExplanation ? (
+                  <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                    <h3 className="text-sm font-normal text-blue-800 mb-2 uppercase tracking-wider">
+                      💡 Your Personalized Insight
+                    </h3>
+                    <p className="text-blue-900 font-light text-sm leading-relaxed">
+                      {personalizedExplanation}
+                    </p>
+                  </div>
+                ) : null}
+
                 {/* Description */}
                 <div>
                   <p className="text-navy/80 font-light leading-relaxed">
                     {info.description}
                   </p>
                 </div>
+
+                {/* Dynamic Questions */}
+                {dynamicQuestions && dynamicQuestions.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-normal text-navy mb-3 flex items-center gap-2">
+                      <span className="text-purple-500">🤔</span> Questions to Challenge This
+                    </h3>
+                    <ul className="space-y-3">
+                      {dynamicQuestions.map((q, idx) => (
+                        <li key={idx} className="bg-purple-50 border border-purple-200 p-3 rounded">
+                          <p className="text-navy font-normal text-sm mb-1">{q.question}</p>
+                          <p className="text-navy/60 font-light text-xs italic">{q.hint}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
 
                 {/* Red Flags */}
                 {info.redFlags.length > 0 && (

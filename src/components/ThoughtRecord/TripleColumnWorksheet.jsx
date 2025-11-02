@@ -6,6 +6,7 @@ import SocraticQuestions from './SocraticQuestions';
 import ThoughtRecordHistory from './ThoughtRecordHistory';
 import { detectDistortions, saveThoughtRecord, validateRationalResponse, analyzeQuestionAnswers } from '../../services/distortionDetection';
 import { saveThoughtRecordToFirestore } from '../../services/thoughtRecordService';
+import { saveThoughtExerciseSession, updateThoughtExerciseSession } from '../../services/thoughtExerciseService';
 
 const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavigate = null, user = null }) => {
   console.log('🎨 TripleColumnWorksheet rendering...');
@@ -29,6 +30,10 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
   const [answersApproved, setAnswersApproved] = useState(false);
   const [responseValidated, setResponseValidated] = useState(false);
   const [isValidatingResponse, setIsValidatingResponse] = useState(false);
+  const [thoughtIntensity, setThoughtIntensity] = useState(5);
+  const [responseIntensity, setResponseIntensity] = useState(5);
+  const [currentSessionId, setCurrentSessionId] = useState(null);
+  const [dynamicQuestions, setDynamicQuestions] = useState([]);
 
   // Auto-analyze when thought is provided
   useEffect(() => {
@@ -56,6 +61,25 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
         setDistortions(result.distortions);
         setCurrentStep(2);
         setRationalResponse('');
+
+        // Save initial session to Firestore
+        if (user && user.uid) {
+          const sessionData = {
+            automaticThought: automaticThought,
+            thoughtIntensity: thoughtIntensity,
+            distortions: result.distortions,
+            questions: [],
+            userAnswers: {},
+            rationalResponse: '',
+            responseIntensity: 5
+          };
+
+          const savedSession = await saveThoughtExerciseSession(user.uid, sessionData);
+          if (savedSession) {
+            setCurrentSessionId(savedSession.id);
+            console.log('💾 Session saved:', savedSession.id);
+          }
+        }
       } else {
         alert('No distortions detected. Please try another thought.');
       }
@@ -162,6 +186,17 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
         try {
           await saveThoughtRecordToFirestore(user.uid, record);
           console.log('✅ Saved to both localStorage and Firestore');
+
+          // Update exercise session with final data
+          if (currentSessionId) {
+            await updateThoughtExerciseSession(user.uid, currentSessionId, {
+              rationalResponse: rationalResponse.trim(),
+              responseIntensity: responseIntensity,
+              userAnswers: questionAnswers,
+              questions: dynamicQuestions
+            });
+            console.log('✅ Exercise session updated');
+          }
         } catch (firestoreError) {
           console.error('Failed to save to Firestore, but saved locally:', firestoreError);
         }
@@ -419,6 +454,9 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
                 setQuestionAnswers(answers);
               }}
               onSubmitAnswers={handleSubmitAnswers}
+              onQuestionsLoaded={(questions) => {
+                setDynamicQuestions(questions);
+              }}
             />
           </div>
         )}
@@ -483,6 +521,7 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
         distortion={selectedDistortion}
         isOpen={showDistortionExplainer}
         onClose={() => setShowDistortionExplainer(false)}
+        automaticThought={automaticThought}
       />
     </div>
   );
