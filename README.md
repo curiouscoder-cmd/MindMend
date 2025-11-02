@@ -1,7 +1,7 @@
 # MindMend - AI-Powered Mental Wellness Platform
 
-![Last Commit](https://img.shields.io/badge/Last%20Commit-2025--11--01-blue.svg)
-![Version](https://img.shields.io/badge/Version-3.0.0-green.svg)
+![Last Commit](https://img.shields.io/badge/Last%20Commit-2025--11--02-blue.svg)
+![Version](https://img.shields.io/badge/Version-3.1.0-green.svg)
 [![Primary Language](https://img.shields.io/badge/Language-JavaScript-yellow.svg)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Google Cloud](https://img.shields.io/badge/Google%20Cloud-Firebase%20%2B%20Vertex%20AI-4285F4.svg)](https://cloud.google.com/)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Firebase-FF6F00.svg)](https://mindmend-25dca.web.app/)
@@ -34,8 +34,75 @@
 ## 🤖 AI Architecture
 
 - **Primary**: Vertex AI Gemini 2.5 (Flash/Pro) for reasoning, chat, and translation
+- **CBT Engine**: Gemini 2.0 Flash for distortion detection, answer analysis, and response validation
 - **Multimodal**: Cloud Vision, Cloud Speech-to-Text, Cloud Text-to-Speech
 - **Data**: Firestore for realtime storage and user data
+
+## 🧠 CBT Thought Record Workflow
+
+### **Complete User Journey**
+
+```
+1️⃣ Enter Negative Thought
+   ↓ User types automatic negative thought
+   ↓ Click "Analyze Thought →"
+   
+2️⃣ AI Distortion Detection (Gemini 2.0 Flash)
+   ↓ AI analyzes thought pattern
+   ↓ Identifies cognitive distortions with confidence scores
+   ↓ Displays vibrant color-coded badges
+   ↓ Click badge → View detailed explanation modal
+   
+3️⃣ Distortion-Specific Questions
+   ↓ Click "Write Response →"
+   ↓ System generates 3 Socratic questions based on distortion type
+   ↓ User answers each question (any length)
+   ↓ Quality meter shows progress: 33% → 66% → 100%
+   
+4️⃣ Answer Validation (AI Analysis)
+   ↓ "🔍 Analyze My Answers" button appears
+   ↓ User clicks → AI analyzes answers
+   ↓ Shows "⏳ Analyzing Your Answers..."
+   ↓ AI evaluates: genuine reflection, understanding, evidence
+   ↓ If approved: ✅ "Great reflection! You can now write your response"
+   ↓ If needs work: ⚠️ Feedback + specific suggestions
+   ↓ Response field unlocks only after approval
+   
+5️⃣ Write Rational Response
+   ↓ User writes their own balanced response
+   ↓ No templates or auto-generation
+   ↓ Active therapeutic engagement
+   ↓ Click "🔍 Analyze Response" below textarea
+   
+6️⃣ Response Validation (AI Analysis)
+   ↓ Shows "⏳ Analyzing Response..."
+   ↓ AI validates: challenges thought, provides evidence, realistic
+   ↓ If valid: ✅ "Great! You can now save it"
+   ↓ If invalid: ⚠️ Feedback + improvement suggestions
+   ↓ User can edit and re-analyze
+   
+7️⃣ Save Entry
+   ↓ "💾 Save Entry" button enabled only after validation
+   ↓ Saves to localStorage + Firestore
+   ↓ Shows success message
+   ↓ Entry added to history
+```
+
+### **AI Validation Criteria**
+
+**Answer Analysis (Encouraging)**:
+- Shows genuine reflection (not superficial)
+- Demonstrates understanding of thought pattern
+- Provides evidence or reasoning
+- Honest and thoughtful engagement
+- **Approves if ANY genuine effort shown**
+
+**Response Validation (Strict)**:
+- Directly challenges the negative thought
+- Provides evidence or logical reasoning
+- Realistic and grounded (no toxic positivity)
+- Actually helps reframe the thought
+- Shows understanding of core issue
 
 ## 🏆 Hackathon Implementation Status
 
@@ -84,15 +151,43 @@
 - Intuitive mood selection with visual feedback
 - Clean, calming design with soft color palette
 
-#### 🧠 Tailored CBT Experience
-- Personalized cognitive behavioral therapy exercises based on selected mood
-- Multi-step guided exercises including:
+#### 🧠 Advanced CBT Thought Record System
+- **AI-Powered Distortion Detection**: Automatically identifies cognitive distortions in negative thoughts
+  - 10 distortion types: All-or-Nothing, Overgeneralization, Mental Filter, Disqualifying Positive, Jumping to Conclusions, Magnification, Emotional Reasoning, Should Statements, Labeling, Personalization
+  - Vibrant color-coded badges for easy identification
+  - Interactive explainer modals with detailed descriptions and challenge strategies
+  
+- **Distortion-Specific Socratic Questions**: 
+  - Dynamic question sets tailored to each detected distortion type
+  - 3 guided reflection questions per distortion
+  - Real-time quality meter tracking answer completion
+  - Generic fallback questions for comprehensive coverage
+
+- **Three-Stage AI Validation Workflow**:
+  1. **Distortion Analysis**: AI detects cognitive distortions with confidence scores
+  2. **Answer Validation**: AI analyzes Socratic question responses for genuine reflection
+     - Encouraging approach: approves any genuine effort
+     - Provides specific feedback and improvement suggestions
+     - Unlocks response field only after approval
+  3. **Response Validation**: AI validates rational response before saving
+     - Ensures response effectively challenges negative thought
+     - Checks for evidence, logic, and realistic reframing
+     - Prevents saving until response meets CBT standards
+
+- **User-Driven Response Writing**:
+  - No templates or auto-generation
+  - Users write their own rational responses
+  - Active engagement promotes therapeutic learning
+  - Response field locked until questions are approved
+
+- **Multi-Step Guided Exercises**:
   - Breathing exercises with timer
   - Reflection and journaling prompts
   - Grounding techniques (5-4-3-2-1 method)
   - Thought challenging and reframing
   - Self-compassion practices
   - Solution-focused activities
+
 - **Voice Input Integration**: Express emotions through voice with AI-powered emotion detection
 - **Doodle Mood Input**: Draw your feelings and get AI-powered mood analysis
 - **Emotional Twin**: AI companion that learns and mirrors your emotional patterns
@@ -108,7 +203,11 @@
 - **Crisis Support Network**: 24/7 peer support for urgent situations
 
 #### 🤖 AI-Powered Features
-- **Personal AI Coach**: Personalized guidance and check-ins with Google AI integration
+- **Personal AI Coach**: Personalized guidance and check-ins with Gemini 2.5 integration
+- **Cognitive Distortion Detection**: AI identifies 10 types of distorted thinking patterns
+- **Socratic Question Generation**: Context-aware questions tailored to specific distortions
+- **Answer Quality Analysis**: AI evaluates reflection depth and provides encouraging feedback
+- **Response Validation**: Comprehensive AI validation ensuring CBT effectiveness
 - **Smart Insights**: AI-driven analysis of mood patterns and triggers
 - **Adaptive Recommendations**: Customized exercise suggestions based on progress
 - **Crisis Detection**: AI monitoring for signs of mental health crises
@@ -164,6 +263,110 @@
 3. Integrate into UI components
 
 All features use @google/genai v1.27.0 latest API!
+
+## 🧠 CBT Technical Implementation
+
+### **AI Functions**
+
+#### **1. detectDistortions(thought)**
+```javascript
+// Location: src/services/distortionDetection.js
+// Model: Gemini 2.0 Flash
+// Purpose: Analyze negative thought and identify cognitive distortions
+
+Returns:
+{
+  distortions: [
+    {
+      type: "all-or-nothing",
+      name: "All-or-Nothing Thinking",
+      confidence: 0.85,
+      explanation: "Seeing things in black-and-white..."
+    }
+  ]
+}
+```
+
+#### **2. analyzeQuestionAnswers(thought, answers, distortions)**
+```javascript
+// Location: src/services/distortionDetection.js
+// Model: Gemini 2.0 Flash
+// Purpose: Validate Socratic question responses
+// Temperature: 0.5 (encouraging approach)
+
+Returns:
+{
+  approved: true/false,
+  message: "Great reflection! You can now write your response.",
+  suggestion: "Try adding specific examples..."
+}
+```
+
+#### **3. validateRationalResponse(thought, response, distortions)**
+```javascript
+// Location: src/services/distortionDetection.js
+// Model: Gemini 2.0 Flash
+// Purpose: Validate rational response effectiveness
+// Temperature: 0.3 (strict validation)
+
+Returns:
+{
+  isRational: true/false,
+  feedback: "This directly challenges the distortion...",
+  suggestion: "Consider adding evidence..."
+}
+```
+
+### **Key Components**
+
+| Component | Purpose | Features |
+|-----------|---------|----------|
+| **TripleColumnWorksheet** | Main CBT interface | 3-column layout, step management, validation flow |
+| **DistortionBadge** | Visual distortion display | Color-coded badges, type normalization |
+| **DistortionExplainer** | Educational modal | Descriptions, red flags, challenge strategies |
+| **SocraticQuestions** | Guided reflection | Dynamic questions, quality meter, answer analysis |
+| **ThoughtRecordHistory** | Past entries | View saved records, track progress |
+
+### **Data Flow**
+
+```
+User Input → detectDistortions() → Display Badges
+                                  ↓
+                    Generate Distortion-Specific Questions
+                                  ↓
+User Answers → analyzeQuestionAnswers() → Unlock Response Field
+                                         ↓
+User Writes Response → validateRationalResponse() → Enable Save
+                                                   ↓
+                                    Save to localStorage + Firestore
+```
+
+### **Normalization System**
+
+Handles AI output variations:
+```javascript
+// Aliases mapped to canonical types
+"mind-reading" → "jumping-to-conclusions"
+"fortune-telling" → "jumping-to-conclusions"
+"catastrophizing" → "magnification"
+"black-and-white" → "all-or-nothing"
+```
+
+### **Storage**
+
+- **localStorage**: Offline-first, immediate access
+- **Firestore**: Cloud sync, cross-device access
+- **Structure**:
+```javascript
+{
+  automaticThought: string,
+  distortions: array,
+  questionAnswers: object,
+  rationalResponse: string,
+  timestamp: date,
+  userId: string
+}
+```
 
 ## 🛠️ Installation & Setup Guide
 
@@ -586,6 +789,12 @@ MindMend/
 │   │   ├── 🧭 Navigation.jsx              # Navigation bar
 │   │   ├── 🏠 Onboarding.jsx              # Mood selection homepage
 │   │   ├── 🧠 CBTExercise.jsx             # CBT exercise components
+│   │   ├── 📁 ThoughtRecord/              # Advanced CBT Thought Record System
+│   │   │   ├── TripleColumnWorksheet.jsx # Main CBT worksheet component
+│   │   │   ├── DistortionBadge.jsx       # Color-coded distortion badges
+│   │   │   ├── DistortionExplainer.jsx   # Interactive distortion modals
+│   │   │   ├── SocraticQuestions.jsx     # Dynamic question generation
+│   │   │   └── ThoughtRecordHistory.jsx  # Saved entries history
 │   │   ├── 📊 ProgressTracking.jsx        # Progress visualization
 │   │   ├── 🎮 Gamification.jsx            # Gamification features
 │   │   ├── 👥 Community.jsx               # Community support
@@ -602,6 +811,8 @@ MindMend/
 │   │   ├── 🔥 firebaseConfig.js           # Firebase initialization
 │   │   ├── 🔐 authService.js              # Authentication service
 │   │   ├── 🗄️ firestoreService.js        # Firestore database
+│   │   ├── 🧠 distortionDetection.js      # AI distortion detection & validation
+│   │   ├── 📝 thoughtRecordService.js     # Thought record CRUD operations
 │   │   ├── 🔔 fcmService.js               # Push notifications
 │   │   └── 💾 offlineService.js           # Offline data management
 │   ├── 📁 hooks/
