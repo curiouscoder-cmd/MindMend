@@ -104,7 +104,10 @@ const BDIAssessment = ({ onBack, onNavigate, user }) => {
           type: 'BDI',
           score: results.score,
           severity: results.severity,
-          category: results.category,
+          level: results.level,
+          interpretation: results.interpretation,
+          criticalAlert: results.criticalAlert,
+          suicidalIdeation: results.suicidalIdeation,
           answers: finalAnswers,
           timestamp: serverTimestamp(),
           completedAt: new Date().toISOString()
