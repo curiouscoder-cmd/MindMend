@@ -209,13 +209,15 @@ const questionsByDistortion = {
   }
 };
 
-const SocraticQuestions = ({ automaticThought, distortions, onQualityChange, onAnswersChange }) => {
+const SocraticQuestions = ({ automaticThought, distortions, onQualityChange, onAnswersChange, onSubmitAnswers }) => {
   const [answers, setAnswers] = useState({
     q1: '',
     q2: '',
     q3: ''
   });
   const [expandedQuestion, setExpandedQuestion] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisFeedback, setAnalysisFeedback] = useState(null);
 
   // Get questions based on primary distortion
   const getQuestions = () => {
@@ -226,6 +228,8 @@ const SocraticQuestions = ({ automaticThought, distortions, onQualityChange, onA
     const d = distortions[0];
     const primaryDistortion = normalizeType(d.type || d.name);
     const distortionQuestions = questionsByDistortion[primaryDistortion];
+
+    console.log('🔍 Primary distortion:', primaryDistortion, 'from', d);
 
     if (distortionQuestions) {
       return distortionQuestions.questions.slice(0, 3);
@@ -241,13 +245,45 @@ const SocraticQuestions = ({ automaticThought, distortions, onQualityChange, onA
 
   const questions = getQuestions();
 
+  const handleSubmitAnswers = async () => {
+    setIsAnalyzing(true);
+    setAnalysisFeedback(null);
+
+    try {
+      if (onSubmitAnswers) {
+        const result = await onSubmitAnswers(answers);
+        if (result.approved) {
+          setAnalysisFeedback({
+            type: 'success',
+            message: result.message || '✅ Great reflection! You can now write your rational response.'
+          });
+        } else {
+          setAnalysisFeedback({
+            type: 'warning',
+            message: result.message || '⚠️ Please provide more thoughtful answers.',
+            suggestion: result.suggestion
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error analyzing answers:', error);
+      setAnalysisFeedback({
+        type: 'error',
+        message: 'Failed to analyze answers. Please try again.'
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
   const calculateQuality = () => {
     const questionAnswers = [answers.q1, answers.q2, answers.q3];
-    const filledAnswers = questionAnswers.filter(a => a.trim().length > 20).length;
+    const filledAnswers = questionAnswers.filter(a => a.trim().length > 0).length;
     return Math.round((filledAnswers / 3) * 100);
   };
 
   const quality = calculateQuality();
+  const allQuestionsAnswered = answers.q1.trim().length > 0 && answers.q2.trim().length > 0 && answers.q3.trim().length > 0;
 
   const handleAnswerChange = (id, value) => {
     const newAnswers = { ...answers, [id]: value };
@@ -256,7 +292,7 @@ const SocraticQuestions = ({ automaticThought, distortions, onQualityChange, onA
     // Notify parent of quality change
     if (onQualityChange) {
       const newQuality = Math.round(
-        (Object.values(newAnswers).filter(a => a.trim().length > 20).length / 3) * 100
+        (Object.values(newAnswers).filter(a => a.trim().length > 0).length / 3) * 100
       );
       onQualityChange(newQuality);
     }
@@ -346,6 +382,41 @@ const SocraticQuestions = ({ automaticThought, distortions, onQualityChange, onA
             );
           })}
         </div>
+
+        {/* Submit Button */}
+        {allQuestionsAnswered && (
+          <div className="mt-6">
+            <button
+              onClick={handleSubmitAnswers}
+              disabled={isAnalyzing}
+              className="w-full bg-ocean text-white py-3 px-6 font-normal text-sm hover:bg-ocean/90 disabled:bg-ocean/50 disabled:cursor-not-allowed transition-all rounded"
+            >
+              {isAnalyzing ? '⏳ Analyzing Your Answers...' : '🔍 Analyze My Answers'}
+            </button>
+          </div>
+        )}
+
+        {/* Analysis Feedback */}
+        {analysisFeedback && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`mt-4 p-4 rounded ${
+              analysisFeedback.type === 'success' 
+                ? 'bg-green-50 text-green-800 border border-green-200' 
+                : analysisFeedback.type === 'warning'
+                ? 'bg-yellow-50 text-yellow-800 border border-yellow-200'
+                : 'bg-red-50 text-red-800 border border-red-200'
+            }`}
+          >
+            <p className="text-sm font-normal">{analysisFeedback.message}</p>
+            {analysisFeedback.suggestion && (
+              <p className="text-xs mt-2 opacity-80">
+                💡 {analysisFeedback.suggestion}
+              </p>
+            )}
+          </motion.div>
+        )}
       </div>
 
       {/* Quality Indicator */}
@@ -369,7 +440,8 @@ const SocraticQuestions = ({ automaticThought, distortions, onQualityChange, onA
         <p className="text-xs text-navy/50 font-light mt-2">
           {quality < 33 && 'Take your time - answer thoughtfully'}
           {quality >= 33 && quality < 66 && 'Good progress - keep going'}
-          {quality >= 66 && 'Great reflection! Ready to write your response'}
+          {quality >= 66 && quality < 100 && 'Almost there - complete all questions'}
+          {quality === 100 && allQuestionsAnswered && 'All questions answered! Click "Analyze My Answers" above'}
         </p>
       </div>
 

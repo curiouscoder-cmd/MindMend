@@ -4,7 +4,7 @@ import DistortionBadge from './DistortionBadge';
 import DistortionExplainer from './DistortionExplainer';
 import SocraticQuestions from './SocraticQuestions';
 import ThoughtRecordHistory from './ThoughtRecordHistory';
-import { detectDistortions, saveThoughtRecord, validateRationalResponse, improveRationalResponse, generateResponseFromUserAnswers } from '../../services/distortionDetection';
+import { detectDistortions, saveThoughtRecord, validateRationalResponse, analyzeQuestionAnswers } from '../../services/distortionDetection';
 import { saveThoughtRecordToFirestore } from '../../services/thoughtRecordService';
 
 const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavigate = null, user = null }) => {
@@ -26,7 +26,9 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
   const [showDistortionExplainer, setShowDistortionExplainer] = useState(false);
   const [questionQuality, setQuestionQuality] = useState(0);
   const [questionAnswers, setQuestionAnswers] = useState({ q1: '', q2: '', q3: '' });
-  const [isImprovingResponse, setIsImprovingResponse] = useState(false);
+  const [answersApproved, setAnswersApproved] = useState(false);
+  const [responseValidated, setResponseValidated] = useState(false);
+  const [isValidatingResponse, setIsValidatingResponse] = useState(false);
 
   // Auto-analyze when thought is provided
   useEffect(() => {
@@ -70,6 +72,61 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
     setShowDistortionExplainer(true);
   };
 
+  const handleSubmitAnswers = async (answers) => {
+    try {
+      const result = await analyzeQuestionAnswers(automaticThought, answers, distortions);
+      
+      if (result.approved) {
+        setAnswersApproved(true);
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Error submitting answers:', error);
+      return {
+        approved: false,
+        message: 'Failed to analyze answers. Please try again.'
+      };
+    }
+  };
+
+  const handleValidateResponse = async () => {
+    if (!rationalResponse.trim()) {
+      alert('Please write a rational response first');
+      return;
+    }
+
+    setIsValidatingResponse(true);
+    setValidationFeedback(null);
+
+    try {
+      const validation = await validateRationalResponse(automaticThought, rationalResponse, distortions);
+      
+      if (validation.isRational) {
+        setResponseValidated(true);
+        setValidationFeedback({
+          type: 'success',
+          message: validation.feedback || '✅ Great! Your response effectively challenges the negative thought. You can now save it.'
+        });
+      } else {
+        setResponseValidated(false);
+        setValidationFeedback({
+          type: 'warning',
+          message: validation.feedback || '⚠️ Your response needs improvement to effectively challenge the thought.',
+          suggestion: validation.suggestion
+        });
+      }
+    } catch (error) {
+      console.error('Error validating response:', error);
+      setValidationFeedback({
+        type: 'error',
+        message: 'Failed to validate response. Please try again.'
+      });
+    } finally {
+      setIsValidatingResponse(false);
+    }
+  };
+
 
   const handleSaveRecord = async () => {
     if (!automaticThought.trim()) {
@@ -82,26 +139,14 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
       return;
     }
 
-    setIsValidating(true);
-    setValidationFeedback(null);
+    if (!responseValidated) {
+      alert('Please validate your response first by clicking "Analyze Response"');
+      return;
+    }
+
+    setIsSaving(true);
 
     try {
-      // Validate the rational response
-      const validation = await validateRationalResponse(automaticThought, rationalResponse, distortions);
-      
-      if (!validation.isRational) {
-        setValidationFeedback({
-          type: 'warning',
-          message: validation.feedback || 'This response may not be fully rational. Please revise it.',
-          suggestion: validation.suggestion
-        });
-        setIsValidating(false);
-        return;
-      }
-
-      // If validation passes, save the record
-      setIsSaving(true);
-
       const record = {
         automaticThought: automaticThought.trim(),
         distortions,
@@ -148,7 +193,6 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
       alert('Failed to save thought record. Please try again.');
     } finally {
       setIsSaving(false);
-      setIsValidating(false);
     }
   };
 
@@ -330,18 +374,31 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
                       onChange={(e) => {
                         setRationalResponse(e.target.value);
                         setValidationFeedback(null);
+                        setResponseValidated(false); // Reset validation when user edits
                       }}
-                      placeholder={questionQuality === 0 ? 'Answer the questions below first...' : 'Your response will appear here...'}
-                      disabled={questionQuality === 0}
+                      placeholder={!answersApproved ? 'Complete and submit the questions below first...' : 'Write your balanced, rational response here...'}
+                      disabled={!answersApproved}
                       className={`w-full h-32 p-4 bg-navy/5 border border-navy/20 text-navy placeholder:text-navy/40 font-light text-sm focus:outline-none focus:border-navy transition-all resize-none rounded ${
-                        questionQuality === 0 ? 'opacity-50 cursor-not-allowed' : ''
+                        !answersApproved ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     />
                     
-                    {questionQuality === 0 && (
+                    {!answersApproved && (
                       <p className="text-xs text-navy/50 font-light mt-2 italic">
-                        💡 Answer the questions below to unlock this field
+                        💡 Answer all questions below and click "Analyze My Answers" to unlock this field
                       </p>
+                    )}
+
+                    {answersApproved && rationalResponse.trim() && (
+                      <div className="mt-4">
+                        <button
+                          onClick={handleValidateResponse}
+                          disabled={isValidatingResponse}
+                          className="w-full bg-ocean text-white py-3 px-6 font-normal text-sm hover:bg-ocean/90 disabled:bg-ocean/50 disabled:cursor-not-allowed transition-all rounded"
+                        >
+                          {isValidatingResponse ? '⏳ Analyzing Response...' : '🔍 Analyze Response'}
+                        </button>
+                      </div>
                     )}
                     
                   </div>
@@ -361,6 +418,7 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
               onAnswersChange={(answers) => {
                 setQuestionAnswers(answers);
               }}
+              onSubmitAnswers={handleSubmitAnswers}
             />
           </div>
         )}
@@ -390,10 +448,10 @@ const TripleColumnWorksheet = ({ prefilledThought = null, onBack = null, onNavig
           <div className="flex gap-3 mb-8">
             <button
               onClick={handleSaveRecord}
-              disabled={!rationalResponse.trim() || isSaving || isValidating || questionQuality === 0}
+              disabled={!responseValidated || isSaving}
               className="flex-1 bg-ocean text-white py-3 px-6 font-normal text-sm hover:bg-ocean/90 disabled:bg-ocean/30 disabled:cursor-not-allowed transition-all"
             >
-              {isValidating ? '⏳ Validating...' : isSaving ? '💾 Saving...' : '💾 Save Entry'}
+              {isSaving ? '💾 Saving...' : '💾 Save Entry'}
             </button>
             
             <button
