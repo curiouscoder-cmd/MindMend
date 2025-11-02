@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const BDIResults = ({ results, onBack }) => {
+const BDIResults = ({ results, onBack, onNavigate }) => {
   const { 
     score, 
     level, 
@@ -25,10 +25,10 @@ const BDIResults = ({ results, onBack }) => {
         className="text-center mb-8"
       >
         <div className="text-6xl mb-4">{icon}</div>
-        <h1 className="text-5xl font-light text-navy mb-3 tracking-tight">
+        <h1 className="text-5xl font-semibold text-navy mb-3 tracking-tight">
           Assessment Complete
         </h1>
-        <p className="text-navy/60 font-light">
+        <p className="text-navy/60 font-light text-lg">
           Here are your results and personalized recommendations
         </p>
       </motion.div>
@@ -134,42 +134,58 @@ const BDIResults = ({ results, onBack }) => {
               <p className="text-navy/80 flex-1 font-light">{rec}</p>
             </motion.div>
           ))}
+          
+          {/* Find Therapist Button */}
+          {score >= 11 && onNavigate && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 + recommendations.length * 0.1 }}
+              className="p-4 bg-ocean/10 border-l-2 border-ocean cursor-pointer hover:bg-ocean/20 transition-all"
+              onClick={() => onNavigate('therapist-finder')}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-start gap-3 flex-1">
+                  <span className="text-ocean font-light text-sm">🧠</span>
+                  <p className="text-navy/80 flex-1 font-light">
+                    Find a qualified therapist in your city
+                  </p>
+                </div>
+                <span className="text-ocean text-sm">→</span>
+              </div>
+            </motion.div>
+          )}
         </div>
       </motion.div>
 
-      {/* Additional Resources */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-        className="card bg-gradient-to-br from-sky/20 to-mint/20 border border-ocean/20 mb-6"
-      >
-        <h3 className="text-xl font-display font-bold text-navy mb-4 tracking-tight">
-          Additional Resources
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 bg-white rounded-xl border border-ocean/20">
-            <div className="text-2xl mb-2">🧠</div>
-            <h4 className="font-bold text-navy mb-1">Find a Therapist</h4>
-            <p className="text-sm text-navy/70">Psychology Today, BetterHelp, Talkspace</p>
+      {/* CBT Worksheet Recommendation */}
+      {score >= 11 && onNavigate && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="bg-ocean/10 border-l-4 border-ocean p-8 mb-8"
+        >
+          <div className="flex items-start gap-4">
+            <span className="text-3xl">📝</span>
+            <div className="flex-1">
+              <h3 className="text-xl font-normal text-navy mb-2">
+                Try the Triple-Column Technique
+              </h3>
+              <p className="text-navy/70 font-light text-sm leading-relaxed mb-4">
+                A powerful CBT tool to challenge negative thoughts. Write your automatic thought, 
+                let AI identify cognitive distortions, then craft a rational response.
+              </p>
+              <button
+                onClick={() => onNavigate('cbt-worksheet')}
+                className="bg-navy text-white py-3 px-6 font-normal text-sm hover:bg-navy/90 transition-all border-l-4 border-ocean"
+              >
+                Open CBT Worksheet →
+              </button>
+            </div>
           </div>
-          <div className="p-4 bg-white rounded-xl border border-ocean/20">
-            <div className="text-2xl mb-2">📚</div>
-            <h4 className="font-bold text-navy mb-1">Self-Help Resources</h4>
-            <p className="text-sm text-navy/70">NAMI, Mental Health America, Anxiety & Depression Association</p>
-          </div>
-          <div className="p-4 bg-white rounded-xl border border-ocean/20">
-            <div className="text-2xl mb-2">👥</div>
-            <h4 className="font-bold text-navy mb-1">Support Groups</h4>
-            <p className="text-sm text-navy/70">DBSA, NAMI Support Groups, Online Communities</p>
-          </div>
-          <div className="p-4 bg-white rounded-xl border border-ocean/20">
-            <div className="text-2xl mb-2">💊</div>
-            <h4 className="font-bold text-navy mb-1">Medical Support</h4>
-            <p className="text-sm text-navy/70">Consult with your doctor about treatment options</p>
-          </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       {/* Important Note */}
       <motion.div

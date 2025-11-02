@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const CrisisMode = ({ onClose, onExerciseComplete }) => {
+const CrisisMode = ({ onClose, onExerciseComplete, onNavigate }) => {
   const [currentExercise, setCurrentExercise] = useState(0);
   const [breathingCount, setBreathingCount] = useState(0);
   const [isBreathing, setIsBreathing] = useState(false);
@@ -291,6 +291,23 @@ const CrisisMode = ({ onClose, onExerciseComplete }) => {
                 </div>
               </div>
             ))}
+            
+            {/* Find Therapist Button */}
+            {onNavigate && (
+              <button
+                onClick={() => {
+                  onClose();
+                  onNavigate('therapist-finder');
+                }}
+                className="w-full p-3 bg-ocean text-white rounded-lg font-medium hover:bg-ocean/90 transition-all flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <span>🧠</span>
+                  <span>Find a Therapist in Your City</span>
+                </div>
+                <span>→</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -15,6 +15,9 @@ const MoodAnalytics = lazy(() => import('./components/MoodAnalytics.jsx'));
 const CrisisMode = lazy(() => import('./components/CrisisMode.jsx'));
 const VoiceInput = lazy(() => import('./components/VoiceInput.jsx'));
 const BDIAssessment = lazy(() => import('./components/Assessment/BDIAssessment.jsx'));
+const TripleColumnWorksheet = lazy(() => import('./components/ThoughtRecord/TripleColumnWorksheet.jsx'));
+const DistortionLibrary = lazy(() => import('./components/DistortionLibrary/DistortionLibrary.jsx'));
+const TherapistFinder = lazy(() => import('./components/TherapistFinder.jsx'));
 import LoadingSpinner from './components/LoadingSpinner.jsx';
 import { onAuthChange } from './services/authService.js';
 import { createUserProfile, getUserProfile, updateUserProgress } from './services/firestoreService.js';
@@ -235,6 +238,26 @@ function App() {
                 <BDIAssessment
                   user={user}
                   onBack={() => setCurrentView('home')}
+                  onNavigate={handleNavigate}
+                />
+              );
+            case 'cbt-worksheet':
+              return (
+                <TripleColumnWorksheet
+                  onBack={() => setCurrentView('home')}
+                  onNavigate={handleNavigate}
+                />
+              );
+            case 'distortion-library':
+              return (
+                <DistortionLibrary
+                  onBack={() => setCurrentView('cbt-worksheet')}
+                />
+              );
+            case 'therapist-finder':
+              return (
+                <TherapistFinder
+                  onBack={() => setCurrentView('home')}
                 />
               );
             default:
@@ -306,6 +329,7 @@ function App() {
         <Suspense fallback={null}> 
           <CrisisMode
             onClose={() => setShowCrisisMode(false)}
+            onNavigate={handleNavigate}
             onExerciseComplete={() => {
               setUserProgress(prev => ({
                 ...prev,

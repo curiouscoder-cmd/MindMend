@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import BDIResults from './BDIResults';
 import { processAssessment } from '../../utils/bdiScoring';
 
-const BDIAssessment = ({ onBack, user }) => {
+const BDIAssessment = ({ onBack, onNavigate, user }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [isComplete, setIsComplete] = useState(false);
@@ -102,6 +102,7 @@ const BDIAssessment = ({ onBack, user }) => {
       <BDIResults 
         results={assessmentResults}
         onBack={onBack}
+        onNavigate={onNavigate}
       />
     );
   }
@@ -121,10 +122,10 @@ const BDIAssessment = ({ onBack, user }) => {
             Back to Home
           </button>
           
-          <h1 className="text-5xl font-light text-navy mb-4 tracking-tight">
+          <h1 className="text-5xl font-semibold text-navy mb-4 tracking-tight">
             Burns Depression Checklist
           </h1>
-          <p className="text-navy/60 text-base font-light">
+          <p className="text-navy/60 text-lg font-light">
             Answer based on how you've been feeling over the past two weeks
           </p>
         </div>

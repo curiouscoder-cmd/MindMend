@@ -4,6 +4,7 @@ import { logout } from '../services/authService.js';
 const Navigation = ({ currentView, onNavigate, calmPoints, user }) => {
   const navItems = [
     { id: 'home', label: 'Home', icon: '🏠' },
+    { id: 'cbt-worksheet', label: 'CBT', icon: '📝' },
     { id: 'coach', label: 'AI Coach', icon: '🤖' },
     { id: 'your-friend', label: 'Your Friend', icon: '👥' },
     { id: 'analytics', label: 'Analytics', icon: '📊' }

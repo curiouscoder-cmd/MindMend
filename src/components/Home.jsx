@@ -340,10 +340,10 @@ const Home = ({ user, onMoodSelect, onNavigate, moodHistory = [] }) => {
         <div className="flex items-start gap-4 mb-6">
           <span className="text-3xl">📋</span>
           <div className="flex-1">
-            <h3 className="text-xl font-light text-navy mb-2 tracking-tight">
+            <h3 className="text-xl font-semibold text-navy mb-2 tracking-tight">
               Depression Assessment
             </h3>
-            <p className="text-navy/60 text-sm font-light leading-relaxed">
+            <p className="text-navy/60 text-base font-light leading-relaxed">
               Burns Depression Checklist — Track your mental wellness over time. 
               Takes 5-10 minutes.
             </p>
@@ -353,7 +353,7 @@ const Home = ({ user, onMoodSelect, onNavigate, moodHistory = [] }) => {
           onClick={() => onNavigate && onNavigate('bdi-assessment')}
           whileHover={{ x: 4 }}
           whileTap={{ scale: 0.99 }}
-          className="w-full bg-navy text-white font-normal py-4 px-6 transition-all duration-200 border-l-4 border-ocean hover:border-highlight"
+          className="w-full bg-navy text-white font-normal py-4 px-6 rounded-xl transition-all duration-200 border-l-4 border-ocean hover:border-highlight"
         >
           Start Assessment →
         </motion.button>
