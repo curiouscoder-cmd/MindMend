@@ -18,6 +18,7 @@ import * as webSpeechService from './ttsService.js';
 const audioCache = new Map();
 const MAX_CACHE_SIZE = 50;
 let isElevenLabsAvailable = false;
+let currentAudio = null; // Track current audio for stopping
 
 // Voice configurations - Best female voices for India
 const VOICES = {
@@ -156,14 +157,25 @@ export const generateSpeech = async (text, options = {}) => {
 
     // Play audio and trigger callbacks
     if (onStart || onEnd) {
+      // Stop any currently playing audio
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+      }
+      
       const audio = new Audio(audioUrl);
+      currentAudio = audio; // Store reference for stopping
+      
       if (onStart) {
         audio.addEventListener('play', onStart);
       }
       if (onEnd) {
-        audio.addEventListener('ended', onEnd);
+        audio.addEventListener('ended', () => {
+          currentAudio = null;
+          if (onEnd) onEnd();
+        });
       }
-      audio.play();
+      audio.play().catch(err => console.error('Audio play error:', err));
     }
 
     return audioUrl;
@@ -407,6 +419,22 @@ const cacheAudio = (key, url) => {
 };
 
 /**
+ * Stop current audio playback
+ */
+export const stopSpeech = () => {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+    console.log('🛑 ElevenLabs audio stopped');
+  }
+  // Also stop Web Speech API
+  if (window.speechSynthesis && window.speechSynthesis.speaking) {
+    window.speechSynthesis.cancel();
+  }
+};
+
+/**
  * Clear audio cache
  */
 export const clearCache = () => {
@@ -436,6 +464,7 @@ export const getCacheStats = () => {
 export default {
   generateSpeech,
   generateContextAwareSpeech,
+  stopSpeech,
   getAvailableVoices,
   getSupportedLanguages,
   clearCache,

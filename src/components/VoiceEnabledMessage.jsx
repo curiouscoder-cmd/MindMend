@@ -70,28 +70,51 @@ const VoiceEnabledMessage = ({
             onEnd: () => {
               console.log('🎵 Speech ended, updating UI');
               setIsPlaying(false);
+              if (audioRef.current) {
+                audioRef.current.currentTime = 0;
+              }
             },
             onStart: () => {
               console.log('🎵 Speech started');
               setIsLoading(false);
+              setIsPlaying(true);
             }
           }
         );
         console.log('✅ Audio generated:', url ? 'Success' : 'Failed');
         setAudioUrl(url);
-      } else {
-        console.log('💾 Using cached audio');
-        // For cached audio, play it
-        const audio = new Audio(url);
-        audio.onended = () => setIsPlaying(false);
-        audio.onplay = () => setIsLoading(false);
-        await audio.play();
       }
 
-      if (url && (url.startsWith('blob:') || url === 'browser_tts')) {
+      // Create or reuse audio element
+      if (url && url.startsWith('blob:')) {
+        // For blob URLs from ElevenLabs
+        if (!audioRef.current) {
+          audioRef.current = new Audio(url);
+          audioRef.current.onended = () => {
+            console.log('🎵 Audio playback ended');
+            setIsPlaying(false);
+            if (audioRef.current) {
+              audioRef.current.currentTime = 0;
+            }
+          };
+          audioRef.current.onerror = (err) => {
+            console.error('❌ Audio playback error:', err);
+            setError('Failed to play audio');
+            setIsPlaying(false);
+          };
+        }
+        
+        audioRef.current.playbackRate = playbackSpeed;
+        await audioRef.current.play();
         setIsPlaying(true);
+        setIsLoading(false);
+      } else if (url === 'browser_tts') {
+        // Web Speech API is handling playback
+        setIsPlaying(true);
+        setIsLoading(false);
       } else if (!url) {
         setError('Failed to generate audio');
+        setIsPlaying(false);
       }
     } catch (err) {
       console.error('Error playing message:', err);

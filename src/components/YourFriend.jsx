@@ -232,81 +232,83 @@ const speakMessage = async (text) => {
   };
 
   return (
-    <div className="min-h-screen bg-mint/50 p-4">
+    <div className="min-h-screen bg-mint/50 p-2 sm:p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-lg p-6 mb-4"
+          className="bg-white rounded-2xl shadow-lg p-3 sm:p-6 mb-3 sm:mb-4"
         >
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center space-x-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-r from-ocean to-highlight flex items-center justify-center text-3xl shadow-lg">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r from-ocean to-highlight flex items-center justify-center text-2xl sm:text-3xl shadow-lg shrink-0">
                 👥
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800">Your Friend</h1>
-                <p className="text-sm text-gray-600">
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Your Friend</h1>
+                <p className="text-xs sm:text-sm text-gray-600 truncate">
                   {isConnected ? (
                     <span className="flex items-center">
                       <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                      Connected • Real-time conversation
+                      <span className="hidden sm:inline">Connected • Real-time</span>
+                      <span className="sm:hidden">Connected</span>
                     </span>
                   ) : (
-                    'Start talking with your AI friend'
+                    'Start talking with your friend'
                   )}
                 </p>
               </div>
             </div>
 
-            {/* Language Selector */}
-            <div className="flex items-center space-x-2">
+            {/* Language Selector & Start Button */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <select
                 value={currentLanguage}
                 onChange={(e) => changeLanguage(e.target.value)}
-                className="px-3 py-2 rounded-lg border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-ocean"
+                className="px-2 sm:px-3 py-2 rounded-lg border border-gray-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-ocean"
                 disabled={isConnected}
               >
-                <option value="en">🇮🇳 English</option>
-                <option value="hi">🇮🇳 हिंदी</option>
-                <option value="ta">🇮🇳 தமிழ்</option>
-                <option value="te">🇮🇳 తెలుగు</option>
-                <option value="bn">🇮🇳 বাংলা</option>
-                <option value="mr">🇮🇳 मराठी</option>
-                <option value="gu">🇮🇳 ગુજરાતી</option>
-                <option value="kn">🇮🇳 ಕನ್ನಡ</option>
+                <option value="en">English</option>
+                <option value="hi">हिंदी</option>
+                <option value="ta">தமிழ்</option>
+                <option value="te">తెలుగు</option>
+                <option value="bn">বাংলা</option>
+                <option value="mr">मराठी</option>
+                <option value="gu">ગુજરાતી</option>
+                <option value="kn">ಕನ್ನಡ</option>
               </select>
 
               {/* Start/Stop Button */}
               <button
                 onClick={startConversation}
-                className={`px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 ${
+                className={`px-3 sm:px-6 py-2 rounded-xl font-semibold transition-all transform hover:scale-105 text-xs sm:text-sm whitespace-nowrap ${
                   isConnected
                     ? 'bg-red-500 hover:bg-red-600 text-white'
                     : 'bg-gradient-to-r from-ocean to-highlight hover:from-primary-700 hover:to-ocean text-white'
                 }`}
               >
-                {isConnected ? '🛑 End Chat' : '🎤 Start Talking'}
+                <span className="hidden sm:inline">{isConnected ? '🛑 End Chat' : '🎤 Start Talking'}</span>
+                <span className="sm:hidden">{isConnected ? '🛑 End' : '🎤 Talk'}</span>
               </button>
             </div>
           </div>
 
           {/* Status Indicators */}
           {isConnected && (
-            <div className={`mt-4 p-3 rounded-lg transition-all ${
+            <div className={`mt-2 sm:mt-4 p-2 sm:p-3 rounded-lg transition-all text-xs sm:text-sm ${
               isListening 
                 ? 'bg-gradient-to-r from-green-50 to-cyan-50 border border-green-200' 
                 : 'bg-gray-50 border border-gray-200'
             }`}>
-              <div className="flex items-center space-x-6 text-sm">
-                <div className={`flex items-center space-x-2 transition-all ${isListening ? 'text-green-600' : 'text-gray-400'}`}>
-                  <div className={`w-3 h-3 rounded-full transition-all ${isListening ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
-                  <span className="font-medium">{isListening ? '🎤 Listening...' : '⏸️ Paused'}</span>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-6">
+                <div className={`flex items-center gap-2 transition-all ${isListening ? 'text-green-600' : 'text-gray-400'}`}>
+                  <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${isListening ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                  <span className="font-medium">{isListening ? '🎤 Listening' : '⏸️ Paused'}</span>
                 </div>
-                <div className={`flex items-center space-x-2 transition-all ${isSpeaking ? 'text-blue-600' : 'text-gray-400'}`}>
-                  <div className={`w-3 h-3 rounded-full transition-all ${isSpeaking ? 'bg-blue-500 animate-pulse' : 'bg-gray-300'}`}></div>
-                  <span className="font-medium">{isSpeaking ? '🔊 Speaking...' : '🔇 Silent'}</span>
+                <div className={`flex items-center gap-2 transition-all ${isSpeaking ? 'text-blue-600' : 'text-gray-400'}`}>
+                  <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all ${isSpeaking ? 'bg-blue-500 animate-pulse' : 'bg-gray-300'}`}></div>
+                  <span className="font-medium">{isSpeaking ? '🔊 Speaking' : '🔇 Silent'}</span>
                 </div>
               </div>
             </div>
@@ -321,15 +323,15 @@ const speakMessage = async (text) => {
         </motion.div>
 
         {/* Chat Messages */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 h-[600px] flex flex-col">
-          <div className="flex-1 overflow-y-auto space-y-4 custom-scrollbar">
+        <div className="bg-white rounded-2xl shadow-lg p-2 sm:p-6 h-[50vh] sm:h-[600px] flex flex-col">
+          <div className="flex-1 overflow-y-auto space-y-2 sm:space-y-4 custom-scrollbar">
             <AnimatePresence>
               {messages.length === 0 && !interimTranscript ? (
                 <div className="h-full flex items-center justify-center text-gray-400">
-                  <div className="text-center">
-                    <div className="text-6xl mb-4">👥</div>
-                    <p className="text-lg">Click "Start Talking" to begin</p>
-                    <p className="text-sm mt-2">Your friend is ready to listen</p>
+                  <div className="text-center px-4">
+                    <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">👥</div>
+                    <p className="text-sm sm:text-lg">Click "Start Talking" to begin</p>
+                    <p className="text-xs sm:text-sm mt-1 sm:mt-2">Your friend is ready to listen</p>
                   </div>
                 </div>
               ) : (
@@ -344,31 +346,31 @@ const speakMessage = async (text) => {
                   >
                     {message.type === 'user' ? (
                       // User Message
-                      <div className="max-w-[70%] flex items-start space-x-2">
-                        <div className="flex-1 px-4 py-3 rounded-2xl bg-gradient-to-r from-ocean to-highlight text-white shadow-md">
-                          <p className="text-sm leading-relaxed">{message.content}</p>
-                          <div className="text-[10px] mt-1 text-sky text-right">
+                      <div className="max-w-[85%] sm:max-w-[70%] flex items-start gap-1 sm:gap-2">
+                        <div className="flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-ocean to-highlight text-white shadow-md">
+                          <p className="text-xs sm:text-sm leading-relaxed">{message.content}</p>
+                          <div className="text-[8px] sm:text-[10px] mt-1 text-sky text-right">
                             {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </div>
                         </div>
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-ocean to-highlight text-white flex items-center justify-center shadow-md flex-shrink-0">
-                          <span className="text-sm">🧑</span>
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-ocean to-highlight text-white flex items-center justify-center shadow-md flex-shrink-0">
+                          <span className="text-xs sm:text-sm">🧑</span>
                         </div>
                       </div>
                     ) : (
                       // Friend Message
-                      <div className="max-w-[70%] flex items-start space-x-2">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-ocean to-highlight flex items-center justify-center shadow-md flex-shrink-0">
-                          <span className="text-base">👥</span>
+                      <div className="max-w-[85%] sm:max-w-[70%] flex items-start gap-1 sm:gap-2">
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-ocean to-highlight flex items-center justify-center shadow-md flex-shrink-0">
+                          <span className="text-sm sm:text-base">👥</span>
                         </div>
-                        <div className="flex-1 bg-gray-50 rounded-2xl border border-gray-200 p-4 shadow-sm">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs font-medium text-ocean">Your Friend</span>
-                            <div className="text-[10px] text-gray-500">
+                        <div className="flex-1 bg-gray-50 rounded-2xl border border-gray-200 p-2 sm:p-4 shadow-sm">
+                          <div className="flex items-center justify-between mb-1 gap-1">
+                            <span className="text-xs font-medium text-ocean">Friend</span>
+                            <div className="text-[8px] sm:text-[10px] text-gray-500">
                               {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </div>
                           </div>
-                          <div className="text-sm text-gray-700 leading-relaxed">
+                          <div className="text-xs sm:text-sm text-gray-700 leading-relaxed">
                             {message.content}
                           </div>
                         </div>
@@ -385,15 +387,15 @@ const speakMessage = async (text) => {
                     animate={{ opacity: 1, y: 0 }}
                     className="flex justify-end"
                   >
-                    <div className="max-w-[70%] flex items-start space-x-2">
-                      <div className="flex-1 px-4 py-3 rounded-2xl bg-gradient-to-r from-primary-300 to-highlight text-white shadow-md opacity-70">
-                        <p className="text-sm leading-relaxed italic">{interimTranscript}</p>
-                        <div className="text-[10px] mt-1 text-sky text-right">
+                    <div className="max-w-[85%] sm:max-w-[70%] flex items-start gap-1 sm:gap-2">
+                      <div className="flex-1 px-3 sm:px-4 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-primary-300 to-highlight text-white shadow-md opacity-70">
+                        <p className="text-xs sm:text-sm leading-relaxed italic">{interimTranscript}</p>
+                        <div className="text-[8px] sm:text-[10px] mt-1 text-sky text-right">
                           Listening...
                         </div>
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary-300 to-highlight text-white flex items-center justify-center shadow-md flex-shrink-0 animate-pulse">
-                        <span className="text-sm">🎤</span>
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-primary-300 to-highlight text-white flex items-center justify-center shadow-md flex-shrink-0 animate-pulse">
+                        <span className="text-xs sm:text-sm">🎤</span>
                       </div>
                     </div>
                   </motion.div>
@@ -424,22 +426,22 @@ const speakMessage = async (text) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4"
+          className="mt-3 sm:mt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4"
         >
-          <div className="bg-white rounded-xl p-4 shadow-md">
-            <div className="text-2xl mb-2">🎤</div>
-            <h3 className="font-semibold text-gray-800 mb-1">Real-time Voice</h3>
-            <p className="text-xs text-gray-600">Natural conversation with minimal delay</p>
+          <div className="bg-white rounded-xl p-3 sm:p-4 shadow-md">
+            <div className="text-xl sm:text-2xl mb-1 sm:mb-2">🎤</div>
+            <h3 className="font-semibold text-gray-800 mb-1 text-sm">Real-time Voice</h3>
+            <p className="text-xs text-gray-600">Natural conversation</p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-md">
-            <div className="text-2xl mb-2">🧠</div>
-            <h3 className="font-semibold text-gray-800 mb-1">Context Aware</h3>
-            <p className="text-xs text-gray-600">Remembers your history and adapts</p>
+          <div className="bg-white rounded-xl p-3 sm:p-4 shadow-md">
+            <div className="text-xl sm:text-2xl mb-1 sm:mb-2">🧠</div>
+            <h3 className="font-semibold text-gray-800 mb-1 text-sm">Context Aware</h3>
+            <p className="text-xs text-gray-600">Remembers & adapts</p>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-md">
-            <div className="text-2xl mb-2">🌍</div>
-            <h3 className="font-semibold text-gray-800 mb-1">8 Languages</h3>
-            <p className="text-xs text-gray-600">Speak in your preferred Indian language</p>
+          <div className="bg-white rounded-xl p-3 sm:p-4 shadow-md">
+            <div className="text-xl sm:text-2xl mb-1 sm:mb-2">🌍</div>
+            <h3 className="font-semibold text-gray-800 mb-1 text-sm">8 Languages</h3>
+            <p className="text-xs text-gray-600">Indian languages</p>
           </div>
         </motion.div>
       </div>

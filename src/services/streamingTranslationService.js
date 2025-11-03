@@ -40,7 +40,9 @@ const LANGUAGES = {
 };
 
 // API endpoints for Firebase Functions
-const API_BASE_URL = '/.netlify/functions';
+// Use environment variable or fallback to Firebase Functions URL
+const API_BASE_URL = import.meta.env.VITE_FUNCTIONS_URL || 
+  'https://us-central1-mindmend-25dca.cloudfunctions.net';
 
 /**
  * Generate cache key for translation requests
@@ -107,18 +109,22 @@ export async function streamTranslation(text, targetLanguage = 'en', onProgress)
       };
     }
 
+    // Build query string for GET request
+    const params = new URLSearchParams({
+      text,
+      targetLang: targetLanguage,
+      streaming: 'true'
+    });
+    
+    const url = new URL(`${API_BASE_URL}/streamingTranslation`);
+    url.search = params.toString();
+    
     // Use streaming translation Firebase Function
-    const response = await fetch(`${API_BASE_URL}/streamingTranslation`, {
-      method: 'POST',
+    const response = await fetch(url.toString(), {
+      method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
         'Accept': 'text/event-stream',
       },
-      body: JSON.stringify({
-        text,
-        targetLanguage,
-        streaming: true,
-      }),
     });
 
     if (!response.ok) {
@@ -204,16 +210,21 @@ export async function translateText(text, targetLanguage = 'en') {
       };
     }
 
-    const response = await fetch(`${API_BASE_URL}/streamingTranslation`, {
-      method: 'POST',
+    // Build query string for GET request
+    const params = new URLSearchParams({
+      text,
+      targetLang: targetLanguage,
+      streaming: 'false'
+    });
+    
+    const url = new URL(`${API_BASE_URL}/streamingTranslation`);
+    url.search = params.toString();
+    
+    const response = await fetch(url.toString(), {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        text,
-        targetLanguage,
-        streaming: false,
-      }),
     });
 
     if (!response.ok) {
@@ -253,7 +264,11 @@ export async function translateText(text, targetLanguage = 'en') {
  */
 export async function getTranslationMetrics() {
   try {
-    const response = await fetch(`${API_BASE_URL}/streamingTranslationMetrics`);
+    const url = new URL(`${API_BASE_URL}/streamingTranslationMetrics`);
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+    });
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -286,7 +301,8 @@ export async function clearTranslationCache() {
     translationCache.clear();
     
     // Clear server cache
-    const response = await fetch(`${API_BASE_URL}/clearTranslationCache`, {
+    const url = new URL(`${API_BASE_URL}/clearTranslationCache`);
+    const response = await fetch(url.toString(), {
       method: 'POST',
     });
     
@@ -298,7 +314,9 @@ export async function clearTranslationCache() {
     return { success: true };
   } catch (error) {
     console.error('Failed to clear cache:', error);
-    return { success: false, error: error.message };
+    // Don't fail completely if server cache clear fails
+    console.log('✅ Local cache cleared (server cache clear failed, but continuing)');
+    return { success: true, localOnly: true };
   }
 }
 

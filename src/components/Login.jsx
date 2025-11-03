@@ -62,7 +62,24 @@ const Login = ({ onLoginSuccess }) => {
       onLoginSuccess(user);
     } catch (err) {
       console.error('Anonymous sign-in error:', err);
-      setError('Anonymous sign-in failed. Please try again.');
+      
+      // Provide specific error messages
+      if (err.code === 'auth/admin-restricted-operation' || 
+          err.code === 'auth/operation-not-allowed') {
+        setError('Anonymous sign-in is disabled. Using guest session instead. Please enable anonymous authentication in Firebase Console for full features.');
+        // Still try to proceed with fallback
+        try {
+          const fallbackUser = await signInAnonymous();
+          onLoginSuccess(fallbackUser);
+          return;
+        } catch (fallbackErr) {
+          setError('Unable to create session. Please try Google Sign-in instead.');
+        }
+      } else if (err.code === 'auth/network-request-failed') {
+        setError('Network error. Please check your internet connection.');
+      } else {
+        setError('Anonymous sign-in failed. Please try Google Sign-in instead.');
+      }
     } finally {
       setLoading(false);
     }
@@ -204,7 +221,6 @@ const Login = ({ onLoginSuccess }) => {
               { icon: '🧘', text: 'CBT exercises & mood tracking' },
               { icon: '🤖', text: 'AI wellness coach (Mira)' },
               { icon: '🎯', text: 'Personalized mental health insights' },
-              { icon: '🌐', text: 'Works offline' },
             ].map((feature, index) => (
               <div key={index} className="flex items-center text-sm text-gray-600">
                 <span className="mr-2">{feature.icon}</span>

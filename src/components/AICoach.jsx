@@ -268,50 +268,51 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto px-2 sm:px-4">
       {/* Header */}
-      <div className="text-center mb-6">
-        <div className="flex items-center justify-center space-x-3 mb-4">
-          <div className="w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center animate-pulse-gentle">
-            <span className="text-2xl">🤖</span>
+      <div className="text-center mb-4 sm:mb-6">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center animate-pulse-gentle shrink-0">
+            <span className="text-xl sm:text-2xl">🤖</span>
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-calm-800">Meet Mira</h1>
-            <p className="text-blue-900">Your Personalized AI Wellness Coach</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-calm-800">Meet Mira</h1>
+            <p className="text-xs sm:text-sm text-blue-900">Your Personalized AI Wellness Coach</p>
           </div>
         </div>
         
         {/* User Context Indicator */}
         {getCurrentUser() && (
-          <div className="mb-3 inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-200">
-            <span className="text-xs font-medium text-purple-700">
-              {getCurrentUser().isAnonymous ? '🔒 Anonymous Mode' : `👤 ${getCurrentUser().displayName?.split(' ')[0] || 'User'}`}
+          <div className="mb-2 sm:mb-3 inline-flex flex-wrap items-center justify-center gap-1 sm:gap-2 px-2 sm:px-4 py-2 bg-gradient-to-r from-purple-50 to-pink-50 rounded-full border border-purple-200 text-xs">
+            <span className="font-medium text-purple-700">
+              {getCurrentUser().isAnonymous ? '🔒 Anon' : `👤 ${getCurrentUser().displayName?.split(' ')[0] || 'User'}`}
             </span>
             {userProgress?.streak > 0 && (
               <>
                 <span className="text-purple-300">•</span>
-                <span className="text-xs text-purple-600">🔥 {userProgress.streak} day streak</span>
+                <span className="text-purple-600">🔥 {userProgress.streak}d</span>
               </>
             )}
             {userProgress?.completedExercises > 0 && (
               <>
                 <span className="text-purple-300">•</span>
-                <span className="text-xs text-purple-600">✅ {userProgress.completedExercises} exercises</span>
+                <span className="text-purple-600">✅ {userProgress.completedExercises}</span>
               </>
             )}
           </div>
         )}
         
-        <div className="flex items-center justify-center space-x-4 text-sm text-blue-900">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-blue-900">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span>Gemini 2.5 Flash • Personalized</span>
+            <span className="hidden sm:inline">Gemini 2.5 Flash • Personalized</span>
+            <span className="sm:hidden">Gemini 2.5</span>
           </div>
           
           {/* Auto-play toggle */}
           <button
             onClick={() => setAutoPlayVoice(!autoPlayVoice)}
-            className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs transition-all ${
+            className={`flex items-center space-x-1 px-2 sm:px-3 py-1 rounded-full text-xs transition-all ${
               autoPlayVoice 
                 ? 'bg-green-100 text-green-700 hover:bg-green-200' 
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -319,18 +320,18 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
             title={autoPlayVoice ? 'Auto-play enabled' : 'Auto-play disabled'}
           >
             <span>{autoPlayVoice ? '🔊' : '🔇'}</span>
-            <span>Auto-speak</span>
+            <span className="hidden sm:inline">Auto-speak</span>
           </button>
           
         </div>
       </div>
 
       {/* Chat Container */}
-      <div className="card flex flex-col h-[60vh] min-h-[28rem]">
+      <div className="card flex flex-col h-[50vh] sm:h-[60vh] min-h-[24rem] sm:min-h-[28rem]">
         {/* Messages */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar"
+          className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-2 sm:space-y-4 custom-scrollbar"
         >
           {messages.map((message) => (
             <div
@@ -338,7 +339,7 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
               className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {message.type === 'user' ? (
-                <div className="max-w-[80%] lg:max-w-[70%] flex items-start space-x-2">
+                <div className="max-w-[85%] sm:max-w-[80%] lg:max-w-[70%] flex items-start space-x-1 sm:space-x-2">
                   <div className="flex-1 px-4 py-3 rounded-2xl bg-primary-500 text-white shadow-sm">
                     <div className="text-sm leading-relaxed prose prose-sm prose-invert max-w-none">
                       <ReactMarkdown 
@@ -359,20 +360,20 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
                         {message.content}
                       </ReactMarkdown>
                     </div>
-                    <div className="text-[10px] mt-1 text-primary-100 text-right">
+                    <div className="text-[9px] sm:text-[10px] mt-1 text-primary-100 text-right">
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-primary-500 text-white flex items-center justify-center shadow">
-                    <span className="text-sm">🧑</span>
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-primary-500 text-white flex items-center justify-center shadow shrink-0">
+                    <span className="text-xs sm:text-sm">🧑</span>
                   </div>
                 </div>
               ) : (
-                <div className="max-w-[80%] lg:max-w-[70%] flex items-start space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center shadow">
-                    <span className="text-base">🤖</span>
+                <div className="max-w-[85%] sm:max-w-[80%] lg:max-w-[70%] flex items-start space-x-1 sm:space-x-2">
+                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center shadow shrink-0">
+                    <span className="text-sm sm:text-base">🤖</span>
                   </div>
-                  <div className="flex-1 bg-white rounded-2xl border border-purple-100 p-4 shadow-sm">
+                  <div className="flex-1 bg-white rounded-2xl border border-purple-100 p-2 sm:p-4 shadow-sm">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-medium text-purple-600">Mira</span>
                       <div className="text-[10px] text-calm-500">
@@ -421,13 +422,13 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
         </div>
 
         {/* Quick Responses */}
-        <div className="px-4 py-2 border-t border-calm-100">
-          <div className="flex flex-wrap gap-2 mb-3">
+        <div className="px-2 sm:px-4 py-2 border-t border-calm-100 overflow-x-auto">
+          <div className="flex flex-wrap gap-1 sm:gap-2 mb-2 sm:mb-3">
             {quickResponses.map((response, index) => (
               <button
                 key={index}
                 onClick={() => handleSendMessage(response)}
-                className="px-3 py-1 bg-calm-100 hover:bg-calm-200 text-calm-700 text-xs rounded-full transition-all shadow-sm"
+                className="px-2 sm:px-3 py-1 bg-calm-100 hover:bg-calm-200 text-calm-700 text-xs rounded-full transition-all shadow-sm whitespace-nowrap"
               >
                 {response}
               </button>
@@ -436,8 +437,8 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
         </div>
 
         {/* Input */}
-        <div className="p-4 border-t border-calm-100 sticky bottom-0 bg-white">
-          <div className="flex items-end space-x-3">
+        <div className="p-2 sm:p-4 border-t border-calm-100 sticky bottom-0 bg-white">
+          <div className="flex items-end gap-2 sm:gap-3">
             {/* Voice Button */}
             <VoiceButton
               onTranscription={handleVoiceTranscription}
@@ -449,15 +450,15 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Share what's on your mind... (or use voice 🎤)"
-              className="flex-1 p-3 border border-calm-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none shadow-sm"
+              placeholder="Share your thoughts... 💭"
+              className="flex-1 p-2 sm:p-3 border border-calm-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none shadow-sm text-sm"
               rows="1"
               ref={textareaRef}
             />
             <button
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || isTyping}
-              className="btn-primary px-6 disabled:opacity-50 disabled:cursor-not-allowed shadow"
+              className="btn-primary px-3 sm:px-6 py-2 disabled:opacity-50 disabled:cursor-not-allowed shadow text-sm"
             >
               Send
             </button>
@@ -476,23 +477,23 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
       </div>
 
       {/* Coach Features */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-        <div className="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg">
-          <div className="text-2xl mb-2">💭</div>
-          <h3 className="font-semibold text-blue-800 mb-1">Empathetic Listening</h3>
-          <p className="text-sm text-blue-900">I'm here to listen without judgment and provide support</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4 mt-4 sm:mt-6">
+        <div className="p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg">
+          <div className="text-xl sm:text-2xl mb-1 sm:mb-2">💭</div>
+          <h3 className="font-semibold text-blue-800 mb-1 text-sm">Empathetic Listening</h3>
+          <p className="text-xs sm:text-sm text-blue-900">I'm here to listen without judgment</p>
         </div>
         
-        <div className="p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg">
-          <div className="text-2xl mb-2">🎯</div>
-          <h3 className="font-semibold text-blue-800 mb-1">Personalized Guidance</h3>
-          <p className="text-sm text-blue-900">Tailored advice based on your unique situation</p>
+        <div className="p-3 sm:p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-lg">
+          <div className="text-xl sm:text-2xl mb-1 sm:mb-2">🎯</div>
+          <h3 className="font-semibold text-blue-800 mb-1 text-sm">Personalized Guidance</h3>
+          <p className="text-xs sm:text-sm text-blue-900">Tailored advice for your situation</p>
         </div>
         
-        <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg">
-          <div className="text-2xl mb-2">🌱</div>
-          <h3 className="font-semibold text-purple-800 mb-1">Growth Support</h3>
-          <p className="text-sm text-purple-600">Helping you build resilience and coping skills</p>
+        <div className="p-3 sm:p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg">
+          <div className="text-xl sm:text-2xl mb-1 sm:mb-2">🌱</div>
+          <h3 className="font-semibold text-purple-800 mb-1 text-sm">Growth Support</h3>
+          <p className="text-xs sm:text-sm text-purple-600">Build resilience & coping skills</p>
         </div>
       </div>
 

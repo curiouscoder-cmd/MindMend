@@ -78,7 +78,8 @@ export const getGoogleRedirectResult = async () => {
 
 /**
  * Sign in anonymously (for privacy-conscious users)
- * @returns {Promise<User>} Firebase user object
+ * Falls back to localStorage-based session if anonymous auth is disabled
+ * @returns {Promise<User>} Firebase user object or mock user object
  */
 export const signInAnonymous = async () => {
   try {
@@ -90,6 +91,35 @@ export const signInAnonymous = async () => {
     return user;
   } catch (error) {
     console.error('❌ Anonymous sign-in error:', error);
+    
+    // Check if error is due to anonymous auth being disabled
+    if (error.code === 'auth/admin-restricted-operation' || 
+        error.code === 'auth/operation-not-allowed') {
+      console.log('⚠️ Anonymous authentication is disabled in Firebase Console');
+      console.log('📝 To enable: Firebase Console > Authentication > Sign-in method > Anonymous > Enable');
+      
+      // Fallback: Create a mock user session with localStorage
+      const mockUserId = 'anon_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+      const mockUser = {
+        uid: mockUserId,
+        isAnonymous: true,
+        displayName: 'Guest User',
+        email: null,
+        photoURL: null,
+        metadata: {
+          creationTime: new Date().toISOString(),
+          lastSignInTime: new Date().toISOString()
+        }
+      };
+      
+      // Store in localStorage for persistence
+      localStorage.setItem('mindmend_mock_user', JSON.stringify(mockUser));
+      localStorage.setItem('mindmend_session_id', mockUserId);
+      
+      console.log('✅ Using localStorage-based session (fallback):', mockUserId);
+      return mockUser;
+    }
+    
     throw error;
   }
 };
