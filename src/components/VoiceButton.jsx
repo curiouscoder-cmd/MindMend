@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import api from '../services/apiService.js';
+import { detectLanguageFromSpeech, getSTTLanguageCode } from '../services/languageDetectionService.js';
 
-const VoiceButton = ({ onTranscription, onEmotionDetected, onListeningStart, disabled = false }) => {
+const VoiceButton = ({ onTranscription, onEmotionDetected, onListeningStart, disabled = false, currentLanguage = 'en' }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const [emotion, setEmotion] = useState(null);
   const [transcription, setTranscription] = useState('');
+  const [detectedLanguage, setDetectedLanguage] = useState(currentLanguage);
 
   const mediaRecorderRef = useRef(null);
   const audioContextRef = useRef(null);
@@ -22,7 +24,8 @@ const VoiceButton = ({ onTranscription, onEmotionDetected, onListeningStart, dis
       recognitionRef.current = new SpeechRecognition();
       recognitionRef.current.continuous = true;
       recognitionRef.current.interimResults = true;
-      recognitionRef.current.lang = 'en-US';
+      // Use STT language code based on current language
+      recognitionRef.current.lang = getSTTLanguageCode(currentLanguage);
 
       recognitionRef.current.onresult = (event) => {
         let interimTranscript = '';
@@ -40,8 +43,13 @@ const VoiceButton = ({ onTranscription, onEmotionDetected, onListeningStart, dis
         const currentTranscript = (finalTranscript + interimTranscript).trim();
         setTranscription(currentTranscript);
 
-        // Analyze emotion in real-time for final transcripts
+        // Detect language from speech (keyword matching for English letters)
         if (finalTranscript) {
+          const detectedLang = detectLanguageFromSpeech(finalTranscript);
+          setDetectedLanguage(detectedLang);
+          console.log('🌍 Detected language from speech:', detectedLang, 'from transcript:', finalTranscript);
+          
+          // Analyze emotion in real-time for final transcripts
           analyzeEmotionRealTime(finalTranscript);
         }
       };
@@ -171,10 +179,11 @@ const VoiceButton = ({ onTranscription, onEmotionDetected, onListeningStart, dis
       audioContextRef.current = null;
     }
 
-    // Send final transcription
+    // Send final transcription with detected language
     if (transcription && onTranscription) {
-      console.log('🎤 Sending transcription:', transcription);
-      onTranscription(transcription);
+      console.log('🎤 Sending transcription:', transcription, 'Language:', detectedLanguage);
+      // Pass transcription with language metadata
+      onTranscription(transcription, detectedLanguage);
     }
 
     setAudioLevel(0);

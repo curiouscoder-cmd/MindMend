@@ -67,17 +67,27 @@ function cacheResponse(cacheKey, response) {
 }
 
 /**
- * Retry logic with exponential backoff
+ * Retry logic with exponential backoff and jitter
  */
-async function retryWithBackoff(fn, maxRetries = 3) {
+async function retryWithBackoff(fn, maxRetries = 5) {
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
       return await fn();
     } catch (error) {
       // Check if it's a rate limit error
       if (error.status === 429 || error.code === 429) {
-        const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
-        console.log(`⏳ Rate limited. Retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+        if (attempt === maxRetries - 1) {
+          // Last attempt failed, return graceful fallback
+          console.log(`❌ Rate limited after ${maxRetries} attempts. Using fallback.`);
+          throw error;
+        }
+        
+        // Exponential backoff with jitter: 1s, 2s, 4s, 8s, 16s
+        const baseDelay = Math.pow(2, attempt) * 1000;
+        const jitter = Math.random() * 1000;
+        const delay = baseDelay + jitter;
+        
+        console.log(`⏳ Rate limited. Retrying in ${Math.round(delay)}ms (attempt ${attempt + 1}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, delay));
       } else {
         // Don't retry for other errors
@@ -184,7 +194,7 @@ export const chatPersonalized = onRequest({
             temperature: 0.9,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: 300,
+            maxOutputTokens: 150, // Reduced for faster responses and more natural conversation
             candidateCount: 1,
             safetySettings: [
               {

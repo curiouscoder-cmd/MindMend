@@ -149,10 +149,18 @@ export const updateUserProfile = async (profileData) => {
  */
 export const logout = async () => {
   try {
+    // Clear localStorage for guest/mock users
+    localStorage.removeItem('mindmend_mock_user');
+    localStorage.removeItem('mindmend_session_id');
+    
+    // Sign out from Firebase
     await signOut(auth);
     console.log('✅ User signed out successfully');
   } catch (error) {
     console.error('❌ Sign out error:', error);
+    // Even if Firebase signout fails, clear localStorage
+    localStorage.removeItem('mindmend_mock_user');
+    localStorage.removeItem('mindmend_session_id');
     throw error;
   }
 };

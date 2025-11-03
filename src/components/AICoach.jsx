@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm';
 import api from '../services/apiService.js';
 import { generatePersonalizedResponse } from '../services/personalizedChatService.js';
 import { getCurrentUser } from '../services/authService.js';
+import { streamText, getQuickAcknowledgment, startTypingAnimation } from '../services/streamingChatService.js';
 import VoiceButton from './VoiceButton.jsx';
 import VoiceEnabledMessage from './VoiceEnabledMessage';
 import { mockData } from '../data/mockData';
@@ -24,6 +25,7 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
   const [isPlayingVoice, setIsPlayingVoice] = useState(false);
   const [currentEmotion, setCurrentEmotion] = useState(null);
   const [showRealTimeChat, setShowRealTimeChat] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState('en');
 
   // Initialize with welcome message
   useEffect(() => {
@@ -187,10 +189,15 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
     return;
   };
 
-  const handleVoiceTranscription = (transcription) => {
+  const handleVoiceTranscription = (transcription, voiceLanguage = 'en') => {
     setInputMessage(transcription);
+    // Update detected language from voice
+    if (voiceLanguage && voiceLanguage !== 'en') {
+      setCurrentLanguage(voiceLanguage);
+      console.log('🌍 Voice language detected:', voiceLanguage);
+    }
     // Auto-send after voice input
-    setTimeout(() => handleSendMessage(transcription), 500);
+    setTimeout(() => handleSendMessage(transcription, voiceLanguage), 500);
   };
 
   const handleEmotionDetected = (emotion) => {
@@ -198,9 +205,53 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
     console.log('Real-time emotion:', emotion);
   };
 
-  const handleSendMessage = async (overrideText) => {
+  // Detect language from text
+  const detectLanguage = (text) => {
+    // Devanagari script detection (Hindi, Marathi, Sanskrit)
+    const devanagariRegex = /[\u0900-\u097F]/;
+    if (devanagariRegex.test(text)) return 'hi';
+    
+    // Tamil script detection
+    const tamilRegex = /[\u0B80-\u0BFF]/;
+    if (tamilRegex.test(text)) return 'ta';
+    
+    // Telugu script detection
+    const teluguRegex = /[\u0C00-\u0C7F]/;
+    if (teluguRegex.test(text)) return 'te';
+    
+    // Bengali script detection
+    const bengaliRegex = /[\u0980-\u09FF]/;
+    if (bengaliRegex.test(text)) return 'bn';
+    
+    // Gujarati script detection
+    const gujaratiRegex = /[\u0A80-\u0AFF]/;
+    if (gujaratiRegex.test(text)) return 'gu';
+    
+    // Kannada script detection
+    const kannadaRegex = /[\u0C80-\u0CFF]/;
+    if (kannadaRegex.test(text)) return 'kn';
+    
+    // Malayalam script detection
+    const malayalamRegex = /[\u0D00-\u0D7F]/;
+    if (malayalamRegex.test(text)) return 'ml';
+    
+    // Punjabi script detection
+    const punjabiRegex = /[\u0A00-\u0A7F]/;
+    if (punjabiRegex.test(text)) return 'pa';
+    
+    return 'en'; // Default to English
+  };
+
+  const handleSendMessage = async (overrideText, voiceLanguage = null) => {
     const text = (overrideText ?? inputMessage).trim();
     if (!text) return;
+
+    // Use voice language if provided, otherwise detect from text
+    let detectedLang = voiceLanguage;
+    if (!voiceLanguage) {
+      detectedLang = detectLanguage(text);
+    }
+    setCurrentLanguage(detectedLang);
 
     // Add user message
     const userMsg = {
@@ -208,7 +259,8 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
       type: 'user',
       content: text,
       timestamp: new Date(),
-      emotion: currentEmotion
+      emotion: currentEmotion,
+      language: detectedLang
     };
 
     setMessages(prev => [...prev, userMsg]);
@@ -218,21 +270,46 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
 
     // Generate AI response
     try {
-      const aiResponse = await generateAIResponse(text);
+      // Show quick acknowledgment while generating response
+      const quickAck = getQuickAcknowledgment(text);
+      const ackMsg = {
+        id: Date.now() + 0.5,
+        type: 'coach',
+        content: quickAck,
+        timestamp: new Date(),
+        mood: 'supportive',
+        language: detectedLang,
+        isStreaming: true
+      };
+      
+      setMessages(prev => [...prev, ackMsg]);
+      
+      // Generate full response
+      const aiResponse = await generateAIResponse(text, detectedLang);
+      
+      // Update with full response (streaming effect)
       const aiMsg = {
         id: Date.now() + 1,
         type: 'coach',
         content: aiResponse,
         timestamp: new Date(),
-        mood: 'supportive'
+        mood: 'supportive',
+        language: detectedLang,
+        isStreaming: false
       };
 
-      setMessages(prev => [...prev, aiMsg]);
+      setMessages(prev => {
+        // Replace the acknowledgment with full response
+        return prev.map(msg => 
+          msg.id === ackMsg.id ? aiMsg : msg
+        );
+      });
+      
       setIsTyping(false);
       
       // Play voice response
       if (autoPlayVoice) {
-        playResponseVoice(aiResponse);
+        playResponseVoice(aiResponse, detectedLang);
       }
     } catch (error) {
       console.error('Error generating AI response:', error);
@@ -386,6 +463,7 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
                       emotion={message.mood || 'supportive'}
                       autoPlay={autoPlayVoice}
                       showControls={true}
+                      language={message.language || currentLanguage}
                     />
                   </div>
                 </div>

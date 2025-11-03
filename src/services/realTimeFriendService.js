@@ -268,7 +268,9 @@ export const generateFriendResponse = async (userInput, context = {}) => {
     if (currentUser) {
       try {
         const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 
-          'http://localhost:5001/mindmend-25dca/us-central1';
+          (window.location.hostname === 'localhost' 
+            ? 'http://localhost:5001/mindmend-25dca/us-central1'
+            : 'https://us-central1-mindmend-25dca.cloudfunctions.net');
         
         const contextResponse = await fetch(`${FUNCTIONS_URL}/getUserContext`, {
           method: 'POST',

@@ -155,27 +155,27 @@ export const generateSpeech = async (text, options = {}) => {
 
     console.log('✅ ElevenLabs speech generated successfully');
 
-    // Play audio and trigger callbacks
-    if (onStart || onEnd) {
-      // Stop any currently playing audio
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-      }
-      
-      const audio = new Audio(audioUrl);
-      currentAudio = audio; // Store reference for stopping
-      
-      if (onStart) {
-        audio.addEventListener('play', onStart);
-      }
-      if (onEnd) {
-        audio.addEventListener('ended', () => {
-          currentAudio = null;
-          if (onEnd) onEnd();
-        });
-      }
-      audio.play().catch(err => console.error('Audio play error:', err));
+    // Store audio reference for later playback control
+    // NOTE: Playback is handled by VoiceEnabledMessage component, not here
+    // This prevents double playback
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }
+    
+    // Create audio element but don't play it yet
+    const audio = new Audio(audioUrl);
+    currentAudio = audio; // Store reference for stopping via stopSpeech()
+    
+    // Set up callbacks for when playback actually happens
+    if (onStart) {
+      audio.addEventListener('play', onStart);
+    }
+    if (onEnd) {
+      audio.addEventListener('ended', () => {
+        currentAudio = null;
+        if (onEnd) onEnd();
+      });
     }
 
     return audioUrl;

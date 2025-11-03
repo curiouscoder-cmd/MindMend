@@ -9,7 +9,8 @@ const VoiceEnabledMessage = ({
   persona = 'mira', 
   emotion = 'supportive',
   autoPlay = false,
-  showControls = true 
+  showControls = true,
+  language = 'en'
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,12 +61,13 @@ const VoiceEnabledMessage = ({
       if (!url) {
         console.log('🎙️ Generating new audio with ElevenLabs...');
         // Generate speech with ElevenLabs (auto-fallback to Web Speech)
+        // NOTE: elevenLabsService handles playback internally, we just get the URL
         url = await elevenLabsService.generateSpeech(
           message.content, 
           { 
             emotion,
             voice: 'rachel', // Best female voice for India
-            language: 'en',
+            language: language || 'en', // Use detected language
             useCache: true,
             onEnd: () => {
               console.log('🎵 Speech ended, updating UI');
@@ -77,7 +79,6 @@ const VoiceEnabledMessage = ({
             onStart: () => {
               console.log('🎵 Speech started');
               setIsLoading(false);
-              setIsPlaying(true);
             }
           }
         );
@@ -85,10 +86,10 @@ const VoiceEnabledMessage = ({
         setAudioUrl(url);
       }
 
-      // Create or reuse audio element
+      // Create or reuse audio element for blob URLs
       if (url && url.startsWith('blob:')) {
         // For blob URLs from ElevenLabs
-        if (!audioRef.current) {
+        if (!audioRef.current || audioRef.current.src !== url) {
           audioRef.current = new Audio(url);
           audioRef.current.onended = () => {
             console.log('🎵 Audio playback ended');
@@ -109,7 +110,7 @@ const VoiceEnabledMessage = ({
         setIsPlaying(true);
         setIsLoading(false);
       } else if (url === 'browser_tts') {
-        // Web Speech API is handling playback
+        // Web Speech API is handling playback internally
         setIsPlaying(true);
         setIsLoading(false);
       } else if (!url) {

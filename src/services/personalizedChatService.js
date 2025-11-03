@@ -15,6 +15,49 @@ import { searchKnowledgeBase, createTherapistSystemPrompt } from './knowledgeBas
 const conversationCache = new Map();
 const MAX_HISTORY_LENGTH = 10;
 
+// Response cache for personalized chat (5-minute TTL)
+const responseCache = new Map();
+const RESPONSE_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+/**
+ * Generate cache key from user message
+ */
+function getCacheKey(userMessage, language = 'en') {
+  return `${language}_${userMessage.substring(0, 100).replace(/\s+/g, '_')}`;
+}
+
+/**
+ * Get cached response if available and not expired
+ */
+function getCachedResponse(cacheKey) {
+  if (!cacheKey) return null;
+  const cached = responseCache.get(cacheKey);
+  if (cached && Date.now() - cached.timestamp < RESPONSE_CACHE_TTL) {
+    console.log('💾 Using cached personalized response');
+    return cached.response;
+  }
+  if (cached) {
+    responseCache.delete(cacheKey);
+  }
+  return null;
+}
+
+/**
+ * Cache response with TTL
+ */
+function cacheResponse(cacheKey, response) {
+  if (!cacheKey) return;
+  responseCache.set(cacheKey, {
+    response,
+    timestamp: Date.now()
+  });
+  // Clean old entries if cache gets too large
+  if (responseCache.size > 50) {
+    const firstKey = responseCache.keys().next().value;
+    responseCache.delete(firstKey);
+  }
+}
+
 /**
  * Get user profile data for personalization
  */
@@ -162,17 +205,30 @@ ${knowledgeText}`;
 }
 
 /**
- * Generate personalized AI response using Gemini
+ * Generate personalized response using Gemini with full context
+ * @param {string} userMessage - User's message
+ * @param {Array} moodHistory - User's mood history
+ * @param {Object} userProgress - User's progress data
+ * @param {Array} conversationContext - Recent conversation messages
+ * @param {string} language - Detected language code (en, hi, ta, te, etc.)
+ * @returns {Promise<Object>} Response object with personalized message
  */
-export async function generatePersonalizedResponse(
-  userMessage,
-  moodHistory = [],
-  userProgress = {},
-  conversationContext = []
-) {
+export async function generatePersonalizedResponse(userMessage, moodHistory = [], userProgress = {}, conversationContext = [], language = 'en') {
   try {
     const currentUser = getCurrentUser();
     const userId = currentUser?.uid || 'anonymous';
+    
+    // Check cache first for faster response
+    const cacheKey = getCacheKey(userMessage, language);
+    const cachedResponse = getCachedResponse(cacheKey);
+    if (cachedResponse) {
+      return {
+        response: cachedResponse,
+        personalized: true,
+        cached: true,
+        timestamp: new Date().toISOString()
+      };
+    }
     
     // Get user profile for personalization
     const userProfile = currentUser ? await getUserProfile(userId) : { displayName: 'friend' };
@@ -186,8 +242,11 @@ export async function generatePersonalizedResponse(
     
     if (currentUser) {
       try {
+        // Use emulator if running locally, otherwise use deployed functions
         const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 
-          'http://localhost:5001/mindmend-25dca/us-central1';
+          (window.location.hostname === 'localhost' 
+            ? 'http://localhost:5001/mindmend-25dca/us-central1'
+            : 'https://us-central1-mindmend-25dca.cloudfunctions.net');
         
         const contextResponse = await fetch(`${FUNCTIONS_URL}/getUserContext`, {
           method: 'POST',
@@ -223,7 +282,23 @@ export async function generatePersonalizedResponse(
     }
     
     // Build personalized system prompt with unified context and professional knowledge
-    const systemPrompt = buildPersonalizedPrompt(userProfile, moodHistory, userProgress, unifiedContext, knowledgePassages);
+    let systemPrompt = buildPersonalizedPrompt(userProfile, moodHistory, userProgress, unifiedContext, knowledgePassages);
+    
+    // Add language instruction to system prompt
+    const languageInstructions = {
+      hi: '\n\n🌍 LANGUAGE INSTRUCTION: Respond ONLY in PURE HINDI using Devanagari script (हिंदी). NO English words or Roman script. Keep sentences SHORT (1-2 lines). Be warm and supportive.',
+      ta: '\n\n🌍 LANGUAGE INSTRUCTION: Respond ONLY in PURE TAMIL using Tamil script (தமிழ்). NO English words. Keep sentences SHORT (1-2 lines). Be warm and supportive.',
+      te: '\n\n🌍 LANGUAGE INSTRUCTION: Respond ONLY in PURE TELUGU using Telugu script (తెలుగు). NO English words. Keep sentences SHORT (1-2 lines). Be warm and supportive.',
+      bn: '\n\n🌍 LANGUAGE INSTRUCTION: Respond ONLY in PURE BENGALI using Bengali script (বাংলা). NO English words. Keep sentences SHORT (1-2 lines). Be warm and supportive.',
+      gu: '\n\n🌍 LANGUAGE INSTRUCTION: Respond ONLY in PURE GUJARATI using Gujarati script (ગુજરાતી). NO English words. Keep sentences SHORT (1-2 lines). Be warm and supportive.',
+      kn: '\n\n🌍 LANGUAGE INSTRUCTION: Respond ONLY in PURE KANNADA using Kannada script (ಕನ್ನಡ). NO English words. Keep sentences SHORT (1-2 lines). Be warm and supportive.',
+      ml: '\n\n🌍 LANGUAGE INSTRUCTION: Respond ONLY in PURE MALAYALAM using Malayalam script (മലയാളം). NO English words. Keep sentences SHORT (1-2 lines). Be warm and supportive.',
+      pa: '\n\n🌍 LANGUAGE INSTRUCTION: Respond ONLY in PURE PUNJABI using Punjabi script (ਪੰਜਾਬੀ). NO English words. Keep sentences SHORT (1-2 lines). Be warm and supportive.'
+    };
+    
+    if (language && language !== 'en' && languageInstructions[language]) {
+      systemPrompt += languageInstructions[language];
+    }
     
     // Build conversation messages
     const messages = [
@@ -246,8 +321,11 @@ export async function generatePersonalizedResponse(
     });
     
     // Call Gemini API via Firebase Functions
+    // Use emulator if running locally, otherwise use deployed functions
     const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 
-      'http://localhost:5001/mindmend-25dca/us-central1';
+      (window.location.hostname === 'localhost' 
+        ? 'http://localhost:5001/mindmend-25dca/us-central1'
+        : 'https://us-central1-mindmend-25dca.cloudfunctions.net');
     
     const response = await fetch(`${FUNCTIONS_URL}/chatPersonalized`, {
       method: 'POST',
@@ -270,6 +348,9 @@ export async function generatePersonalizedResponse(
     const data = await response.json();
     const aiResponse = data.response;
     
+    // Cache the response for future identical messages
+    cacheResponse(cacheKey, aiResponse);
+    
     // Save to conversation history and log activity
     if (currentUser) {
       const currentMood = moodHistory && moodHistory.length > 0 ? moodHistory[moodHistory.length - 1] : 'neutral';
@@ -282,6 +363,7 @@ export async function generatePersonalizedResponse(
     return {
       response: aiResponse,
       personalized: true,
+      cached: false,
       timestamp: new Date().toISOString()
     };
     
