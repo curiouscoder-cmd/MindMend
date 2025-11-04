@@ -4,8 +4,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import api from '../services/apiService.js';
 import { generatePersonalizedResponse } from '../services/personalizedChatService.js';
+import { generateStreamingPersonalizedResponse } from '../services/streamingPersonalizedChatService.js';
 import { getCurrentUser } from '../services/authService.js';
-import { streamText, getQuickAcknowledgment, startTypingAnimation } from '../services/streamingChatService.js';
+import { streamText, startTypingAnimation } from '../services/streamingChatService.js';
 import VoiceButton from './VoiceButton.jsx';
 import VoiceEnabledMessage from './VoiceEnabledMessage';
 import { mockData } from '../data/mockData';
@@ -96,7 +97,7 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
     return welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
   };
 
-  const generateAIResponse = async (userMessage) => {
+  const generateAIResponse = async (userMessage, onStreamChunk = null) => {
     try {
       console.log('🤖 Generating personalized response with Mira...');
       console.log('📊 Context:', { 
@@ -106,12 +107,31 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
         exercises: userProgress?.completedExercises || 0
       });
       
-      // Use personalized chat service with full context
+      // Use streaming for real-time response
+      if (onStreamChunk) {
+        const result = await generateStreamingPersonalizedResponse(
+          userMessage,
+          moodHistory,
+          userProgress,
+          messages,
+          currentLanguage,
+          onStreamChunk
+        );
+        
+        console.log('✅ Streamed personalized response:', {
+          personalized: result.personalized,
+          length: result.response?.length
+        });
+        
+        return result.response || 'I understand. How can I help you further?';
+      }
+      
+      // Fallback to non-streaming
       const result = await generatePersonalizedResponse(
         userMessage,
         moodHistory,
         userProgress,
-        messages // Pass current conversation as context
+        messages
       );
       
       console.log('✅ Personalized response generated:', {
@@ -120,7 +140,6 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
         length: result.response?.length
       });
       
-      // Return the response text
       return result.response || 'I understand. How can I help you further?';
     } catch (error) {
       console.error('AI Response Error:', error);
@@ -268,43 +287,34 @@ const AICoach = ({ userProgress, moodHistory, currentMood }) => {
     setCurrentEmotion(null);
     setIsTyping(true);
 
-    // Generate AI response
+    // Generate AI response with streaming
     try {
-      // Show quick acknowledgment while generating response
-      const quickAck = getQuickAcknowledgment(text);
-      const ackMsg = {
-        id: Date.now() + 0.5,
+      // Create placeholder message for streaming
+      const aiMsgId = Date.now() + 1;
+      const aiMsg = {
+        id: aiMsgId,
         type: 'coach',
-        content: quickAck,
+        content: '',
         timestamp: new Date(),
         mood: 'supportive',
         language: detectedLang,
         isStreaming: true
       };
       
-      setMessages(prev => [...prev, ackMsg]);
+      setMessages(prev => [...prev, aiMsg]);
       
-      // Generate full response
-      const aiResponse = await generateAIResponse(text, detectedLang);
-      
-      // Update with full response (streaming effect)
-      const aiMsg = {
-        id: Date.now() + 1,
-        type: 'coach',
-        content: aiResponse,
-        timestamp: new Date(),
-        mood: 'supportive',
-        language: detectedLang,
-        isStreaming: false
-      };
-
-      setMessages(prev => {
-        // Replace the acknowledgment with full response
-        return prev.map(msg => 
-          msg.id === ackMsg.id ? aiMsg : msg
-        );
+      // Stream the response
+      const aiResponse = await generateAIResponse(text, (chunk, fullText) => {
+        // Update message content as chunks arrive
+        setMessages(prev => prev.map(msg => 
+          msg.id === aiMsgId ? { ...msg, content: fullText } : msg
+        ));
       });
       
+      // Mark streaming as complete
+      setMessages(prev => prev.map(msg => 
+        msg.id === aiMsgId ? { ...msg, isStreaming: false, content: aiResponse } : msg
+      ));
       setIsTyping(false);
       
       // Play voice response

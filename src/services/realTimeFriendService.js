@@ -52,18 +52,18 @@ export const initializeSpeechRecognition = (onTranscript, onError) => {
     console.log('🎤 Listening ended');
     isListening = false;
     
-    // Only auto-restart if not manually stopped (e.g., during speaking)
-    if (shouldAutoRestart) {
+    // Only auto-restart if not manually stopped and not speaking
+    if (shouldAutoRestart && !isSpeaking) {
       setTimeout(() => {
-        if (recognition && !isListening && !isSpeaking) {
+        if (recognition && !isListening && !isSpeaking && shouldAutoRestart) {
           try {
             recognition.start();
             console.log('🔄 Auto-restarted listening');
           } catch (e) {
-            console.log('Recognition already running or stopped manually');
+            console.log('⚠️ Could not auto-restart:', e.message);
           }
         }
-      }, 100);
+      }, 300); 
     }
   };
 
@@ -84,8 +84,17 @@ export const initializeSpeechRecognition = (onTranscript, onError) => {
   };
 
   recognition.onerror = (event) => {
-    console.error('❌ Speech recognition error:', event.error);
-    if (onError) onError(event.error);
+    // Ignore aborted errors as they're expected during stop/start cycles
+    if (event.error === 'aborted') {
+      console.log('⚠️ Recognition aborted (expected during transitions)');
+      return;
+    }
+    
+    // For other errors, log and notify
+    if (event.error !== 'no-speech') {
+      console.error('❌ Speech recognition error:', event.error);
+      if (onError) onError(event.error);
+    }
   };
 
   return recognition;
@@ -113,9 +122,13 @@ export const startListening = () => {
  * Stop listening
  */
 export const stopListening = () => {
-  if (recognition) {
+  if (recognition && isListening) {
     shouldAutoRestart = false; // Disable auto-restart
-    recognition.stop();
+    try {
+      recognition.stop();
+    } catch (e) {
+      console.log('⚠️ Error stopping recognition:', e.message);
+    }
   }
 };
 
@@ -123,9 +136,13 @@ export const stopListening = () => {
  * Pause listening temporarily (e.g., during speaking)
  */
 export const pauseListening = () => {
-  if (recognition) {
+  if (recognition && isListening) {
     shouldAutoRestart = false; // Disable auto-restart temporarily
-    recognition.stop();
+    try {
+      recognition.stop();
+    } catch (e) {
+      console.log('⚠️ Error pausing recognition:', e.message);
+    }
   }
 };
 
@@ -135,12 +152,16 @@ export const pauseListening = () => {
 export const resumeListening = () => {
   shouldAutoRestart = true;
   if (recognition && !isListening && !isSpeaking) {
-    try {
-      recognition.start();
-      console.log('🎤 Listening resumed');
-    } catch (e) {
-      console.log('⚠️ Could not resume:', e);
-    }
+    setTimeout(() => {
+      if (!isListening && !isSpeaking) {
+        try {
+          recognition.start();
+          console.log('🎤 Listening resumed');
+        } catch (e) {
+          console.log('⚠️ Could not resume:', e.message);
+        }
+      }
+    }, 500); // Add delay to prevent conflicts
   } else {
     console.log('🎧 Skipping resume — still speaking or already listening');
   }
@@ -353,11 +374,11 @@ ${replyLanguage === 'hi' ?
 
 Respond as a caring friend would in a natural conversation.`;
 
-    // Call Gemini API via Firebase Functions
+    // Call Gemini API via Firebase Functions with STREAMING
     const FUNCTIONS_URL = import.meta.env.VITE_FUNCTIONS_URL || 
       'http://localhost:5001/mindmend-25dca/us-central1';
     
-    console.log('📡 Calling API:', `${FUNCTIONS_URL}/chatPersonalized`);
+    console.log('📡 Calling streaming API:', `${FUNCTIONS_URL}/chatPersonalized`);
     
     const response = await fetch(`${FUNCTIONS_URL}/chatPersonalized`, {
       method: 'POST',
@@ -371,7 +392,7 @@ Respond as a caring friend would in a natural conversation.`;
           language: conversationContext.language || 'en'
         },
         context: conversationContext,
-        maxTokens: 100 // Keep responses short
+        stream: true // Enable streaming
       })
     });
 
@@ -379,8 +400,56 @@ Respond as a caring friend would in a natural conversation.`;
       throw new Error(`API error: ${response.status}`);
     }
 
-    const data = await response.json();
-    let friendResponse = data.response || data.message || getFallbackResponse(mood);
+    // Read streaming response
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let friendResponse = '';
+    let buffer = '';
+    let firstChunkReceived = false;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      
+      if (done) break;
+      
+      buffer += decoder.decode(value, { stream: true });
+      
+      // Process complete SSE messages
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+      
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            
+            if (data.error) {
+              throw new Error(data.error);
+            }
+            
+            if (data.text) {
+              friendResponse += data.text;
+              
+              // Log first chunk for debugging
+              if (!firstChunkReceived) {
+                console.log('⚡ First chunk received:', friendResponse.substring(0, 50));
+                firstChunkReceived = true;
+              }
+            }
+            
+            if (data.done && data.fullResponse) {
+              friendResponse = data.fullResponse;
+            }
+          } catch (parseError) {
+            console.error('Error parsing SSE:', parseError);
+          }
+        }
+      }
+    }
+
+    if (!friendResponse) {
+      friendResponse = getFallbackResponse(mood);
+    }
 
     // Post-processing: reduce repeated openings and overused terms
     const recent = conversationContext.history.slice(-6).join(' ').toLowerCase();
@@ -461,38 +530,61 @@ const getFallbackResponse = (mood) => {
  * @param {Object} callbacks - onStart, onEnd callbacks
  * @returns {Promise<void>}
  */
-export const speakResponse = async (text, callbacks = {}) => {
+export const speakResponse = async (text) => {
   try {
     isSpeaking = true;
     shouldAutoRestart = false;
 
-    await elevenLabsService.generateContextAwareSpeech(text, conversationContext, {
+    // Generate audio URL
+    const audioUrl = await elevenLabsService.generateContextAwareSpeech(text, conversationContext, {
       voice: 'rachel',
-      useCache: false,
-      onStart: () => {
+      useCache: false
+    });
+
+    if (!audioUrl) {
+      throw new Error('Failed to generate audio');
+    }
+
+    // Create and play audio
+    const audio = new Audio(audioUrl);
+    
+    // Return a promise that resolves when audio finishes
+    return new Promise((resolve, reject) => {
+      audio.onplay = () => {
         console.log('🔊 Friend speaking...');
-        if (callbacks.onStart) callbacks.onStart();
-      },
-      onEnd: () => {
+      };
+
+      audio.onended = () => {
         console.log('✅ Friend finished speaking');
         isSpeaking = false;
         shouldAutoRestart = true;
 
-        // 🩵 FIX: Safely resume listening after speech ends
+        // Resume listening after speech ends
         setTimeout(() => {
           if (!isSpeaking && recognition && !isListening) {
             try {
               recognition.start();
-              console.log('🎤 Listening resumed after speaking (via friendService)');
+              console.log('🎤 Listening resumed after speaking');
             } catch (e) {
               console.warn('⚠️ Could not restart recognition:', e);
             }
           }
-        }, 500); // Reduced delay for faster response
+        }, 500);
 
-        if (callbacks.onEnd) callbacks.onEnd();
-      },
+        resolve();
+      };
+
+      audio.onerror = (error) => {
+        console.error('❌ Audio playback error:', error);
+        isSpeaking = false;
+        shouldAutoRestart = true;
+        reject(error);
+      };
+
+      // Actually play the audio
+      audio.play().catch(reject);
     });
+
   } catch (error) {
     console.error('❌ Error speaking:', error);
     isSpeaking = false;
@@ -501,13 +593,13 @@ export const speakResponse = async (text, callbacks = {}) => {
       if (recognition && !isListening) {
         try {
           recognition.start();
-          console.log('🎤 Listening resumed after speech error recovery');
+          console.log('🎤 Listening resumed after error recovery');
         } catch (e) {
           console.warn('⚠️ Could not resume after error:', e);
         }
       }
     }, 800);
-    if (callbacks.onEnd) callbacks.onEnd();
+    throw error;
   }
 };
 

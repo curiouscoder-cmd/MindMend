@@ -198,31 +198,25 @@ const YourFriend = () => {
   };
 
 const speakMessage = async (text) => {
-  setIsSpeaking(true);
+  // Pause listening before speaking (prevent echo)
+  friendService.pauseListening();
   setIsListening(false);
+  setIsSpeaking(true);
 
-  // Stop listening before speaking (prevent echo)
-  if (recognitionRef.current) {
-    try {
-      recognitionRef.current.stop();
-      console.log('🔇 Stopped listening to prevent echo');
-    } catch (e) {
-      console.log('Recognition already stopped');
-    }
+  try {
+    // Speak the response (this will handle audio playback and auto-resume listening)
+    await friendService.speakResponse(text);
+    
+    // Update UI state after speaking completes
+    setIsSpeaking(false);
+    setIsListening(true);
+  } catch (error) {
+    console.error('❌ Error in speakMessage:', error);
+    // Ensure state is cleared and listening resumes even if speech fails
+    setIsSpeaking(false);
+    setIsListening(true);
+    friendService.resumeListening();
   }
-
-  await friendService.speakResponse(text, {
-    onStart: () => {
-      console.log('🔊 Friend speaking...');
-      setIsListening(false);
-      setIsSpeaking(true);
-    },
-    onEnd: () => {
-      console.log('✅ Friend finished speaking');
-      setIsSpeaking(false);
-      setIsListening(true); // Reflect resumed listening in UI
-    },
-  });
 };
 
 

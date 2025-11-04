@@ -111,7 +111,8 @@ export const chatPersonalized = onRequest({
   region: 'us-central1',
   timeoutSeconds: 60,
   memory: '256MiB',
-  maxInstances: 2  // Reduced to prevent concurrent API calls
+  maxInstances: 2,  // Reduced to prevent concurrent API calls
+  cors: true
 }, async (req, res) => {
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
@@ -183,68 +184,108 @@ export const chatPersonalized = onRequest({
       }
     });
 
-    // Generate content with retry logic and rate limit handling
-    let result;
-    try {
-      result = await retryWithBackoff(async () => {
-        return await ai.models.generateContent({
-          model: 'gemini-2.0-flash-exp',
-          contents,
-          config: {
-            temperature: 0.9,
-            topK: 40,
-            topP: 0.95,
-            maxOutputTokens: 150, // Reduced for faster responses and more natural conversation
-            candidateCount: 1,
-            safetySettings: [
-              {
-                category: 'HARM_CATEGORY_HARASSMENT',
-                threshold: 'BLOCK_NONE'
-              },
-              {
-                category: 'HARM_CATEGORY_HATE_SPEECH',
-                threshold: 'BLOCK_NONE'
-              },
-              {
-                category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-                threshold: 'BLOCK_MEDIUM_AND_ABOVE'
-              },
-              {
-                category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
-                threshold: 'BLOCK_NONE'
-              }
-            ]
+    // Check if client wants streaming
+    const enableStreaming = req.body.stream === true;
+
+    if (enableStreaming) {
+      // Set headers for Server-Sent Events
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+
+      try {
+        const stream = await retryWithBackoff(async () => {
+          return await ai.models.generateContentStream({
+            model: 'gemini-2.0-flash-exp',
+            contents,
+            config: {
+              temperature: 0.9,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 1000,
+              candidateCount: 1,
+              safetySettings: [
+                { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+                { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+                { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+              ]
+            }
+          });
+        }, 3);
+
+        let fullResponse = '';
+        for await (const chunk of stream) {
+          const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (text) {
+            fullResponse += text;
+            res.write(`data: ${JSON.stringify({ text, done: false })}\n\n`);
           }
+        }
+
+        // Send final message
+        res.write(`data: ${JSON.stringify({ text: '', done: true, fullResponse })}\n\n`);
+        res.end();
+
+        console.log('✅ Streamed personalized response:', {
+          length: fullResponse.length,
+          userName: userContext.userName
         });
-      }, 3);
-    } catch (retryError) {
-      console.error('❌ Failed after retries:', retryError.message);
-      throw retryError;
+
+      } catch (streamError) {
+        console.error('❌ Streaming error:', streamError.message);
+        res.write(`data: ${JSON.stringify({ error: streamError.message, done: true })}\n\n`);
+        res.end();
+      }
+    } else {
+      // Non-streaming mode (original behavior)
+      let result;
+      try {
+        result = await retryWithBackoff(async () => {
+          return await ai.models.generateContent({
+            model: 'gemini-2.0-flash-exp',
+            contents,
+            config: {
+              temperature: 0.9,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 1000,
+              candidateCount: 1,
+              safetySettings: [
+                { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_NONE' },
+                { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_NONE' },
+                { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_NONE' }
+              ]
+            }
+          });
+        }, 3);
+      } catch (retryError) {
+        console.error('❌ Failed after retries:', retryError.message);
+        throw retryError;
+      }
+
+      const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      const finalResponse = responseText || 
+        `Thank you for sharing, ${userContext.userName || 'friend'}. I'm here to support you. What would feel most helpful right now?`;
+
+      cacheResponse(cacheKey, finalResponse);
+
+      console.log('✅ Generated personalized response:', {
+        length: finalResponse.length,
+        userName: userContext.userName,
+        finishReason: result.candidates?.[0]?.finishReason,
+        cached: false
+      });
+
+      res.json({
+        response: finalResponse,
+        timestamp: new Date().toISOString(),
+        model: 'gemini-2.0-flash-exp',
+        personalized: true,
+        cached: false
+      });
     }
-
-    const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    // Fallback if no response
-    const finalResponse = responseText || 
-      `Thank you for sharing, ${userContext.userName || 'friend'}. I'm here to support you. What would feel most helpful right now?`;
-
-    // Cache the response
-    cacheResponse(cacheKey, finalResponse);
-
-    console.log('✅ Generated personalized response:', {
-      length: finalResponse.length,
-      userName: userContext.userName,
-      finishReason: result.candidates?.[0]?.finishReason,
-      cached: false
-    });
-
-    res.json({
-      response: finalResponse,
-      timestamp: new Date().toISOString(),
-      model: 'gemini-2.0-flash-exp',
-      personalized: true,
-      cached: false
-    });
 
   } catch (error) {
     console.error('❌ Personalized chat error:', error);

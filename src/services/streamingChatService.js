@@ -146,45 +146,11 @@ export const formatNaturalResponse = (text) => {
   return formatted.trim();
 };
 
-/**
- * Generate quick response for faster perceived response time
- * Used when full response is taking too long
- */
-export const getQuickAcknowledgment = (userMessage) => {
-  const acknowledgments = [
-    "I hear you...",
-    "Tell me more...",
-    "I'm listening...",
-    "Go on...",
-    "That sounds tough...",
-    "I understand...",
-    "Let me think about that...",
-    "That's interesting...",
-    "I see...",
-    "You're right..."
-  ];
-  
-  // Pick based on message sentiment
-  const lowerMsg = userMessage.toLowerCase();
-  
-  if (/sad|depressed|unhappy|bad|terrible|awful/.test(lowerMsg)) {
-    return "I'm sorry to hear that. Let me help...";
-  } else if (/happy|great|awesome|wonderful|excited/.test(lowerMsg)) {
-    return "That's wonderful! Tell me more...";
-  } else if (/anxious|worried|nervous|scared|afraid/.test(lowerMsg)) {
-    return "I understand your concerns. Let me help...";
-  } else if (/angry|mad|furious|frustrated/.test(lowerMsg)) {
-    return "I hear your frustration. Let's work through this...";
-  }
-  
-  return acknowledgments[Math.floor(Math.random() * acknowledgments.length)];
-};
 
 export default {
   streamText,
   generateStreamingResponse,
   getTypingIndicator,
   startTypingAnimation,
-  formatNaturalResponse,
-  getQuickAcknowledgment
+  formatNaturalResponse
 };
