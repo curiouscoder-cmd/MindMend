@@ -16,7 +16,7 @@ function renderChunks(deps) {
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000,
+    port: 5173,
     open: true
   },
   build: {

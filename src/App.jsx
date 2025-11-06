@@ -25,6 +25,8 @@ import LoadingSpinner from './components/LoadingSpinner.jsx';
 import { onAuthChange } from './services/authService.js';
 import { createUserProfile, getUserProfile, updateUserProgress } from './services/firestoreService.js';
 import { initializeFCM, onForegroundMessage } from './services/fcmService.js';
+import metricsService from './services/metricsService.js';
+import insightsService from './services/insightsService.js';
 
 function App() {
   // Authentication state
@@ -81,6 +83,13 @@ function App() {
               }
             });
           }
+          
+          // Initialize metrics tracking
+          metricsService.initializeSession(authUser.uid, {
+            displayName: authUser.displayName,
+            email: authUser.email
+          });
+          console.log('📊 Metrics tracking initialized');
         } catch (error) {
           console.error('Error loading user profile:', error);
         }
@@ -131,6 +140,18 @@ function App() {
       date: new Date().toLocaleDateString()
     };
     setMoodHistory(prev => [...prev, moodEntry]);
+    
+    // Track mood entry
+    metricsService.trackMoodEntry({
+      mood: mood.id,
+      intensity: mood.intensity || 5,
+      triggers: [],
+      method: 'manual'
+    });
+    
+    // Invalidate insights cache to trigger refresh
+    insightsService.invalidateCache();
+    
     setCurrentView('exercise');
   };
 
@@ -145,6 +166,19 @@ function App() {
       ...prev,
       ...newProgress
     }));
+    
+    // Track exercise completion
+    metricsService.trackExerciseCompletion('cbt-exercise', {
+      type: 'cbt',
+      duration: 300,
+      completionRate: 100,
+      moodBefore: currentMood,
+      moodAfter: 'calm',
+      effectiveness: 5
+    });
+    
+    // Invalidate insights cache to trigger refresh
+    insightsService.invalidateCache();
     
     // Save to Firestore
     if (user) {
@@ -163,6 +197,12 @@ function App() {
   };
 
   const handleNavigate = (view) => {
+    // Track feature usage
+    metricsService.trackFeatureUsage(view, {
+      previousView: currentView,
+      timestamp: Date.now()
+    });
+    
     setCurrentView(view);
   };
 

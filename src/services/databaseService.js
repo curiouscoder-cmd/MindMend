@@ -6,7 +6,6 @@
 // For now, we'll use a mock implementation that can be easily replaced
 
 import { createClient } from '@supabase/supabase-js';
-import offlineService from './offlineService';
 
 // Simple error handler fallback
 const handleStorageError = (error, operation, data) => {
@@ -19,11 +18,8 @@ class DatabaseService {
     this.supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     this.supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
     this.supabase = null;
-    this.isOnline = navigator.onLine;
-    this.syncQueue = [];
     
     this.initializeDatabase();
-    this.setupEventListeners();
   }
 
   async initializeDatabase() {
@@ -40,7 +36,7 @@ class DatabaseService {
           console.log('Supabase connection verified');
         }
       } else {
-        console.warn('Supabase credentials not found, using offline mode only');
+        console.warn('Supabase credentials not found');
       }
     } catch (error) {
       console.error('Database initialization failed:', error);
@@ -48,21 +44,11 @@ class DatabaseService {
     }
   }
 
-  setupEventListeners() {
-    window.addEventListener('online', () => {
-      this.isOnline = true;
-      this.syncOfflineData();
-    });
-
-    window.addEventListener('offline', () => {
-      this.isOnline = false;
-    });
-  }
 
   // User Management
   async createUser(userData) {
     try {
-      if (this.isOnline && this.supabase) {
+      if (this.supabase) {
         const { data, error } = await this.supabase
           .from('users')
           .insert([{
@@ -76,23 +62,18 @@ class DatabaseService {
           .select();
 
         if (error) throw error;
-        
-        // Also save locally
-        await offlineService.saveData('users', userData);
         return data[0];
-      } else {
-        // Offline mode
-        return await offlineService.saveData('users', userData);
       }
+      return null;
     } catch (error) {
       handleStorageError(error, 'createUser', userData);
-      return await offlineService.saveData('users', userData);
+      return null;
     }
   }
 
   async getUser(userId) {
     try {
-      if (this.isOnline && this.supabase) {
+      if (this.supabase) {
         const { data, error } = await this.supabase
           .from('users')
           .select('*')
@@ -100,19 +81,12 @@ class DatabaseService {
           .single();
 
         if (error && error.code !== 'PGRST116') throw error;
-        
-        if (data) {
-          // Update local cache
-          await offlineService.saveData('users', data);
-          return data;
-        }
+        return data;
       }
-      
-      // Fallback to local storage
-      return await offlineService.getData('users', userId);
+      return null;
     } catch (error) {
       handleStorageError(error, 'getUser', { userId });
-      return await offlineService.getData('users', userId);
+      return null;
     }
   }
 
@@ -130,31 +104,25 @@ class DatabaseService {
     };
 
     try {
-      if (this.isOnline && this.supabase) {
+      if (this.supabase) {
         const { data, error } = await this.supabase
           .from('mood_entries')
           .insert([entry])
           .select();
 
         if (error) throw error;
-        
-        entry.synced = true;
-        await offlineService.saveData('moodEntries', entry);
         return data[0];
-      } else {
-        // Queue for sync when online
-        this.syncQueue.push({ table: 'mood_entries', data: entry });
-        return await offlineService.saveData('moodEntries', entry);
       }
+      return null;
     } catch (error) {
       handleStorageError(error, 'saveMoodEntry', entry);
-      return await offlineService.saveData('moodEntries', entry);
+      return null;
     }
   }
 
   async getMoodHistory(userId, limit = 30) {
     try {
-      if (this.isOnline && this.supabase) {
+      if (this.supabase) {
         const { data, error } = await this.supabase
           .from('mood_entries')
           .select('*')
@@ -163,21 +131,9 @@ class DatabaseService {
           .limit(limit);
 
         if (error) throw error;
-        
-        // Update local cache
-        for (const entry of data) {
-          await offlineService.saveData('moodEntries', entry);
-        }
-        
         return data;
       }
-      
-      // Fallback to local storage
-      const localEntries = await offlineService.getData('moodEntries');
-      return localEntries
-        .filter(entry => entry.user_id === userId)
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-        .slice(0, limit);
+      return [];
     } catch (error) {
       handleStorageError(error, 'getMoodHistory', { userId, limit });
       return [];
@@ -201,24 +157,19 @@ class DatabaseService {
     };
 
     try {
-      if (this.isOnline && this.supabase) {
+      if (this.supabase) {
         const { data, error } = await this.supabase
           .from('exercise_completions')
           .insert([completion])
           .select();
 
         if (error) throw error;
-        
-        completion.synced = true;
-        await offlineService.saveData('exerciseCompletions', completion);
         return data[0];
-      } else {
-        this.syncQueue.push({ table: 'exercise_completions', data: completion });
-        return await offlineService.saveData('exerciseCompletions', completion);
       }
+      return null;
     } catch (error) {
       handleStorageError(error, 'saveExerciseCompletion', completion);
-      return await offlineService.saveData('exerciseCompletions', completion);
+      return null;
     }
   }
 
@@ -239,30 +190,25 @@ class DatabaseService {
     };
 
     try {
-      if (this.isOnline && this.supabase) {
+      if (this.supabase) {
         const { data, error } = await this.supabase
           .from('forum_posts')
           .insert([post])
           .select();
 
         if (error) throw error;
-        
-        post.synced = true;
-        await offlineService.saveData('forumPosts', post);
         return data[0];
-      } else {
-        this.syncQueue.push({ table: 'forum_posts', data: post });
-        return await offlineService.saveData('forumPosts', post);
       }
+      return null;
     } catch (error) {
       handleStorageError(error, 'saveForumPost', post);
-      return await offlineService.saveData('forumPosts', post);
+      return null;
     }
   }
 
   async getForumPosts(forumId, limit = 20) {
     try {
-      if (this.isOnline && this.supabase) {
+      if (this.supabase) {
         const { data, error } = await this.supabase
           .from('forum_posts')
           .select('*')
@@ -273,13 +219,7 @@ class DatabaseService {
         if (error) throw error;
         return data;
       }
-      
-      // Fallback to local storage
-      const localPosts = await offlineService.getData('forumPosts');
-      return localPosts
-        .filter(post => post.forum_id === forumId)
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-        .slice(0, limit);
+      return [];
     } catch (error) {
       handleStorageError(error, 'getForumPosts', { forumId, limit });
       return [];
@@ -304,30 +244,50 @@ class DatabaseService {
     };
 
     try {
-      if (this.isOnline && this.supabase) {
+      if (this.supabase) {
         const { data, error } = await this.supabase
           .from('user_metrics')
           .insert([metricsEntry])
           .select();
 
         if (error) throw error;
-        
-        metricsEntry.synced = true;
-        await offlineService.saveData('userMetrics', metricsEntry);
         return data[0];
-      } else {
-        this.syncQueue.push({ table: 'user_metrics', data: metricsEntry });
-        return await offlineService.saveData('userMetrics', metricsEntry);
       }
+      return null;
     } catch (error) {
       handleStorageError(error, 'saveUserMetrics', metricsEntry);
-      return await offlineService.saveData('userMetrics', metricsEntry);
+      return null;
+    }
+  }
+
+  async getUserMetrics(userId, timeframe = 'month') {
+    try {
+      if (this.supabase) {
+        const startDate = new Date();
+        if (timeframe === 'week') startDate.setDate(startDate.getDate() - 7);
+        else if (timeframe === 'month') startDate.setMonth(startDate.getMonth() - 1);
+        else if (timeframe === 'year') startDate.setFullYear(startDate.getFullYear() - 1);
+
+        const { data, error } = await this.supabase
+          .from('user_metrics')
+          .select('*')
+          .eq('user_id', userId)
+          .gte('timestamp', startDate.toISOString())
+          .order('timestamp', { ascending: false });
+
+        if (error) throw error;
+        return data || [];
+      }
+      return [];
+    } catch (error) {
+      handleStorageError(error, 'getUserMetrics', { userId, timeframe });
+      return [];
     }
   }
 
   async getAggregatedMetrics(timeframe = 'week') {
     try {
-      if (this.isOnline && this.supabase) {
+      if (this.supabase) {
         const startDate = new Date();
         if (timeframe === 'week') startDate.setDate(startDate.getDate() - 7);
         else if (timeframe === 'month') startDate.setMonth(startDate.getMonth() - 1);
@@ -339,14 +299,16 @@ class DatabaseService {
           .gte('timestamp', startDate.toISOString());
 
         if (error) throw error;
-
-        // Aggregate the data
         return this.aggregateMetricsData(data);
       }
       
-      // Fallback to local metrics
-      const localMetrics = await offlineService.getData('userMetrics');
-      return this.aggregateMetricsData(localMetrics);
+      return {
+        totalUsers: 0,
+        dailyActiveUsers: 0,
+        completedExercises: 0,
+        averageMoodScore: 0,
+        engagementRate: 0
+      };
     } catch (error) {
       handleStorageError(error, 'getAggregatedMetrics', { timeframe });
       return {
@@ -386,42 +348,6 @@ class DatabaseService {
     };
   }
 
-  // Sync offline data when connection is restored
-  async syncOfflineData() {
-    if (!this.isOnline || !this.supabase || this.syncQueue.length === 0) return;
-
-    console.log(`Syncing ${this.syncQueue.length} offline entries...`);
-
-    const syncPromises = this.syncQueue.map(async (item) => {
-      try {
-        const { data, error } = await this.supabase
-          .from(item.table)
-          .insert([item.data])
-          .select();
-
-        if (error) throw error;
-
-        // Mark as synced in local storage
-        item.data.synced = true;
-        await offlineService.saveData(item.table.replace('_', ''), item.data);
-
-        return { success: true, item };
-      } catch (error) {
-        console.error(`Failed to sync ${item.table}:`, error);
-        return { success: false, item, error };
-      }
-    });
-
-    const results = await Promise.allSettled(syncPromises);
-    const successful = results.filter(r => r.status === 'fulfilled' && r.value.success);
-    
-    // Remove successfully synced items from queue
-    this.syncQueue = this.syncQueue.filter((item, index) => 
-      results[index].status === 'rejected' || !results[index].value.success
-    );
-
-    console.log(`Synced ${successful.length} items successfully`);
-  }
 
   // Real-time subscriptions
   subscribeToForumUpdates(forumId, callback) {
@@ -470,29 +396,22 @@ class DatabaseService {
 
         return { 
           status: error ? 'error' : 'healthy',
-          error: error?.message,
-          online: this.isOnline,
-          queueSize: this.syncQueue.length
+          error: error?.message
         };
       }
       
       return { 
-        status: 'offline_only', 
-        online: this.isOnline,
-        queueSize: this.syncQueue.length
+        status: 'no_database'
       };
     } catch (error) {
       return { 
         status: 'error', 
-        error: error.message,
-        online: this.isOnline,
-        queueSize: this.syncQueue.length
+        error: error.message
       };
     }
   }
 }
 
-// Create singleton instance
 const databaseService = new DatabaseService();
 
 export default databaseService;

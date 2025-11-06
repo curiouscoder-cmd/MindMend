@@ -136,6 +136,35 @@ export const saveExerciseCompletion = async (userId, exerciseData) => {
   return docRef.id;
 };
 
+// Metrics tracking
+export const saveUserMetrics = async (userId, metricsData) => {
+  const metricsRef = collection(db, 'users', userId, 'metrics');
+  const docRef = await addDoc(metricsRef, {
+    ...metricsData,
+    timestamp: serverTimestamp(),
+  });
+  return docRef.id;
+};
+
+export const getUserMetrics = async (userId, days = 30) => {
+  const metricsRef = collection(db, 'users', userId, 'metrics');
+  const q = query(metricsRef, orderBy('timestamp', 'desc'), limit(days));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+};
+
+export const getAggregatedMetrics = async (days = 7) => {
+  // This would require a more complex query or cloud function
+  // For now, return empty aggregated data
+  return {
+    totalUsers: 0,
+    dailyActiveUsers: 0,
+    completedExercises: 0,
+    averageMoodScore: 0,
+    engagementRate: 0
+  };
+};
+
 export default {
   createUserProfile,
   getUserProfile,
@@ -148,4 +177,7 @@ export default {
   createPost,
   getPosts,
   saveExerciseCompletion,
+  saveUserMetrics,
+  getUserMetrics,
+  getAggregatedMetrics,
 };

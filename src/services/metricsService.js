@@ -1,7 +1,7 @@
 // Comprehensive Metrics Tracking Service for MindMend AI
 // Tracks user engagement, wellness outcomes, and platform performance
 
-import databaseService from './databaseService';
+import { saveUserMetrics, getUserMetrics, getAggregatedMetrics } from './firestoreService';
 
 class MetricsService {
   constructor() {
@@ -54,6 +54,13 @@ class MetricsService {
   initializeSession(userId, userProfile = {}) {
     this.currentSession.userId = userId;
     this.currentSession.userProfile = userProfile;
+    
+    console.log('🎯 MetricsService initialized for user:', userId);
+    console.log('📊 Current session state:', {
+      exercisesCompleted: this.currentSession.exercisesCompleted,
+      moodEntries: this.currentSession.moodEntries,
+      aiInteractions: this.currentSession.aiInteractions
+    });
     
     this.trackEvent('session_start', {
       userId,
@@ -216,12 +223,12 @@ class MetricsService {
   // Sync metrics to database
   async syncMetrics() {
     try {
-      const localEvents = await this.getLocalEvents();
+      if (!this.currentSession.userId) return;
       
-      if (localEvents.length === 0) return;
+      const localEvents = await this.getLocalEvents();
 
-      // Send to database
-      await databaseService.saveUserMetrics(this.currentSession.userId, {
+      // Send to Firebase
+      await saveUserMetrics(this.currentSession.userId, {
         sessionId: this.currentSession.sessionId,
         sessionDuration: Date.now() - this.sessionStartTime,
         featuresUsed: Array.from(this.currentSession.featuresUsed),
@@ -257,10 +264,12 @@ class MetricsService {
   // Get real-time analytics
   async getRealTimeAnalytics(timeframe = 'today') {
     try {
-      const metrics = await databaseService.getAggregatedMetrics(timeframe);
+      const days = timeframe === 'week' ? 7 : timeframe === 'month' ? 30 : 1;
+      const metrics = await getAggregatedMetrics(days);
       
       return {
         ...metrics,
+        completedExercises: this.currentSession.exercisesCompleted,
         currentSession: {
           duration: Date.now() - this.sessionStartTime,
           featuresUsed: this.currentSession.featuresUsed.size,
@@ -292,21 +301,39 @@ class MetricsService {
   // Get user-specific analytics
   async getUserAnalytics(userId, timeframe = 'month') {
     try {
-      const userEvents = this.currentSession.events.filter(e => e.userId === userId);
-      const userMetrics = await databaseService.getUserMetrics(userId, timeframe);
+      const days = timeframe === 'week' ? 7 : timeframe === 'month' ? 30 : 365;
+      const userMetrics = await getUserMetrics(userId, days);
 
-      return {
-        totalSessions: userMetrics.length,
-        totalTime: userMetrics.reduce((sum, m) => sum + (m.sessionDuration || 0), 0),
-        featuresUsed: [...new Set(userMetrics.flatMap(m => m.featuresUsed || []))],
-        exercisesCompleted: userMetrics.reduce((sum, m) => sum + (m.exercisesCompleted || 0), 0),
-        moodEntries: userMetrics.reduce((sum, m) => sum + (m.moodEntries || 0), 0),
-        aiInteractions: userMetrics.reduce((sum, m) => sum + (m.aiInteractions || 0), 0),
-        voiceUsage: userMetrics.reduce((sum, m) => sum + (m.voiceUsage || 0), 0),
-        communityEngagement: userMetrics.reduce((sum, m) => sum + (m.communityEngagement || 0), 0),
+      console.log('🔍 getUserAnalytics - Firebase metrics:', userMetrics);
+      console.log('🔍 getUserAnalytics - Current session:', {
+        exercisesCompleted: this.currentSession.exercisesCompleted,
+        moodEntries: this.currentSession.moodEntries,
+        aiInteractions: this.currentSession.aiInteractions
+      });
+
+      // Combine database metrics with current session data
+      const dbExercises = userMetrics.reduce((sum, m) => sum + (m.exercisesCompleted || 0), 0);
+      const dbMoodEntries = userMetrics.reduce((sum, m) => sum + (m.moodEntries || 0), 0);
+      const dbAiInteractions = userMetrics.reduce((sum, m) => sum + (m.aiInteractions || 0), 0);
+
+      const result = {
+        totalSessions: userMetrics.length + 1, // +1 for current session
+        totalTime: userMetrics.reduce((sum, m) => sum + (m.sessionDuration || 0), 0) + (Date.now() - this.sessionStartTime),
+        featuresUsed: [...new Set([
+          ...userMetrics.flatMap(m => m.featuresUsed || []),
+          ...Array.from(this.currentSession.featuresUsed)
+        ])],
+        exercisesCompleted: dbExercises + this.currentSession.exercisesCompleted,
+        moodEntries: dbMoodEntries + this.currentSession.moodEntries,
+        aiInteractions: dbAiInteractions + this.currentSession.aiInteractions,
+        voiceUsage: userMetrics.reduce((sum, m) => sum + (m.voiceUsage || 0), 0) + this.currentSession.voiceUsage,
+        communityEngagement: userMetrics.reduce((sum, m) => sum + (m.communityEngagement || 0), 0) + this.currentSession.communityEngagement,
         wellnessProgress: this.calculateWellnessProgress(userMetrics),
         engagementTrend: this.calculateEngagementTrend(userMetrics)
       };
+
+      console.log('✅ getUserAnalytics result:', result);
+      return result;
     } catch (error) {
       console.error('Error getting user analytics:', error);
       return this.getFallbackUserAnalytics();

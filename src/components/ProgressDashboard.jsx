@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Pie, Line } from 'react-chartjs-2';
+import metricsService from '../services/metricsService';
+import useDatabase from '../hooks/useDatabase';
+import insightsService from '../services/insightsService';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -28,34 +31,82 @@ ChartJS.register(
 );
 
 const ProgressDashboard = ({ user }) => {
+  const { getMoodHistory, getAnalytics } = useDatabase(user?.id || 'demo-user');
+  
   const [thoughtRecords, setThoughtRecords] = useState([]);
   const [bdiScores, setBdiScores] = useState([]);
+  const [moodHistory, setMoodHistory] = useState([]);
+  const [realTimeAnalytics, setRealTimeAnalytics] = useState(null);
+  const [userAnalytics, setUserAnalytics] = useState(null);
+  const [aiInsights, setAiInsights] = useState(null);
   const [stats, setStats] = useState({
     totalThoughts: 0,
     thisWeek: 0,
     mostCommonTrigger: '',
     mostCommonDistortion: '',
-    improvementRate: 0
+    improvementRate: 0,
+    exercisesCompleted: 0,
+    moodEntries: 0,
+    aiInteractions: 0
   });
 
   useEffect(() => {
     loadData();
   }, []);
 
-  const loadData = () => {
-    // Load thought records from localStorage
-    const records = JSON.parse(localStorage.getItem('thoughtRecords') || '[]');
-    setThoughtRecords(records);
+  const loadData = async () => {
+    try {
+      // Load thought records from localStorage
+      const records = JSON.parse(localStorage.getItem('thoughtRecords') || '[]');
+      setThoughtRecords(records);
 
-    // Load BDI scores from localStorage
-    const scores = JSON.parse(localStorage.getItem('bdiScores') || '[]');
-    setBdiScores(scores);
+      // Load BDI scores from localStorage
+      const scores = JSON.parse(localStorage.getItem('bdiScores') || '[]');
+      setBdiScores(scores);
 
-    // Calculate stats
-    calculateStats(records);
+      // Load real-time analytics from metricsService
+      const analytics = await metricsService.getRealTimeAnalytics('month');
+      console.log('📊 Real-time analytics:', analytics);
+      setRealTimeAnalytics(analytics);
+
+      // Load user-specific analytics
+      let userStats = null;
+      if (user?.id) {
+        userStats = await metricsService.getUserAnalytics(user.id, 'month');
+        console.log('👤 User analytics:', userStats);
+        setUserAnalytics(userStats);
+      }
+
+      // Load mood history from database
+      const moods = await getMoodHistory(30);
+      console.log('😊 Mood history:', moods);
+      setMoodHistory(moods);
+
+      // Generate AI insights
+      const insights = await insightsService.getInsights({
+        thoughtRecords: records,
+        moodHistory: moods,
+        exercisesCompleted: userStats?.exercisesCompleted || 0,
+        bdiScores: scores,
+        userStats
+      });
+      console.log('✨ AI Insights:', insights);
+      setAiInsights(insights);
+
+      // Calculate stats with real data
+      calculateStats(records, analytics, userStats, insights);
+    } catch (error) {
+      console.error('Error loading analytics data:', error);
+      // Fallback to localStorage only
+      const records = JSON.parse(localStorage.getItem('thoughtRecords') || '[]');
+      setThoughtRecords(records);
+      const scores = JSON.parse(localStorage.getItem('bdiScores') || '[]');
+      setBdiScores(scores);
+      calculateStats(records);
+    }
   };
 
-  const calculateStats = (records) => {
+  const calculateStats = (records, analytics, userStats, insights) => {
     const now = new Date();
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
@@ -88,13 +139,24 @@ const ProgressDashboard = ({ user }) => {
     
     const improvement = firstHalfAvg > 0 ? ((firstHalfAvg - secondHalfAvg) / firstHalfAvg) * 100 : 0;
 
-    setStats({
+    const calculatedStats = {
       totalThoughts: records.length,
       thisWeek: thisWeekRecords.length,
-      mostCommonTrigger: 'Academic pressure', // Could be extracted from thought content with NLP
+      mostCommonTrigger: insights?.mostCommonTrigger || 'Getting started',
       mostCommonDistortion: mostCommon ? mostCommon[0] : 'None',
-      improvementRate: Math.max(0, Math.round(improvement))
-    });
+      improvementRate: Math.max(0, Math.round(improvement)),
+      exercisesCompleted: userStats?.exercisesCompleted || analytics?.completedExercises || 0,
+      moodEntries: userStats?.moodEntries || moodHistory.length || 0,
+      aiInteractions: userStats?.aiInteractions || 0
+    };
+
+    console.log('📈 Calculated stats:', calculatedStats);
+    console.log('  - userStats.exercisesCompleted:', userStats?.exercisesCompleted);
+    console.log('  - analytics.completedExercises:', analytics?.completedExercises);
+    console.log('  - moodHistory.length:', moodHistory.length);
+    console.log('  - AI-generated trigger:', insights?.mostCommonTrigger);
+
+    setStats(calculatedStats);
   };
 
   // Prepare distortion frequency data for pie chart
@@ -345,6 +407,82 @@ const ProgressDashboard = ({ user }) => {
           </motion.div>
         </div>
 
+        {/* Current Session Info */}
+        {realTimeAnalytics?.currentSession && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.45 }}
+            className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 p-6 rounded-lg mb-8"
+          >
+            <h2 className="text-lg font-medium text-navy mb-3 flex items-center gap-2">
+              <span>⏱️</span>
+              Current Session
+            </h2>
+            <div className="grid grid-cols-3 gap-4 text-sm">
+              <div>
+                <p className="text-navy/60">Duration</p>
+                <p className="text-navy font-medium">
+                  {Math.floor(realTimeAnalytics.currentSession.duration / 60000)} min
+                </p>
+              </div>
+              <div>
+                <p className="text-navy/60">Features Used</p>
+                <p className="text-navy font-medium">{realTimeAnalytics.currentSession.featuresUsed}</p>
+              </div>
+              <div>
+                <p className="text-navy/60">Events Tracked</p>
+                <p className="text-navy font-medium">{realTimeAnalytics.currentSession.events}</p>
+              </div>
+            </div>
+            <p className="text-xs text-navy/50 mt-3">
+              💡 Your activity is being tracked in real-time. Complete exercises and log moods to see your progress!
+            </p>
+          </motion.div>
+        )}
+
+        {/* Real-time Analytics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 p-6 rounded-lg"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-2xl">💪</span>
+              <span className="text-3xl font-light text-navy">{stats.exercisesCompleted}</span>
+            </div>
+            <p className="text-sm text-navy/60">Exercises Completed</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 p-6 rounded-lg"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-2xl">😊</span>
+              <span className="text-3xl font-light text-navy">{stats.moodEntries}</span>
+            </div>
+            <p className="text-sm text-navy/60">Mood Entries</p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 p-6 rounded-lg"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-2xl">🤖</span>
+              <span className="text-3xl font-light text-navy">{stats.aiInteractions}</span>
+            </div>
+            <p className="text-sm text-navy/60">AI Interactions</p>
+          </motion.div>
+        </div>
+
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Distortion Frequency Pie Chart */}
@@ -401,35 +539,61 @@ const ProgressDashboard = ({ user }) => {
           </motion.div>
         </div>
 
-        {/* Therapy Insights */}
+        {/* AI-Powered Therapy Insights */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7 }}
-          className="bg-white/80 backdrop-blur-sm border border-navy/20 p-6 rounded-lg mb-8"
+          className="bg-gradient-to-br from-purple-50 to-indigo-50 border border-purple-200 p-6 rounded-lg mb-8"
         >
           <h2 className="text-xl font-light text-navy mb-4 flex items-center gap-2">
-            <span>💡</span>
-            Therapy Insights
+            <span>✨</span>
+            AI-Powered Insights
           </h2>
-          <div className="space-y-3">
-            {insights.map((insight, index) => (
+          {aiInsights ? (
+            <div className="space-y-4">
               <motion.div
-                key={index}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.8 + index * 0.1 }}
-                className={`flex items-start gap-3 p-4 rounded-lg ${
-                  insight.type === 'positive' 
-                    ? 'bg-green-50 border border-green-200' 
-                    : 'bg-blue-50 border border-blue-200'
-                }`}
+                transition={{ delay: 0.8 }}
+                className="bg-white/60 p-4 rounded-lg"
               >
-                <span className="text-2xl">{insight.icon}</span>
-                <p className="text-sm text-navy flex-1">{insight.text}</p>
+                <p className="text-sm text-navy/60 mb-1">Progress Summary</p>
+                <p className="text-navy">{aiInsights.progressSummary}</p>
               </motion.div>
-            ))}
-          </div>
+              
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.9 }}
+                className="bg-white/60 p-4 rounded-lg"
+              >
+                <p className="text-sm text-navy/60 mb-1">Primary Pattern</p>
+                <p className="text-navy font-medium">{aiInsights.primaryPattern}</p>
+              </motion.div>
+              
+              <motion.div
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.0 }}
+                className="bg-gradient-to-r from-ocean/10 to-purple-100 p-4 rounded-lg border border-ocean/20"
+              >
+                <p className="text-sm text-navy/60 mb-1">💡 Recommendation</p>
+                <p className="text-navy font-medium">{aiInsights.recommendation}</p>
+              </motion.div>
+              
+              <p className="text-xs text-navy/40 mt-3">
+                Generated by AI • Updated {new Date(aiInsights.generatedAt).toLocaleTimeString()}
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center py-8">
+              <div className="text-center">
+                <p className="text-4xl mb-2">🌱</p>
+                <p className="text-navy/60">Generating personalized insights...</p>
+              </div>
+            </div>
+          )}
         </motion.div>
 
         {/* Thought Record Stats */}
